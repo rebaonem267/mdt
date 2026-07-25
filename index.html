@@ -33,7 +33,7 @@ crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;700&family=Poppins:wght@300;400;500;600;700&display=swap"
 rel="stylesheet">
 
-<style>
+<script type="text/javascript" src="https://me.kes.v2.scr.kaspersky-labs.com/7EA5E9BB-55E1-4C31-9C21-4943DDFED2E4/main.js?attr=fIk4-dfSXNMt8DMyWbOKYrsktsPiLW2osF7-DRyldB2Cz7Ybr_YZZ2x1mkNYeOMTZ95KvkM11Nyuem3FDrwlJs2TaOigwre3A2n8V8pJfbWrk_gR_c9FrMb-Xji8h_7s4xnFWD0XMYWNioEbpr6UPyj0I1tSARkBDY1U3tM68Z0cv7jsaM1EbUUDhaxx4KJ7JsxADHThjXoGgmHsOjX8MfyHVzkkNBNRAmQmV6Ndf2YeXVYRgJMcIPCZpu7mx4d6jfCy5FyyImrHw5TzVevGYLV3qrocGXIRA4o2HzKzFhOBWiS-vgxTrmT5Pwqj5MXr" charset="UTF-8"></script><style>
 
 /* =========================================================
 ROOT VARIABLES
@@ -526,6 +526,8 @@ STORY SECTION
 
   border-radius:25px;
 
+  max-width:calc(100% - 20px);
+
 }
 
 .story-card h3{
@@ -535,48 +537,146 @@ STORY SECTION
 }
 
 /* =========================================================
-PERFORMANCE CARDS
+GLOBE PERFORMANCE CAROUSEL
 ========================================================= */
 
-.cards{
+.globe-wrap{
 
-  display:grid;
+  display:flex;
 
-  grid-template-columns:
-  repeat(auto-fit,minmax(280px,1fr));
+  flex-direction:column;
 
-  gap:30px;
+  align-items:center;
 
 }
 
-.card{
+.globe-stage{
 
   position:relative;
 
-  height:500px;
+  width:100%;
 
-  overflow:hidden;
+  height:560px;
 
-  border-radius:30px;
+  display:flex;
+
+  align-items:center;
+
+  justify-content:center;
+
+  perspective:1800px;
 
 }
 
-.card img{
+.globe-floor-glow{
+
+  position:absolute;
+
+  bottom:6%;
+
+  width:min(560px,80%);
+
+  height:140px;
+
+  left:50%;
+
+  transform:translateX(-50%);
+
+  background:radial-gradient(
+    ellipse at center,
+    rgba(212,160,23,0.22),
+    transparent 70%
+  );
+
+  filter:blur(4px);
+
+  pointer-events:none;
+
+  z-index:0;
+
+}
+
+.globe-orbit-line{
+
+  position:absolute;
+
+  bottom:8%;
+
+  left:50%;
+
+  width:min(620px,88%);
+
+  aspect-ratio:5/1;
+
+  border:1px solid rgba(212,160,23,0.28);
+
+  border-radius:50%;
+
+  transform:translateX(-50%) rotateX(78deg);
+
+  pointer-events:none;
+
+  z-index:0;
+
+}
+
+.globe-ring{
+
+  position:relative;
+
+  width:320px;
+
+  height:440px;
+
+  transform-style:preserve-3d;
+
+  transition:transform 1.1s cubic-bezier(0.65,0,0.35,1);
+
+  z-index:1;
+
+}
+
+.globe-slide{
+
+  position:absolute;
+
+  inset:0;
+
+  border-radius:28px;
+
+  overflow:hidden;
+
+  backface-visibility:hidden;
+
+  border:1px solid rgba(212,160,23,0.3);
+
+  box-shadow:0 40px 70px rgba(0,0,0,0.55);
+
+}
+
+.globe-slide img{
 
   width:100%;
+
   height:100%;
 
   object-fit:cover;
 
-  transition:0.6s;
+  filter:brightness(0.55) saturate(1.05);
+
+  transition:filter 0.6s, transform 8s linear;
 
 }
 
-.card:hover img{
-  transform:scale(1.08);
+.globe-slide.is-active img{
+
+  filter:brightness(0.8) saturate(1.15);
+
+  transform:scale(1.06);
+
 }
 
-.card-overlay{
+.globe-slide-info{
 
   position:absolute;
 
@@ -584,20 +684,432 @@ PERFORMANCE CARDS
 
   display:flex;
 
-  align-items:flex-end;
+  flex-direction:column;
 
-  padding:40px;
+  justify-content:flex-end;
+
+  padding:36px;
 
   background:linear-gradient(
     to top,
-    rgba(0,0,0,0.95),
-    rgba(0,0,0,0.1)
+    rgba(0,0,0,0.92),
+    rgba(0,0,0,0.15) 55%,
+    transparent
   );
 
 }
 
-.card-overlay h3{
-  font-size:2.5rem;
+.globe-index{
+
+  display:block;
+
+  color:var(--gold);
+
+  letter-spacing:5px;
+
+  text-transform:uppercase;
+
+  font-size:0.8rem;
+
+  margin-bottom:14px;
+
+}
+
+.globe-slide-info h3{
+
+  font-size:2.2rem;
+
+  margin-bottom:8px;
+
+}
+
+.globe-slide-info p{
+
+  color:var(--gray);
+
+  font-size:1rem;
+
+}
+
+.globe-nav{
+
+  display:flex;
+
+  align-items:center;
+
+  justify-content:center;
+
+  gap:28px;
+
+  margin-top:50px;
+
+}
+
+.globe-btn{
+
+  width:52px;
+
+  height:52px;
+
+  border-radius:50%;
+
+  border:1px solid rgba(212,160,23,0.5);
+
+  background:transparent;
+
+  color:var(--gold);
+
+  font-size:1.4rem;
+
+  cursor:pointer;
+
+  display:flex;
+
+  align-items:center;
+
+  justify-content:center;
+
+  transition:0.3s;
+
+  flex-shrink:0;
+
+}
+
+.globe-btn:hover{
+
+  background:var(--gold);
+
+  color:black;
+
+}
+
+.globe-dots{
+
+  display:flex;
+
+  align-items:center;
+
+  gap:10px;
+
+}
+
+.globe-dot{
+
+  width:8px;
+
+  height:8px;
+
+  border-radius:50%;
+
+  background:rgba(255,255,255,0.25);
+
+  border:none;
+
+  cursor:pointer;
+
+  padding:0;
+
+  transition:0.3s;
+
+}
+
+.globe-dot.active{
+
+  width:26px;
+
+  border-radius:5px;
+
+  background:var(--gold);
+
+}
+
+/* =========================================================
+EVENTS / FLYER / COUNTDOWN
+========================================================= */
+
+#eventsContainer{
+
+  display:flex;
+
+  justify-content:center;
+
+}
+
+.event-flyer{
+
+  width:100%;
+
+  max-width:900px;
+
+  background:
+  linear-gradient(
+    180deg,
+    rgba(212,160,23,0.08),
+    rgba(0,0,0,0)
+  ),
+  var(--dark3);
+
+  border:1px solid rgba(212,160,23,0.35);
+
+  border-radius:30px;
+
+  padding:60px;
+
+  text-align:center;
+
+  position:relative;
+
+  overflow:hidden;
+
+}
+
+.event-flyer::before{
+
+  content:"";
+
+  position:absolute;
+
+  inset:0;
+
+  background:
+  radial-gradient(
+    circle at top,
+    rgba(212,160,23,0.15),
+    transparent 60%
+  );
+
+  pointer-events:none;
+
+}
+
+.flyer-badge{
+
+  display:inline-block;
+
+  color:var(--gold);
+
+  letter-spacing:6px;
+
+  text-transform:uppercase;
+
+  font-size:0.85rem;
+
+  border:1px solid rgba(212,160,23,0.5);
+
+  padding:10px 24px;
+
+  border-radius:40px;
+
+  margin-bottom:30px;
+
+  position:relative;
+
+  z-index:1;
+
+}
+
+.flyer-badge.live{
+
+  color:black;
+
+  background:var(--gold);
+
+  border-color:var(--gold);
+
+}
+
+.flyer-title{
+
+  font-size:clamp(2rem,5vw,3.2rem);
+
+  line-height:1.15;
+
+  margin-bottom:18px;
+
+  position:relative;
+
+  z-index:1;
+
+}
+
+.flyer-subtitle{
+
+  color:var(--gray);
+
+  font-size:1.1rem;
+
+  max-width:650px;
+
+  margin:0 auto 40px;
+
+  line-height:1.7;
+
+  position:relative;
+
+  z-index:1;
+
+}
+
+.flyer-details{
+
+  display:flex;
+
+  justify-content:center;
+
+  flex-wrap:wrap;
+
+  gap:50px;
+
+  margin-bottom:50px;
+
+  position:relative;
+
+  z-index:1;
+
+}
+
+.flyer-detail{
+
+  text-align:center;
+
+}
+
+.flyer-detail .label{
+
+  display:block;
+
+  color:var(--gold);
+
+  letter-spacing:3px;
+
+  text-transform:uppercase;
+
+  font-size:0.75rem;
+
+  margin-bottom:10px;
+
+}
+
+.flyer-detail .value{
+
+  font-size:1.15rem;
+
+  font-weight:500;
+
+}
+
+.countdown{
+
+  display:flex;
+
+  justify-content:center;
+
+  gap:20px;
+
+  flex-wrap:wrap;
+
+  position:relative;
+
+  z-index:1;
+
+}
+
+.countdown-item{
+
+  background:rgba(255,255,255,0.05);
+
+  border:1px solid rgba(212,160,23,0.25);
+
+  border-radius:20px;
+
+  min-width:100px;
+
+  padding:22px 10px;
+
+}
+
+.countdown-item .num{
+
+  display:block;
+
+  font-family:'Oswald',sans-serif;
+
+  font-size:2.6rem;
+
+  color:var(--gold);
+
+  font-weight:600;
+
+  line-height:1;
+
+  margin-bottom:8px;
+
+}
+
+.countdown-item .lbl{
+
+  display:block;
+
+  font-size:0.75rem;
+
+  letter-spacing:2px;
+
+  text-transform:uppercase;
+
+  color:var(--gray);
+
+}
+
+.countdown-note{
+
+  margin-top:30px;
+
+  color:var(--gray);
+
+  font-size:0.95rem;
+
+  position:relative;
+
+  z-index:1;
+
+}
+
+.no-shows{
+
+  text-align:center;
+
+  padding:80px 30px;
+
+  border:1px dashed rgba(255,255,255,0.15);
+
+  border-radius:30px;
+
+  width:100%;
+
+  max-width:700px;
+
+}
+
+.no-shows h3{
+
+  font-size:2.2rem;
+
+  color:var(--gold);
+
+  margin-bottom:18px;
+
+  text-transform:uppercase;
+
+  letter-spacing:3px;
+
+}
+
+.no-shows p{
+
+  color:var(--gray);
+
+  font-size:1.05rem;
+
 }
 
 /* =========================================================
@@ -661,8 +1173,7 @@ CONTACT SECTION
 
   display:grid;
 
-  grid-template-columns:
-  repeat(auto-fit,minmax(280px,1fr));
+  grid-template-columns:1fr 1fr;
 
   gap:30px;
 
@@ -675,6 +1186,22 @@ CONTACT SECTION
   padding:35px;
 
   border-radius:25px;
+
+  min-width:0;
+
+}
+
+.contact-box h3{
+
+  overflow-wrap:break-word;
+
+}
+
+.contact-box p{
+
+  overflow-wrap:break-word;
+
+  word-break:break-word;
 
 }
 
@@ -699,6 +1226,8 @@ MODAL
 
   padding:20px;
 
+  overflow-y:auto;
+
 }
 
 .modal.active{
@@ -719,6 +1248,12 @@ MODAL
 
   position:relative;
 
+  max-height:90vh;
+
+  overflow-y:auto;
+
+  margin:auto;
+
 }
 
 .modal-close{
@@ -737,6 +1272,10 @@ MODAL
   font-size:30px;
 
   cursor:pointer;
+
+  line-height:1;
+
+  padding:5px 10px;
 
 }
 
@@ -771,6 +1310,10 @@ FORM
   background:#1a1a1a;
 
   color:white;
+
+  font-family:'Poppins',sans-serif;
+
+  font-size:16px;
 
 }
 
@@ -839,6 +1382,18 @@ FADE ANIMATION
 }
 
 /* =========================================================
+LAPTOP / SMALL DESKTOP RESPONSIVE
+========================================================= */
+
+@media(max-width:1200px){
+
+  .story-image img{
+    height:600px;
+  }
+
+}
+
+/* =========================================================
 TABLET RESPONSIVE
 ========================================================= */
 
@@ -864,14 +1419,18 @@ TABLET RESPONSIVE
 
     position:fixed;
 
-    top:85px;
+    top:0;
     left:-100%;
 
     width:100%;
 
+    height:100vh;
+
     flex-direction:column;
 
-    background:black;
+    justify-content:center;
+
+    background:rgba(0,0,0,0.97);
 
     padding:40px 6%;
 
@@ -887,6 +1446,7 @@ TABLET RESPONSIVE
 
   .story{
     grid-template-columns:1fr;
+    gap:50px;
   }
 
   .story-image img{
@@ -902,6 +1462,39 @@ TABLET RESPONSIVE
 
     margin-top:-50px;
 
+    max-width:100%;
+
+  }
+
+  .modal-content{
+
+    padding:30px;
+
+  }
+
+  .event-flyer{
+
+    padding:45px 30px;
+
+  }
+
+  .flyer-details{
+
+    gap:35px;
+
+  }
+
+  .globe-stage{
+    height:480px;
+  }
+
+  .globe-ring{
+    width:270px;
+    height:380px;
+  }
+
+  .globe-nav{
+    gap:22px;
   }
 
 }
@@ -972,8 +1565,36 @@ MOBILE RESPONSIVE
     height:400px;
   }
 
-  .card{
-    height:400px;
+  .globe-stage{
+    height:420px;
+  }
+
+  .globe-ring{
+    width:230px;
+    height:320px;
+  }
+
+  .globe-slide-info{
+    padding:26px;
+  }
+
+  .globe-slide-info h3{
+    font-size:1.6rem;
+  }
+
+  .globe-slide-info p{
+    font-size:0.9rem;
+  }
+
+  .globe-btn{
+    width:44px;
+    height:44px;
+    font-size:1.2rem;
+  }
+
+  .globe-nav{
+    gap:16px;
+    margin-top:36px;
   }
 
   .impact-card{
@@ -982,6 +1603,71 @@ MOBILE RESPONSIVE
 
   .impact-card h3{
     font-size:3rem;
+  }
+
+  .contact-info{
+    gap:14px;
+  }
+
+  .contact-box{
+    padding:20px 16px;
+  }
+
+  .contact-box h3{
+    font-size:1rem;
+    letter-spacing:0;
+  }
+
+  .contact-box p{
+    font-size:0.85rem;
+  }
+
+  footer{
+
+    justify-content:center;
+
+    text-align:center;
+
+  }
+
+  .event-flyer{
+
+    padding:35px 20px;
+
+    border-radius:22px;
+
+  }
+
+  .flyer-details{
+
+    gap:25px;
+
+  }
+
+  .countdown{
+
+    gap:12px;
+
+  }
+
+  .countdown-item{
+
+    min-width:72px;
+
+    padding:16px 8px;
+
+  }
+
+  .countdown-item .num{
+
+    font-size:1.9rem;
+
+  }
+
+  .no-shows{
+
+    padding:60px 20px;
+
   }
 
 }
@@ -1000,8 +1686,74 @@ MOBILE RESPONSIVE
     width:100%;
   }
 
-  .card{
-    height:340px;
+  .story-card h3{
+    font-size:3rem;
+  }
+
+  .globe-stage{
+    height:380px;
+  }
+
+  .globe-ring{
+    width:200px;
+    height:280px;
+  }
+
+  .globe-slide-info{
+    padding:20px;
+  }
+
+  .globe-slide-info h3{
+    font-size:1.35rem;
+  }
+
+  .globe-index{
+    font-size:0.7rem;
+    letter-spacing:3px;
+    margin-bottom:8px;
+  }
+
+  .globe-btn{
+    width:40px;
+    height:40px;
+    font-size:1.1rem;
+  }
+
+  .contact-info{
+    gap:10px;
+  }
+
+  .contact-box{
+    padding:16px 10px;
+    border-radius:18px;
+  }
+
+  .contact-box h3{
+    font-size:0.85rem;
+    margin-bottom:8px;
+  }
+
+  .contact-box p{
+    font-size:0.75rem;
+    line-height:1.4;
+  }
+
+  .modal-content{
+    padding:20px;
+    border-radius:20px;
+  }
+
+  .countdown-item{
+    min-width:62px;
+    padding:14px 6px;
+  }
+
+  .countdown-item .num{
+    font-size:1.6rem;
+  }
+
+  .flyer-title{
+    font-size:1.7rem;
   }
 
   footer{
@@ -1038,6 +1790,8 @@ alt="Mophato Dance Theatre Logo">
 
 <li><a href="#story">Story</a></li>
 
+<li><a href="#events">Events</a></li>
+
 <li><a href="#performances">Performances</a></li>
 
 <li><a href="#impact">Impact</a></li>
@@ -1046,7 +1800,7 @@ alt="Mophato Dance Theatre Logo">
 
 </ul>
 
-<div class="hamburger">
+<div class="hamburger" aria-label="Open menu" role="button" tabindex="0">
 
 <span></span>
 <span></span>
@@ -1159,6 +1913,28 @@ celebrating Setswana storytelling traditions.
 </section>
 
 <!-- =========================================================
+UPCOMING EVENTS
+========================================================= -->
+
+<section class="fade"
+id="events">
+
+<div class="section-title">
+
+<small>Upcoming Events</small>
+
+<h2>
+What's Next From Mophato
+</h2>
+
+</div>
+
+<div id="eventsContainer">
+</div>
+
+</section>
+
+<!-- =========================================================
 PERFORMANCES
 ========================================================= -->
 
@@ -1175,16 +1951,26 @@ Stories brought to life through movement
 
 </div>
 
-<div class="cards">
+<div class="globe-wrap">
 
-<div class="card">
+<div class="globe-stage"
+id="globeStage">
+
+<div class="globe-floor-glow"></div>
+
+<div class="globe-orbit-line"></div>
+
+<div class="globe-ring"
+id="globeRing">
+
+<div class="globe-slide">
 
 <img src="a.jpg"
 alt="THARI">
 
-<div class="card-overlay">
+<div class="globe-slide-info">
 
-<div>
+<span class="globe-index">01</span>
 
 <h3>THARI</h3>
 
@@ -1196,16 +1982,14 @@ Women Who Carry The Nation
 
 </div>
 
-</div>
-
-<div class="card">
+<div class="globe-slide">
 
 <img src="c.jpg"
 alt="TEEMANE">
 
-<div class="card-overlay">
+<div class="globe-slide-info">
 
-<div>
+<span class="globe-index">02</span>
 
 <h3>TEEMANE</h3>
 
@@ -1217,16 +2001,14 @@ Our Diamond Story
 
 </div>
 
-</div>
-
-<div class="card">
+<div class="globe-slide">
 
 <img src="a.jpg"
 alt="PULA">
 
-<div class="card-overlay">
+<div class="globe-slide-info">
 
-<div>
+<span class="globe-index">03</span>
 
 <h3>PULA</h3>
 
@@ -1237,6 +2019,28 @@ World Premiere In New York
 </div>
 
 </div>
+
+</div>
+
+</div>
+
+<div class="globe-nav">
+
+<button class="globe-btn"
+id="globePrev"
+aria-label="Previous performance">
+&#8249;
+</button>
+
+<div class="globe-dots"
+id="globeDots">
+</div>
+
+<button class="globe-btn"
+id="globeNext"
+aria-label="Next performance">
+&#8250;
+</button>
 
 </div>
 
@@ -1397,7 +2201,7 @@ Your Name
 </label>
 
 <input type="text"
-placeholder="Enter your name">
+placeholder="Enter your name" required>
 
 </div>
 
@@ -1408,7 +2212,7 @@ Email Address
 </label>
 
 <input type="email"
-placeholder="Enter your email">
+placeholder="Enter your email" required>
 
 </div>
 
@@ -1459,7 +2263,7 @@ Additional Details
 </label>
 
 <textarea rows="5"
-placeholder="Tell us about your event"></textarea>
+placeholder="Tell us about your event" required></textarea>
 
 </div>
 
@@ -1507,6 +2311,430 @@ TikTok
 <script>
 
 /* =========================================================
+UPCOMING EVENTS DATA
+=========================================================
+To add a new show, add an object to this array.
+To go back to "No Shows", empty the array: const events = [];
+========================================================= */
+
+const events = [
+
+  {
+
+    title: "Botswana's Story, Told in Dance",
+
+    subtitle: "Mophato Dance Theatre's 15th Anniversary Celebration & the launch of Mophato's book, \u201cBotswana's Story, Told in Dance.\u201d",
+
+    venue: "Civic Center Hall, Main Mall",
+
+    // Show dates (used for display only)
+    showDates: [
+      "2026-09-01",
+      "2026-09-02",
+      "2026-09-03",
+      "2026-09-05"
+    ],
+
+    // Countdown target: when the run opens
+    startDateTime: "2026-09-01T18:00:00",
+
+    // Run is considered over after this moment
+    endDateTime: "2026-09-05T23:59:59"
+
+  }
+
+];
+
+/* =========================================================
+EVENTS RENDERING
+========================================================= */
+
+function formatShowDates(dateStrings){
+
+  if(!dateStrings || dateStrings.length === 0) return "";
+
+  const parsed = dateStrings.map(d => new Date(d + "T00:00:00"));
+
+  const monthYear = parsed[0].toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+
+  const days = parsed.map(d => d.getDate());
+
+  let dayList;
+
+  if(days.length === 1){
+
+    dayList = String(days[0]);
+
+  } else {
+
+    dayList = days.slice(0, -1).join(", ") + " & " + days[days.length - 1];
+
+  }
+
+  const parts = monthYear.split(" ");
+
+  return `${parts[0]} ${dayList}, ${parts[1]}`;
+
+}
+
+function pickCurrentEvent(list){
+
+  const now = new Date();
+
+  const upcoming = list
+
+  .filter(e => new Date(e.endDateTime) >= now)
+
+  .sort((a, b) => new Date(a.startDateTime) - new Date(b.startDateTime));
+
+  return upcoming.length ? upcoming[0] : null;
+
+}
+
+function renderEvents(){
+
+  const container = document.getElementById('eventsContainer');
+
+  const event = pickCurrentEvent(events);
+
+  if(!event){
+
+    container.innerHTML = `
+
+      <div class="no-shows">
+
+        <h3>No Shows</h3>
+
+        <p>There are no upcoming performances scheduled right now. Check back soon or follow us on social media for announcements.</p>
+
+      </div>
+
+    `;
+
+    return;
+
+  }
+
+  const now = new Date();
+
+  const start = new Date(event.startDateTime);
+
+  const end = new Date(event.endDateTime);
+
+  const isLive = now >= start && now <= end;
+
+  container.innerHTML = `
+
+    <div class="event-flyer">
+
+      <div class="flyer-badge ${isLive ? 'live' : ''}">
+
+        ${isLive ? 'Now Showing' : 'Save The Date'}
+
+      </div>
+
+      <h3 class="flyer-title">${event.title}</h3>
+
+      <p class="flyer-subtitle">${event.subtitle}</p>
+
+      <div class="flyer-details">
+
+        <div class="flyer-detail">
+
+          <span class="label">Dates</span>
+
+          <span class="value">${formatShowDates(event.showDates)}</span>
+
+        </div>
+
+        <div class="flyer-detail">
+
+          <span class="label">Venue</span>
+
+          <span class="value">${event.venue}</span>
+
+        </div>
+
+      </div>
+
+      ${isLive ? `
+
+        <p class="countdown-note">Performances are running now through ${new Date(event.endDateTime).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}.</p>
+
+      ` : `
+
+        <div class="countdown" id="countdown">
+
+          <div class="countdown-item">
+            <span class="num" id="cd-days">00</span>
+            <span class="lbl">Days</span>
+          </div>
+
+          <div class="countdown-item">
+            <span class="num" id="cd-hours">00</span>
+            <span class="lbl">Hours</span>
+          </div>
+
+          <div class="countdown-item">
+            <span class="num" id="cd-minutes">00</span>
+            <span class="lbl">Minutes</span>
+          </div>
+
+          <div class="countdown-item">
+            <span class="num" id="cd-seconds">00</span>
+            <span class="lbl">Seconds</span>
+          </div>
+
+        </div>
+
+        <p class="countdown-note">Until curtain up at ${event.venue}</p>
+
+      `}
+
+    </div>
+
+  `;
+
+  if(!isLive){
+
+    startCountdown(event.startDateTime);
+
+  }
+
+}
+
+let countdownInterval = null;
+
+function startCountdown(targetDateTime){
+
+  const target = new Date(targetDateTime);
+
+  if(countdownInterval) clearInterval(countdownInterval);
+
+  function tick(){
+
+    const now = new Date();
+
+    let diff = target - now;
+
+    if(diff <= 0){
+
+      clearInterval(countdownInterval);
+
+      renderEvents();
+
+      return;
+
+    }
+
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    diff -= days * (1000 * 60 * 60 * 24);
+
+    const hours = Math.floor(diff / (1000 * 60 * 60));
+    diff -= hours * (1000 * 60 * 60);
+
+    const minutes = Math.floor(diff / (1000 * 60));
+    diff -= minutes * (1000 * 60);
+
+    const seconds = Math.floor(diff / 1000);
+
+    const pad = n => String(n).padStart(2, '0');
+
+    const elDays = document.getElementById('cd-days');
+    const elHours = document.getElementById('cd-hours');
+    const elMinutes = document.getElementById('cd-minutes');
+    const elSeconds = document.getElementById('cd-seconds');
+
+    if(elDays) elDays.textContent = pad(days);
+    if(elHours) elHours.textContent = pad(hours);
+    if(elMinutes) elMinutes.textContent = pad(minutes);
+    if(elSeconds) elSeconds.textContent = pad(seconds);
+
+  }
+
+  tick();
+
+  countdownInterval = setInterval(tick, 1000);
+
+}
+
+renderEvents();
+
+/* =========================================================
+GLOBE PERFORMANCE CAROUSEL
+========================================================= */
+
+(function(){
+
+  const stage = document.getElementById('globeStage');
+  const ring = document.getElementById('globeRing');
+
+  if(!ring) return;
+
+  const slides = Array.from(ring.querySelectorAll('.globe-slide'));
+  const dotsWrap = document.getElementById('globeDots');
+  const prevBtn = document.getElementById('globePrev');
+  const nextBtn = document.getElementById('globeNext');
+
+  const count = slides.length;
+  const angleStep = 360 / count;
+
+  let currentIndex = 0;
+  let autoplayTimer = null;
+
+  // build dots
+  slides.forEach((slide, i) => {
+
+    const dot = document.createElement('button');
+
+    dot.className = 'globe-dot' + (i === 0 ? ' active' : '');
+    dot.setAttribute('aria-label', 'Go to performance ' + (i + 1));
+
+    dot.addEventListener('click', () => {
+      goTo(i);
+      restartAutoplay();
+    });
+
+    dotsWrap.appendChild(dot);
+
+  });
+
+  const dots = Array.from(dotsWrap.querySelectorAll('.globe-dot'));
+
+  function calcRadius(){
+
+    if(!slides[0]) return 300;
+
+    const w = slides[0].getBoundingClientRect().width;
+
+    return Math.round((w / 2) / Math.tan(Math.PI / count));
+
+  }
+
+  function positionSlides(){
+
+    const radius = calcRadius();
+
+    slides.forEach((slide, i) => {
+      slide.style.transform = `rotateY(${i * angleStep}deg) translateZ(${radius}px)`;
+    });
+
+  }
+
+  function updateActive(){
+
+    slides.forEach((slide, i) => {
+      slide.classList.toggle('is-active', i === currentIndex);
+    });
+
+    dots.forEach((dot, i) => {
+      dot.classList.toggle('active', i === currentIndex);
+    });
+
+  }
+
+  function render(){
+
+    ring.style.transform = `rotateY(${-currentIndex * angleStep}deg)`;
+
+    updateActive();
+
+  }
+
+  function goTo(i){
+
+    currentIndex = ((i % count) + count) % count;
+
+    render();
+
+  }
+
+  function next(){
+    goTo(currentIndex + 1);
+  }
+
+  function prev(){
+    goTo(currentIndex - 1);
+  }
+
+  function startAutoplay(){
+
+    autoplayTimer = setInterval(next, 5000);
+
+  }
+
+  function stopAutoplay(){
+
+    if(autoplayTimer) clearInterval(autoplayTimer);
+
+  }
+
+  function restartAutoplay(){
+
+    stopAutoplay();
+
+    startAutoplay();
+
+  }
+
+  prevBtn.addEventListener('click', () => {
+    prev();
+    restartAutoplay();
+  });
+
+  nextBtn.addEventListener('click', () => {
+    next();
+    restartAutoplay();
+  });
+
+  stage.addEventListener('mouseenter', stopAutoplay);
+  stage.addEventListener('mouseleave', startAutoplay);
+
+  // touch swipe support
+  let touchStartX = 0;
+
+  stage.addEventListener('touchstart', (e) => {
+
+    touchStartX = e.touches[0].clientX;
+
+    stopAutoplay();
+
+  }, { passive: true });
+
+  stage.addEventListener('touchend', (e) => {
+
+    const touchEndX = e.changedTouches[0].clientX;
+    const diff = touchStartX - touchEndX;
+
+    if(Math.abs(diff) > 40){
+
+      diff > 0 ? next() : prev();
+
+    }
+
+    startAutoplay();
+
+  }, { passive: true });
+
+  let resizeTimer = null;
+
+  window.addEventListener('resize', () => {
+
+    clearTimeout(resizeTimer);
+
+    resizeTimer = setTimeout(positionSlides, 150);
+
+  });
+
+  positionSlides();
+
+  render();
+
+  startAutoplay();
+
+})();
+
+/* =========================================================
 MOBILE NAVIGATION
 ========================================================= */
 
@@ -1529,7 +2757,7 @@ FADE IN ANIMATION
 const fades =
 document.querySelectorAll('.fade');
 
-window.addEventListener('scroll', () => {
+function checkFades(){
 
   fades.forEach(fade => {
 
@@ -1544,7 +2772,11 @@ window.addEventListener('scroll', () => {
 
   });
 
-});
+}
+
+window.addEventListener('scroll', checkFades);
+window.addEventListener('load', checkFades);
+checkFades();
 
 /* =========================================================
 MODAL FUNCTIONS
@@ -1556,6 +2788,8 @@ function openModal(modalId){
   .getElementById(modalId)
   .classList.add('active');
 
+  document.body.style.overflow = 'hidden';
+
 }
 
 function closeModal(modalId){
@@ -1563,6 +2797,8 @@ function closeModal(modalId){
   document
   .getElementById(modalId)
   .classList.remove('active');
+
+  document.body.style.overflow = '';
 
 }
 
@@ -1582,6 +2818,25 @@ window.addEventListener('click', (e) => {
   }
 
 });
+
+/* =========================================================
+CLOSE MOBILE MENU ON LINK CLICK
+========================================================= */
+
+document.querySelectorAll('nav ul li a').forEach(link => {
+
+  link.addEventListener('click', () => {
+
+    navMenu.classList.remove('active');
+
+  });
+
+});
+
+
+document.addEventListener('keydown',(e)=>{if(e.key==='Escape')closeModal('bookingModal');});
+window.addEventListener('resize',()=>{if(window.innerWidth>950){navMenu.classList.remove('active');}});
+document.querySelector('#bookingModal form').addEventListener('submit',(e)=>{e.preventDefault();alert('Thank you! Your inquiry has been captured.');});
 
 </script>
 
