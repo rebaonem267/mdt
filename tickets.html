@@ -1,0 +1,1713 @@
+<!-- =========================================================
+MOPHATO DANCE THEATRE — TICKETS
+========================================================= -->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<meta name="description"
+content="Buy tickets for Mophato Dance Theatre performances">
+
+<title>
+Tickets — Mophato Dance Theatre
+</title>
+
+<!-- =========================================================
+GOOGLE FONTS
+========================================================= -->
+
+<link rel="preconnect"
+href="https://fonts.googleapis.com">
+
+<link rel="preconnect"
+href="https://fonts.gstatic.com"
+crossorigin>
+
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;700&family=Poppins:wght@300;400;500;600;700&display=swap"
+rel="stylesheet">
+
+<style>
+
+/* =========================================================
+ROOT VARIABLES
+========================================================= */
+
+:root{
+
+  --gold:#d4a017;
+  --gold-light:#f4c542;
+
+  --dark:#050505;
+  --dark2:#0d0d0d;
+  --dark3:#141414;
+
+  --white:#ffffff;
+  --gray:#c0c0c0;
+
+}
+
+/* =========================================================
+GLOBAL RESET
+========================================================= */
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+html{
+  scroll-behavior:smooth;
+}
+
+body{
+
+  background:black;
+
+  color:white;
+
+  font-family:'Poppins',sans-serif;
+
+  overflow-x:hidden;
+
+}
+
+img{
+  max-width:100%;
+  display:block;
+}
+
+section{
+  padding:120px 8%;
+  position:relative;
+}
+
+h1,h2,h3,h4{
+  font-family:'Oswald',sans-serif;
+}
+
+/* =========================================================
+NAVIGATION BAR
+========================================================= */
+
+nav{
+
+  position:fixed;
+
+  top:0;
+  left:0;
+
+  width:100%;
+
+  padding:22px 8%;
+
+  display:flex;
+
+  justify-content:space-between;
+  align-items:center;
+
+  z-index:999;
+
+  background:rgba(0,0,0,0.45);
+
+  backdrop-filter:blur(10px);
+
+  border-bottom:1px solid rgba(255,255,255,0.05);
+
+}
+
+/* =========================================================
+LOGO
+========================================================= */
+
+.logo{
+
+  display:flex;
+
+  align-items:center;
+
+  text-decoration:none;
+
+}
+
+.logo img{
+
+  width:180px;
+
+  max-width:100%;
+
+  height:auto;
+
+  object-fit:contain;
+
+  background:transparent;
+
+  mix-blend-mode:screen;
+
+}
+
+/* =========================================================
+NAV LINKS
+========================================================= */
+
+nav ul{
+
+  display:flex;
+
+  align-items:center;
+
+  list-style:none;
+
+  gap:40px;
+
+  flex-wrap:wrap;
+
+}
+
+nav ul li a{
+
+  text-decoration:none;
+
+  color:white;
+
+  font-size:15px;
+
+  letter-spacing:2px;
+
+  text-transform:uppercase;
+
+  transition:0.3s;
+
+  position:relative;
+
+}
+
+nav ul li a:hover{
+  color:var(--gold);
+}
+
+/* =========================================================
+HAMBURGER MENU
+========================================================= */
+
+.hamburger{
+
+  display:none;
+
+  flex-direction:column;
+
+  gap:5px;
+
+  cursor:pointer;
+
+}
+
+.hamburger span{
+
+  width:25px;
+  height:2px;
+
+  background:white;
+
+}
+
+/* =========================================================
+BUTTONS
+========================================================= */
+
+.btn{
+
+  padding:18px 40px;
+
+  border-radius:60px;
+
+  border:none;
+
+  cursor:pointer;
+
+  font-weight:600;
+
+  transition:0.4s;
+
+  text-decoration:none;
+
+  font-size:15px;
+
+}
+
+.gold-btn{
+
+  background:var(--gold);
+
+  color:black;
+
+}
+
+.gold-btn:hover{
+
+  background:var(--gold-light);
+
+  transform:translateY(-4px);
+
+}
+
+/* =========================================================
+SECTION TITLES
+========================================================= */
+
+.section-title{
+
+  text-align:center;
+
+  margin-bottom:70px;
+
+}
+
+.section-title small{
+
+  display:block;
+
+  color:var(--gold);
+
+  letter-spacing:5px;
+
+  text-transform:uppercase;
+
+  margin-bottom:20px;
+
+}
+
+.section-title h2{
+
+  font-size:clamp(2.5rem,7vw,5rem);
+
+  line-height:1.1;
+
+}
+
+/* =========================================================
+TICKETS PAGE HEADER
+========================================================= */
+
+.tickets-page-header{
+
+  padding-top:180px;
+
+  padding-bottom:0;
+
+  text-align:center;
+
+}
+
+.back-link{
+
+  display:inline-flex;
+
+  align-items:center;
+
+  gap:8px;
+
+  color:var(--gray);
+
+  text-decoration:none;
+
+  font-size:0.9rem;
+
+  letter-spacing:1px;
+
+  text-transform:uppercase;
+
+  margin-bottom:30px;
+
+  transition:0.3s;
+
+}
+
+.back-link:hover{
+
+  color:var(--gold);
+
+}
+
+/* =========================================================
+TICKETS / NO SALE STATE
+========================================================= */
+
+#ticketsContainer{
+
+  display:flex;
+
+  justify-content:center;
+
+}
+
+.no-shows{
+
+  text-align:center;
+
+  padding:80px 30px;
+
+  border:1px dashed rgba(255,255,255,0.15);
+
+  border-radius:30px;
+
+  width:100%;
+
+  max-width:700px;
+
+}
+
+.no-shows h3{
+
+  font-size:2.2rem;
+
+  color:var(--gold);
+
+  margin-bottom:18px;
+
+  text-transform:uppercase;
+
+  letter-spacing:3px;
+
+}
+
+.no-shows p{
+
+  color:var(--gray);
+
+  font-size:1.05rem;
+
+}
+
+/* =========================================================
+TICKETS PAGE
+========================================================= */
+
+.ticket-page{
+
+  width:100%;
+
+  max-width:960px;
+
+}
+
+.ticket-event-head{
+
+  text-align:center;
+
+  margin-bottom:50px;
+
+}
+
+.ticket-event-head .label{
+
+  display:block;
+
+  color:var(--gold);
+
+  letter-spacing:5px;
+
+  text-transform:uppercase;
+
+  font-size:0.8rem;
+
+  margin-bottom:16px;
+
+}
+
+.ticket-event-head h3{
+
+  font-size:clamp(1.8rem,4vw,2.6rem);
+
+  margin-bottom:14px;
+
+}
+
+.ticket-event-head p{
+
+  color:var(--gray);
+
+  max-width:650px;
+
+  margin:0 auto;
+
+  line-height:1.7;
+
+}
+
+.ticket-layout{
+
+  display:grid;
+
+  grid-template-columns:1.3fr 1fr;
+
+  gap:40px;
+
+  align-items:start;
+
+}
+
+.ticket-panel{
+
+  background:var(--dark3);
+
+  border:1px solid rgba(212,160,23,0.25);
+
+  border-radius:26px;
+
+  padding:40px;
+
+}
+
+.ticket-panel h4{
+
+  font-size:1.1rem;
+
+  letter-spacing:2px;
+
+  text-transform:uppercase;
+
+  color:var(--gold);
+
+  margin-bottom:24px;
+
+}
+
+.ticket-type{
+
+  display:flex;
+
+  align-items:center;
+
+  justify-content:space-between;
+
+  gap:20px;
+
+  padding:22px;
+
+  border:1px solid rgba(255,255,255,0.08);
+
+  border-radius:18px;
+
+  margin-bottom:16px;
+
+  cursor:pointer;
+
+  transition:0.3s;
+
+}
+
+.ticket-type:hover{
+
+  border-color:rgba(212,160,23,0.5);
+
+}
+
+.ticket-type.selected{
+
+  border-color:var(--gold);
+
+  background:rgba(212,160,23,0.08);
+
+}
+
+.ticket-type-info h5{
+
+  font-size:1.1rem;
+
+  margin-bottom:6px;
+
+  font-family:'Oswald',sans-serif;
+
+}
+
+.ticket-type-info span{
+
+  color:var(--gray);
+
+  font-size:0.9rem;
+
+}
+
+.ticket-type-price{
+
+  font-family:'Oswald',sans-serif;
+
+  color:var(--gold);
+
+  font-size:1.3rem;
+
+  white-space:nowrap;
+
+}
+
+.date-pill-list{
+
+  display:flex;
+
+  flex-wrap:wrap;
+
+  gap:12px;
+
+  margin-bottom:32px;
+
+}
+
+.date-pill{
+
+  padding:14px 20px;
+
+  border:1px solid rgba(255,255,255,0.12);
+
+  border-radius:14px;
+
+  background:transparent;
+
+  color:white;
+
+  font-family:'Poppins',sans-serif;
+
+  font-size:0.95rem;
+
+  cursor:pointer;
+
+  transition:0.3s;
+
+  text-align:center;
+
+}
+
+.date-pill span{
+
+  display:block;
+
+}
+
+.date-pill .date-pill-weekday{
+
+  color:var(--gray);
+
+  font-size:0.7rem;
+
+  letter-spacing:1px;
+
+  text-transform:uppercase;
+
+  margin-bottom:4px;
+
+}
+
+.date-pill:hover{
+
+  border-color:rgba(212,160,23,0.5);
+
+}
+
+.date-pill.selected{
+
+  border-color:var(--gold);
+
+  background:rgba(212,160,23,0.1);
+
+  color:var(--gold);
+
+}
+
+.date-pill.selected .date-pill-weekday{
+
+  color:var(--gold);
+
+}
+
+.qty-stepper{
+
+  display:flex;
+
+  align-items:center;
+
+  gap:14px;
+
+  margin-top:26px;
+
+}
+
+.qty-stepper button{
+
+  width:40px;
+
+  height:40px;
+
+  border-radius:50%;
+
+  border:1px solid rgba(212,160,23,0.5);
+
+  background:transparent;
+
+  color:var(--gold);
+
+  font-size:1.2rem;
+
+  cursor:pointer;
+
+  transition:0.3s;
+
+}
+
+.qty-stepper button:hover{
+
+  background:var(--gold);
+
+  color:black;
+
+}
+
+.qty-stepper span{
+
+  min-width:30px;
+
+  text-align:center;
+
+  font-size:1.2rem;
+
+  font-family:'Oswald',sans-serif;
+
+}
+
+.ticket-summary-row{
+
+  display:flex;
+
+  justify-content:space-between;
+
+  padding:14px 0;
+
+  border-bottom:1px solid rgba(255,255,255,0.08);
+
+  color:var(--gray);
+
+}
+
+.ticket-summary-row.total{
+
+  color:white;
+
+  font-size:1.3rem;
+
+  font-family:'Oswald',sans-serif;
+
+  border-bottom:none;
+
+  padding-top:20px;
+
+}
+
+.ticket-summary-row.total span:last-child{
+
+  color:var(--gold);
+
+}
+
+.payment-methods{
+
+  margin-top:30px;
+
+  display:flex;
+
+  flex-direction:column;
+
+  gap:14px;
+
+}
+
+.pay-btn{
+
+  width:100%;
+
+  display:flex;
+
+  align-items:center;
+
+  justify-content:center;
+
+  gap:12px;
+
+  padding:18px;
+
+  border-radius:14px;
+
+  border:1px solid rgba(255,255,255,0.15);
+
+  background:#1a1a1a;
+
+  color:white;
+
+  font-size:15px;
+
+  font-weight:600;
+
+  cursor:pointer;
+
+  transition:0.3s;
+
+}
+
+.pay-btn:hover{
+
+  border-color:var(--gold);
+
+  color:var(--gold);
+
+}
+
+.pay-btn:disabled{
+
+  opacity:0.45;
+
+  cursor:not-allowed;
+
+}
+
+.pay-btn:disabled:hover{
+
+  border-color:rgba(255,255,255,0.15);
+
+  color:white;
+
+}
+
+.pay-btn .pay-logo{
+
+  font-family:'Oswald',sans-serif;
+
+  font-weight:700;
+
+  letter-spacing:0.5px;
+
+}
+
+.form-status{
+
+  min-height:22px;
+
+  margin-top:16px;
+
+  font-size:0.9rem;
+
+}
+
+.form-status.success{
+  color:var(--gold);
+}
+
+.form-status.error{
+  color:#e07070;
+}
+
+.ticket-note{
+
+  margin-top:18px;
+
+  color:var(--gray);
+
+  font-size:0.82rem;
+
+  line-height:1.6;
+
+  text-align:center;
+
+}
+
+/* =========================================================
+FOOTER
+========================================================= */
+
+footer{
+
+  padding:60px 8% 46px;
+
+  display:flex;
+
+  justify-content:space-between;
+
+  align-items:center;
+
+  flex-wrap:wrap;
+
+  gap:30px;
+
+  border-top:1px solid rgba(212,160,23,0.15);
+
+  background:linear-gradient(180deg, rgba(212,160,23,0.04), transparent 60%);
+
+}
+
+.footer-brand{
+
+  display:flex;
+
+  align-items:center;
+
+  gap:16px;
+
+}
+
+.footer-logo{
+
+  width:42px;
+
+  height:42px;
+
+  object-fit:contain;
+
+  opacity:0.9;
+
+  mix-blend-mode:screen;
+
+}
+
+.footer-text h4{
+
+  font-size:0.95rem;
+
+  letter-spacing:2px;
+
+  text-transform:uppercase;
+
+  margin-bottom:6px;
+
+}
+
+.footer-text p{
+
+  color:var(--gray);
+
+  font-size:0.85rem;
+
+  letter-spacing:0.3px;
+
+}
+
+.footer-social{
+
+  display:flex;
+
+  gap:14px;
+
+}
+
+.social-links a{
+
+  text-decoration:none;
+
+  color:#c0c0c0;
+
+}
+
+.social-links a:hover{
+  color:var(--gold);
+}
+
+.social-icon{
+
+  width:44px;
+
+  height:44px;
+
+  border-radius:50%;
+
+  border:1px solid rgba(212,160,23,0.35);
+
+  display:flex;
+
+  align-items:center;
+
+  justify-content:center;
+
+  color:var(--gold);
+
+  transition:0.3s;
+
+  flex-shrink:0;
+
+}
+
+.social-icon svg{
+
+  width:18px;
+
+  height:18px;
+
+}
+
+.social-icon:hover{
+
+  background:var(--gold);
+
+  color:black;
+
+  border-color:var(--gold);
+
+  transform:translateY(-4px);
+
+}
+
+/* =========================================================
+TABLET RESPONSIVE
+========================================================= */
+
+@media(max-width:950px){
+
+  nav{
+
+    padding:20px 6%;
+
+  }
+
+  section{
+
+    padding:100px 6%;
+
+  }
+
+  .hamburger{
+    display:flex;
+  }
+
+  nav ul{
+
+    position:fixed;
+
+    top:0;
+    left:-100%;
+
+    width:100%;
+
+    height:100vh;
+
+    flex-direction:column;
+
+    justify-content:center;
+
+    background:rgba(0,0,0,0.97);
+
+    padding:40px 6%;
+
+    transition:0.4s;
+
+    gap:30px;
+
+  }
+
+  nav ul.active{
+    left:0;
+  }
+
+  .ticket-layout{
+    grid-template-columns:1fr;
+  }
+
+}
+
+/* =========================================================
+MOBILE RESPONSIVE
+========================================================= */
+
+@media(max-width:768px){
+
+  nav{
+    padding:18px 5%;
+  }
+
+  section{
+    padding:90px 5%;
+  }
+
+  .logo img{
+    width:140px;
+  }
+
+  .no-shows{
+
+    padding:60px 20px;
+
+  }
+
+  footer{
+
+    justify-content:center;
+
+    text-align:center;
+
+    flex-direction:column;
+
+  }
+
+  .footer-brand{
+
+    flex-direction:column;
+
+  }
+
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- =========================================================
+NAVIGATION
+========================================================= -->
+
+<nav>
+
+<a href="index.html"
+class="logo">
+
+<img src="mdt.png"
+alt="Mophato Dance Theatre Logo">
+
+</a>
+
+<ul>
+
+<li><a href="index.html#story">Story</a></li>
+
+<li><a href="index.html#events">Events</a></li>
+
+<li><a href="tickets.html">Tickets</a></li>
+
+<li><a href="index.html#performances">Performances</a></li>
+
+<li><a href="index.html#impact">Impact</a></li>
+
+<li><a href="index.html#contact">Contact</a></li>
+
+</ul>
+
+<div class="hamburger" aria-label="Open menu" role="button" tabindex="0">
+
+<span></span>
+<span></span>
+<span></span>
+
+</div>
+
+</nav>
+
+<!-- =========================================================
+TICKETS
+========================================================= -->
+
+<section class="tickets-page-header">
+
+<a href="index.html" class="back-link">&larr; Back to Home</a>
+
+<div class="section-title">
+
+<small>Tickets</small>
+
+<h2>
+Get Your Seats
+</h2>
+
+</div>
+
+</section>
+
+<section style="padding-top:0;">
+
+<div id="ticketsContainer">
+</div>
+
+</section>
+
+<!-- =========================================================
+FOOTER
+========================================================= -->
+
+<footer>
+
+<div class="footer-brand">
+
+<img src="mdt.png" alt="" class="footer-logo">
+
+<div class="footer-text">
+<h4>Mophato Dance Theatre</h4>
+<p>© 2026 Mophato Dance Theatre. All rights reserved.</p>
+</div>
+
+</div>
+
+<div class="footer-social">
+
+<a href="https://www.facebook.com/share/1HFWY7sgNZ/?mibextid=wwXIfr" class="social-icon" aria-label="Facebook" target="_blank" rel="noopener">
+<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M14 9h3V6h-3c-1.66 0-3 1.34-3 3v2H9v3h2v6h3v-6h2.5l.5-3H14V9.5c0-.28.22-.5.5-.5H14z" fill="currentColor"/></svg>
+</a>
+
+<a href="https://www.instagram.com/mophatodance_theatre?igsh=MW45eTVkM3d0azI3OQ==" class="social-icon" aria-label="Instagram" target="_blank" rel="noopener">
+<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="4" width="16" height="16" rx="4" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="12" r="3.4" stroke="currentColor" stroke-width="1.6"/><circle cx="16.6" cy="7.4" r="1.1" fill="currentColor"/></svg>
+</a>
+
+<a href="https://www.tiktok.com/@mophatodancetheat?_r=1&_t=ZS-96cqFmmMBJo" class="social-icon" aria-label="TikTok" target="_blank" rel="noopener">
+<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M15.5 4c.4 2.1 1.7 3.5 3.9 3.7v2.6c-1.4.1-2.7-.3-3.9-1.1v6.1c0 3.1-2.5 5.2-5.3 4.9-2.3-.2-4.1-2.1-4.2-4.4-.1-2.6 2-4.8 4.6-4.8.3 0 .6 0 .9.1v2.7a2.2 2.2 0 1 0 1.6 2.1V4h2.4z" fill="currentColor"/></svg>
+</a>
+
+</div>
+
+</footer>
+
+<!-- =========================================================
+FIREBASE (powers admin.html so events can be added/edited
+from any device without touching this code). See
+firebase-config.js — the only file you edit by hand, once,
+with your free Firebase project keys.
+========================================================= -->
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+
+<script>
+
+/* =========================================================
+UPCOMING EVENTS DATA
+=========================================================
+This is the same array that lives in index.html. It is
+duplicated here because each HTML file is a separate static
+page. If you add/change a show, update it in BOTH files.
+========================================================= */
+
+let events = [
+
+  {
+
+    title: "Botswana's Story, Told in Dance",
+
+    subtitle: "Mophato Dance Theatre's 15th Anniversary Celebration & the launch of Mophato's book, \u201cBotswana's Story, Told in Dance.\u201d",
+
+    venue: "Civic Center Hall, Main Mall",
+
+    showDates: [
+      "2026-09-01",
+      "2026-09-02",
+      "2026-09-03",
+      "2026-09-05"
+    ],
+
+    startDateTime: "2026-09-01T18:00:00",
+
+    endDateTime: "2026-09-05T23:59:59",
+
+    ticketsOnSale: true,
+
+    currency: "BWP",
+
+    ticketTypes: [
+      { id: "general", name: "General Admission", description: "Standard seating", price: 150 },
+      { id: "vip", name: "VIP", description: "Front rows + welcome drink", price: 300 },
+      { id: "student", name: "Student", description: "Valid student ID required at door", price: 80 }
+    ]
+
+  }
+
+];
+
+/* =========================================================
+SHARED HELPERS
+========================================================= */
+
+function formatShowDates(dateStrings){
+
+  if(!dateStrings || dateStrings.length === 0) return "";
+
+  const parsed = dateStrings.map(d => new Date(d + "T00:00:00"));
+
+  const monthYear = parsed[0].toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+
+  const days = parsed.map(d => d.getDate());
+
+  let dayList;
+
+  if(days.length === 1){
+
+    dayList = String(days[0]);
+
+  } else {
+
+    dayList = days.slice(0, -1).join(", ") + " & " + days[days.length - 1];
+
+  }
+
+  const parts = monthYear.split(" ");
+
+  return `${parts[0]} ${dayList}, ${parts[1]}`;
+
+}
+
+function pickCurrentEvent(list){
+
+  const now = new Date();
+
+  const upcoming = list
+
+  .filter(e => new Date(e.endDateTime) >= now)
+
+  .sort((a, b) => new Date(a.startDateTime) - new Date(b.startDateTime));
+
+  return upcoming.length ? upcoming[0] : null;
+
+}
+
+function formatMoney(amount, currency){
+
+  return `${currency} ${amount.toFixed(2)}`;
+
+}
+
+/* =========================================================
+TICKETS PAGE
+=========================================================
+Front-end ticket selector + checkout. Both Tingg and
+Virtual Pay require a merchant client ID / secret / API key
+that must stay on a server (never in browser JS), so the
+two "Pay" buttons below call small helper functions that
+POST the order to YOUR backend endpoint, which then talks
+to Tingg / Virtual Pay and returns a redirect URL.
+
+Until those backend endpoints exist, the buttons are wired
+up and fully functional in the UI, but will show a friendly
+"not connected yet" status instead of redirecting. Search
+"PAYMENT_CONFIG" below to plug in your real endpoints once
+you have Tingg / Virtual Pay merchant credentials.
+========================================================= */
+
+const PAYMENT_CONFIG = {
+
+  tinggEndpoint: "/api/create-tingg-checkout",
+
+  virtualPayEndpoint: "/api/create-virtualpay-checkout"
+
+};
+
+let ticketState = {
+
+  event: null,
+
+  selectedDate: null,
+
+  selectedTypeId: null,
+
+  quantity: 1
+
+};
+
+function formatPillDate(dateString){
+
+  const d = new Date(dateString + "T00:00:00");
+
+  return {
+    weekday: d.toLocaleDateString('en-US', { weekday: 'short' }),
+    dayMonth: d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+  };
+
+}
+
+function formatFullDate(dateString){
+
+  const d = new Date(dateString + "T00:00:00");
+
+  return d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+
+}
+
+function renderTickets(){
+
+  const container = document.getElementById('ticketsContainer');
+
+  const event = pickCurrentEvent(events.filter(e => e.ticketsOnSale));
+
+  if(!event){
+
+    container.innerHTML = `
+
+      <div class="no-shows">
+
+        <h3>No Tickets On Sale</h3>
+
+        <p>Ticket sales will open once a performance is announced. Check the Events section on the home page or follow us on social media.</p>
+
+      </div>
+
+    `;
+
+    return;
+
+  }
+
+  ticketState.event = event;
+
+  if(!ticketState.selectedDate){
+
+    ticketState.selectedDate = event.showDates[0];
+
+  }
+
+  if(!ticketState.selectedTypeId){
+
+    ticketState.selectedTypeId = event.ticketTypes[0].id;
+
+  }
+
+  container.innerHTML = `
+
+    <div class="ticket-page">
+
+      <div class="ticket-event-head">
+
+        <span class="label">${formatShowDates(event.showDates)} &middot; ${event.venue}</span>
+
+        <h3>${event.title}</h3>
+
+        <p>${event.subtitle}</p>
+
+      </div>
+
+      <div class="ticket-layout">
+
+        <div class="ticket-panel">
+
+          <h4>Choose Your Date</h4>
+
+          <div id="datePillList" class="date-pill-list"></div>
+
+          <h4>Choose Your Ticket</h4>
+
+          <div id="ticketTypeList"></div>
+
+          <div class="qty-stepper">
+
+            <button type="button" id="qtyMinus" aria-label="Decrease quantity">&minus;</button>
+
+            <span id="qtyValue">1</span>
+
+            <button type="button" id="qtyPlus" aria-label="Increase quantity">&plus;</button>
+
+          </div>
+
+        </div>
+
+        <div class="ticket-panel">
+
+          <h4>Order Summary</h4>
+
+          <div class="ticket-summary-row">
+            <span>Date</span>
+            <span id="summaryDate">-</span>
+          </div>
+
+          <div class="ticket-summary-row">
+            <span id="summaryTypeName">-</span>
+            <span id="summaryUnitPrice">-</span>
+          </div>
+
+          <div class="ticket-summary-row">
+            <span>Quantity</span>
+            <span id="summaryQty">1</span>
+          </div>
+
+          <div class="ticket-summary-row total">
+            <span>Total</span>
+            <span id="summaryTotal">-</span>
+          </div>
+
+          <div class="payment-methods">
+
+            <button type="button" class="pay-btn" id="payTingg">
+              <span class="pay-logo">Tingg</span> by Cellulant
+            </button>
+
+            <button type="button" class="pay-btn" id="payVirtualPay">
+              <span class="pay-logo">Virtual Pay</span>
+            </button>
+
+          </div>
+
+          <p class="form-status" id="ticketStatus" role="status" aria-live="polite"></p>
+
+          <p class="ticket-note">
+            Payments are processed securely by Tingg / Virtual Pay. You'll be redirected to complete payment and returned here once it's done.
+          </p>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  `;
+
+  renderDatePills();
+  renderTicketTypes();
+  updateSummary();
+  bindTicketEvents();
+
+}
+
+function renderDatePills(){
+
+  const list = document.getElementById('datePillList');
+
+  const event = ticketState.event;
+
+  list.innerHTML = event.showDates.map(d => {
+
+    const parts = formatPillDate(d);
+
+    return `
+
+      <button type="button" class="date-pill ${d === ticketState.selectedDate ? 'selected' : ''}" data-date="${d}">
+        <span class="date-pill-weekday">${parts.weekday}</span>
+        <span>${parts.dayMonth}</span>
+      </button>
+
+    `;
+
+  }).join('');
+
+  list.querySelectorAll('.date-pill').forEach(el => {
+
+    el.addEventListener('click', () => {
+
+      ticketState.selectedDate = el.getAttribute('data-date');
+
+      renderDatePills();
+      updateSummary();
+
+    });
+
+  });
+
+}
+
+function renderTicketTypes(){
+
+  const list = document.getElementById('ticketTypeList');
+
+  const event = ticketState.event;
+
+  list.innerHTML = event.ticketTypes.map(t => `
+
+    <div class="ticket-type ${t.id === ticketState.selectedTypeId ? 'selected' : ''}" data-type-id="${t.id}">
+
+      <div class="ticket-type-info">
+        <h5>${t.name}</h5>
+        <span>${t.description}</span>
+      </div>
+
+      <div class="ticket-type-price">${formatMoney(t.price, event.currency)}</div>
+
+    </div>
+
+  `).join('');
+
+  list.querySelectorAll('.ticket-type').forEach(el => {
+
+    el.addEventListener('click', () => {
+
+      ticketState.selectedTypeId = el.getAttribute('data-type-id');
+
+      renderTicketTypes();
+      updateSummary();
+
+    });
+
+  });
+
+}
+
+function getSelectedTicketType(){
+
+  return ticketState.event.ticketTypes.find(t => t.id === ticketState.selectedTypeId);
+
+}
+
+function updateSummary(){
+
+  const event = ticketState.event;
+  const type = getSelectedTicketType();
+
+  document.getElementById('summaryDate').textContent = formatFullDate(ticketState.selectedDate);
+  document.getElementById('summaryTypeName').textContent = type.name;
+  document.getElementById('summaryUnitPrice').textContent = formatMoney(type.price, event.currency);
+  document.getElementById('summaryQty').textContent = ticketState.quantity;
+  document.getElementById('qtyValue').textContent = ticketState.quantity;
+  document.getElementById('summaryTotal').textContent = formatMoney(type.price * ticketState.quantity, event.currency);
+
+}
+
+function bindTicketEvents(){
+
+  document.getElementById('qtyMinus').addEventListener('click', () => {
+
+    ticketState.quantity = Math.max(1, ticketState.quantity - 1);
+    updateSummary();
+
+  });
+
+  document.getElementById('qtyPlus').addEventListener('click', () => {
+
+    ticketState.quantity = Math.min(10, ticketState.quantity + 1);
+    updateSummary();
+
+  });
+
+  document.getElementById('payTingg').addEventListener('click', () => startCheckout('tingg'));
+  document.getElementById('payVirtualPay').addEventListener('click', () => startCheckout('virtualpay'));
+
+}
+
+function buildOrderPayload(){
+
+  const event = ticketState.event;
+  const type = getSelectedTicketType();
+
+  return {
+    reference: `MDT-${Date.now()}`,
+    eventTitle: event.title,
+    performanceDate: formatFullDate(ticketState.selectedDate),
+    ticketType: type.name,
+    unitPrice: type.price,
+    quantity: ticketState.quantity,
+    total: type.price * ticketState.quantity,
+    currency: event.currency
+  };
+
+}
+
+async function startCheckout(provider){
+
+  const statusEl = document.getElementById('ticketStatus');
+  const payButtons = document.querySelectorAll('.pay-btn');
+
+  const order = buildOrderPayload();
+
+  const endpoint = provider === 'tingg' ? PAYMENT_CONFIG.tinggEndpoint : PAYMENT_CONFIG.virtualPayEndpoint;
+  const providerLabel = provider === 'tingg' ? 'Tingg' : 'Virtual Pay';
+
+  payButtons.forEach(b => b.disabled = true);
+
+  statusEl.className = 'form-status';
+  statusEl.textContent = `Connecting to ${providerLabel}\u2026`;
+
+  try{
+
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(order)
+    });
+
+    if(!response.ok) throw new Error('checkout endpoint not available');
+
+    const data = await response.json();
+
+    if(!data.redirectUrl) throw new Error('no redirect url returned');
+
+    window.location.href = data.redirectUrl;
+
+  } catch(err){
+
+    // This is expected until a real backend endpoint is wired
+    // up with your Tingg / Virtual Pay merchant credentials.
+
+    statusEl.className = 'form-status error';
+
+    statusEl.textContent = `${providerLabel} checkout isn't connected yet. Please call +267 75252777 or email mophatodancetheatre@gmail.com to book your seat for ${order.performanceDate}, quoting reference ${order.reference}.`;
+
+    payButtons.forEach(b => b.disabled = false);
+
+  }
+
+}
+
+/* =========================================================
+LOAD REMOTE DATA (Firestore) + BOOT THE PAGE
+=========================================================
+If firebase-config.js has been filled in with real project
+keys, this pulls the live events added via admin.html. If
+not configured yet (or briefly unreachable), the page falls
+back to the array defined above so it never breaks.
+========================================================= */
+
+async function loadRemoteData(){
+
+  if(!window.mdtFirestoreReady) return;
+
+  try{
+
+    const db = window.mdtDb;
+
+    const eventsSnap = await db.collection('events').orderBy('startDateTime').get();
+
+    if(!eventsSnap.empty){
+      events = eventsSnap.docs.map(doc => doc.data());
+    }
+
+  } catch(err){
+
+    console.warn('Mophato: using fallback content — Firestore not reachable yet.', err);
+
+  }
+
+}
+
+async function initPage(){
+
+  await loadRemoteData();
+
+  renderTickets();
+
+}
+
+initPage();
+
+/* =========================================================
+MOBILE NAVIGATION
+========================================================= */
+
+const hamburger =
+document.querySelector('.hamburger');
+
+const navMenu =
+document.querySelector('nav ul');
+
+hamburger.addEventListener('click', () => {
+
+  navMenu.classList.toggle('active');
+
+});
+
+document.querySelectorAll('nav ul li a').forEach(link => {
+
+  link.addEventListener('click', () => {
+
+    navMenu.classList.remove('active');
+
+  });
+
+});
+
+window.addEventListener('resize',()=>{if(window.innerWidth>950){navMenu.classList.remove('active');}});
+
+</script>
+
+</body>
+</html>

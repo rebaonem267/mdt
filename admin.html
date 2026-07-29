@@ -1,0 +1,964 @@
+<!-- =========================================================
+MOPHATO DANCE THEATRE — ADMIN
+Add / edit / remove upcoming events and past performances.
+Requires firebase-config.js to be filled in (see that file
+for setup steps) and a user account created in Firebase
+Authentication.
+========================================================= -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — Mophato Dance Theatre</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+
+:root{
+  --gold:#d4a017;
+  --gold-light:#f4c542;
+  --dark3:#141414;
+  --gray:#c0c0c0;
+  --danger:#e07070;
+}
+
+*{ margin:0; padding:0; box-sizing:border-box; }
+
+body{
+  background:#000;
+  color:#fff;
+  font-family:'Poppins',sans-serif;
+  min-height:100vh;
+}
+
+h1,h2,h3{ font-family:'Oswald',sans-serif; }
+
+header{
+  padding:26px 6%;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  border-bottom:1px solid rgba(212,160,23,0.2);
+  flex-wrap:wrap;
+  gap:14px;
+}
+
+header a{
+  color:var(--gray);
+  text-decoration:none;
+  font-size:0.85rem;
+  letter-spacing:1px;
+  text-transform:uppercase;
+}
+
+header a:hover{ color:var(--gold); }
+
+.brand{
+  display:flex;
+  align-items:center;
+  gap:14px;
+}
+
+.brand h1{
+  font-size:1.3rem;
+  letter-spacing:1px;
+}
+
+main{
+  max-width:1000px;
+  margin:0 auto;
+  padding:50px 6% 100px;
+}
+
+/* login */
+
+#loginScreen{
+  max-width:420px;
+  margin:80px auto;
+  padding:0 6%;
+}
+
+#loginScreen h2{
+  font-size:2rem;
+  margin-bottom:10px;
+}
+
+#loginScreen p{
+  color:var(--gray);
+  margin-bottom:30px;
+  font-size:0.95rem;
+}
+
+.field{ margin-bottom:18px; }
+
+.field label{
+  display:block;
+  margin-bottom:8px;
+  font-size:0.85rem;
+  letter-spacing:0.5px;
+  color:var(--gray);
+}
+
+.field input,
+.field textarea,
+.field select{
+  width:100%;
+  padding:14px;
+  border-radius:10px;
+  border:1px solid rgba(255,255,255,0.12);
+  background:#111;
+  color:#fff;
+  font-family:'Poppins',sans-serif;
+  font-size:15px;
+}
+
+.field input:focus,
+.field textarea:focus{
+  outline:none;
+  border-color:var(--gold);
+}
+
+.btn{
+  padding:14px 30px;
+  border-radius:50px;
+  border:none;
+  cursor:pointer;
+  font-weight:600;
+  font-size:14px;
+  transition:0.3s;
+  letter-spacing:0.5px;
+}
+
+.btn-gold{ background:var(--gold); color:#000; }
+.btn-gold:hover{ background:var(--gold-light); }
+
+.btn-outline{
+  background:transparent;
+  border:1px solid rgba(255,255,255,0.25);
+  color:#fff;
+}
+.btn-outline:hover{ border-color:var(--gold); color:var(--gold); }
+
+.btn-danger{
+  background:transparent;
+  border:1px solid rgba(224,112,112,0.5);
+  color:var(--danger);
+}
+.btn-danger:hover{ background:var(--danger); color:#000; }
+
+.btn-small{ padding:10px 18px; font-size:13px; }
+
+#loginError{
+  color:var(--danger);
+  font-size:0.9rem;
+  min-height:20px;
+  margin-top:14px;
+}
+
+#configWarning{
+  display:none;
+  background:rgba(224,112,112,0.1);
+  border:1px solid rgba(224,112,112,0.4);
+  border-radius:16px;
+  padding:24px;
+  margin:40px 6%;
+  max-width:700px;
+  margin-left:auto;
+  margin-right:auto;
+  color:#f0c0c0;
+  font-size:0.9rem;
+  line-height:1.7;
+}
+
+/* dashboard */
+
+#dashboard{ display:none; }
+
+.tabs{
+  display:flex;
+  gap:10px;
+  margin-bottom:36px;
+  flex-wrap:wrap;
+}
+
+.tab-btn{
+  padding:12px 24px;
+  border-radius:50px;
+  border:1px solid rgba(255,255,255,0.15);
+  background:transparent;
+  color:var(--gray);
+  cursor:pointer;
+  font-size:14px;
+  letter-spacing:0.5px;
+  transition:0.3s;
+}
+
+.tab-btn.active{
+  border-color:var(--gold);
+  color:var(--gold);
+  background:rgba(212,160,23,0.08);
+}
+
+.tab-panel{ display:none; }
+.tab-panel.active{ display:block; }
+
+.panel-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:24px;
+  flex-wrap:wrap;
+  gap:14px;
+}
+
+.panel-head h2{ font-size:1.6rem; }
+
+.item-card{
+  background:var(--dark3);
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:20px;
+  padding:26px;
+  margin-bottom:16px;
+  display:flex;
+  justify-content:space-between;
+  gap:20px;
+  flex-wrap:wrap;
+}
+
+.item-card .info h3{ font-size:1.1rem; margin-bottom:6px; }
+.item-card .info p{ color:var(--gray); font-size:0.88rem; line-height:1.5; }
+.item-card .info .meta{ color:var(--gold); font-size:0.78rem; letter-spacing:1px; text-transform:uppercase; margin-bottom:8px; display:block; }
+
+.item-actions{
+  display:flex;
+  gap:10px;
+  align-self:flex-start;
+}
+
+.empty-note{
+  color:var(--gray);
+  border:1px dashed rgba(255,255,255,0.15);
+  border-radius:16px;
+  padding:30px;
+  text-align:center;
+  font-size:0.9rem;
+}
+
+/* form */
+
+.form-card{
+  background:var(--dark3);
+  border:1px solid rgba(212,160,23,0.25);
+  border-radius:22px;
+  padding:34px;
+  margin-bottom:30px;
+  display:none;
+}
+
+.form-card.active{ display:block; }
+
+.form-card h3{ margin-bottom:24px; font-size:1.2rem; }
+
+.form-row{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:18px;
+}
+
+@media(max-width:640px){
+  .form-row{ grid-template-columns:1fr; }
+}
+
+.checkbox-field{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-bottom:18px;
+}
+
+.checkbox-field input{ width:auto; }
+
+.ticket-type-row{
+  display:grid;
+  grid-template-columns:1.2fr 1.4fr 0.8fr auto;
+  gap:10px;
+  margin-bottom:12px;
+  align-items:center;
+}
+
+@media(max-width:640px){
+  .ticket-type-row{ grid-template-columns:1fr; }
+}
+
+.ticket-type-row input{
+  padding:11px;
+  border-radius:8px;
+  border:1px solid rgba(255,255,255,0.12);
+  background:#111;
+  color:#fff;
+  font-size:14px;
+}
+
+.remove-row-btn{
+  background:transparent;
+  border:1px solid rgba(224,112,112,0.5);
+  color:var(--danger);
+  border-radius:8px;
+  width:36px;
+  height:36px;
+  cursor:pointer;
+}
+
+.form-actions{
+  display:flex;
+  gap:14px;
+  margin-top:24px;
+  flex-wrap:wrap;
+}
+
+.hint{
+  color:var(--gray);
+  font-size:0.78rem;
+  margin-top:-10px;
+  margin-bottom:18px;
+}
+
+.status-msg{
+  min-height:20px;
+  font-size:0.85rem;
+  margin-top:14px;
+}
+.status-msg.success{ color:var(--gold); }
+.status-msg.error{ color:var(--danger); }
+
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="brand">
+    <h1>Mophato Admin</h1>
+  </div>
+  <div style="display:flex; gap:24px; align-items:center;">
+    <a href="index.html">&larr; Back to Site</a>
+    <a href="#" id="logoutLink" style="display:none;">Log Out</a>
+  </div>
+</header>
+
+<div id="configWarning">
+  <strong>Firebase isn't configured yet.</strong> Open <code>firebase-config.js</code> and follow the setup
+  steps at the top of that file (free, ~10 minutes, no coding beyond pasting your project keys once).
+  Until then, this admin page can't save anything, and the site will keep showing its built-in fallback content.
+</div>
+
+<div id="loginScreen">
+  <h2>Sign In</h2>
+  <p>Enter the email &amp; password set up for you in Firebase Authentication.</p>
+
+  <div class="field">
+    <label for="loginEmail">Email</label>
+    <input type="email" id="loginEmail" autocomplete="username">
+  </div>
+
+  <div class="field">
+    <label for="loginPassword">Password</label>
+    <input type="password" id="loginPassword" autocomplete="current-password">
+  </div>
+
+  <button class="btn btn-gold" id="loginBtn">Sign In</button>
+  <p id="loginError"></p>
+</div>
+
+<main id="dashboard">
+
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="events">Upcoming Events</button>
+    <button class="tab-btn" data-tab="performances">Past Performances</button>
+  </div>
+
+  <!-- ============ EVENTS TAB ============ -->
+
+  <div class="tab-panel active" id="tab-events">
+
+    <div class="panel-head">
+      <h2>Upcoming Events</h2>
+      <button class="btn btn-gold btn-small" id="addEventBtn">+ Add Event</button>
+    </div>
+
+    <div class="form-card" id="eventForm">
+
+      <h3 id="eventFormTitle">Add Event</h3>
+
+      <div class="form-row">
+        <div class="field">
+          <label>Title</label>
+          <input type="text" id="ev-title" placeholder="e.g. Botswana's Story, Told in Dance">
+        </div>
+        <div class="field">
+          <label>Venue</label>
+          <input type="text" id="ev-venue" placeholder="e.g. Civic Center Hall, Main Mall">
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Subtitle / Description</label>
+        <textarea id="ev-subtitle" rows="3" placeholder="Shown under the title on the flyer and tickets page"></textarea>
+      </div>
+
+      <div class="form-row">
+        <div class="field">
+          <label>Run Starts (date &amp; time)</label>
+          <input type="datetime-local" id="ev-start">
+        </div>
+        <div class="field">
+          <label>Run Ends (date &amp; time)</label>
+          <input type="datetime-local" id="ev-end">
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Show Dates</label>
+        <input type="text" id="ev-showdates" placeholder="2026-09-01, 2026-09-02, 2026-09-03">
+      </div>
+      <p class="hint">Comma-separated, format YYYY-MM-DD. These are the dates shown as selectable pills on the tickets page.</p>
+
+      <div class="form-row">
+        <div class="field">
+          <label>Currency</label>
+          <input type="text" id="ev-currency" placeholder="BWP" value="BWP">
+        </div>
+        <div class="checkbox-field" style="margin-top:34px;">
+          <input type="checkbox" id="ev-onsale" checked>
+          <label for="ev-onsale" style="margin:0;">Tickets on sale</label>
+        </div>
+      </div>
+
+      <label style="display:block; margin-bottom:12px; font-size:0.85rem; color:var(--gray);">Ticket Types</label>
+
+      <div id="ticketTypeRows"></div>
+
+      <button class="btn btn-outline btn-small" id="addTicketTypeBtn" type="button">+ Add Ticket Type</button>
+
+      <div class="form-actions">
+        <button class="btn btn-gold" id="saveEventBtn">Save Event</button>
+        <button class="btn btn-outline" id="cancelEventBtn">Cancel</button>
+      </div>
+
+      <p class="status-msg" id="eventFormStatus"></p>
+
+    </div>
+
+    <div id="eventsList"></div>
+
+  </div>
+
+  <!-- ============ PERFORMANCES TAB ============ -->
+
+  <div class="tab-panel" id="tab-performances">
+
+    <div class="panel-head">
+      <h2>Past Performances</h2>
+      <button class="btn btn-gold btn-small" id="addPerfBtn">+ Add Performance</button>
+    </div>
+
+    <p class="hint" style="margin-bottom:24px;">These populate the "Performances" carousel on the home page. Add an image URL — you can host images anywhere (your own site, Google Drive share link, imgur, etc.) and paste the direct link here.</p>
+
+    <div class="form-card" id="perfForm">
+
+      <h3 id="perfFormTitle">Add Performance</h3>
+
+      <div class="form-row">
+        <div class="field">
+          <label>Title</label>
+          <input type="text" id="pf-title" placeholder="e.g. THARI">
+        </div>
+        <div class="field">
+          <label>Display Order</label>
+          <input type="number" id="pf-order" placeholder="1" min="1">
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Subtitle</label>
+        <input type="text" id="pf-subtitle" placeholder="e.g. Women Who Carry The Nation">
+      </div>
+
+      <div class="field">
+        <label>Image URL</label>
+        <input type="text" id="pf-image" placeholder="https://...">
+      </div>
+
+      <div class="form-actions">
+        <button class="btn btn-gold" id="savePerfBtn">Save Performance</button>
+        <button class="btn btn-outline" id="cancelPerfBtn">Cancel</button>
+      </div>
+
+      <p class="status-msg" id="perfFormStatus"></p>
+
+    </div>
+
+    <div id="performancesList"></div>
+
+  </div>
+
+</main>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+
+<script>
+
+/* =========================================================
+CONFIG CHECK
+========================================================= */
+
+if(!window.mdtFirestoreReady){
+  document.getElementById('configWarning').style.display = 'block';
+  document.getElementById('loginScreen').style.display = 'none';
+}
+
+/* =========================================================
+AUTH
+========================================================= */
+
+const loginScreen = document.getElementById('loginScreen');
+const dashboard = document.getElementById('dashboard');
+const logoutLink = document.getElementById('logoutLink');
+
+document.getElementById('loginBtn').addEventListener('click', async () => {
+
+  const email = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value;
+  const errEl = document.getElementById('loginError');
+
+  errEl.textContent = '';
+
+  if(!window.mdtAuth){
+    errEl.textContent = 'Firebase Authentication is not configured. See firebase-config.js.';
+    return;
+  }
+
+  try{
+    await window.mdtAuth.signInWithEmailAndPassword(email, password);
+  } catch(err){
+    errEl.textContent = 'Sign-in failed: ' + (err.message || 'check your email and password.');
+  }
+
+});
+
+logoutLink.addEventListener('click', (e) => {
+  e.preventDefault();
+  window.mdtAuth.signOut();
+});
+
+if(window.mdtAuth){
+
+  window.mdtAuth.onAuthStateChanged(user => {
+
+    if(user){
+      loginScreen.style.display = 'none';
+      dashboard.style.display = 'block';
+      logoutLink.style.display = 'inline';
+      loadEvents();
+      loadPerformances();
+    } else {
+      loginScreen.style.display = 'block';
+      dashboard.style.display = 'none';
+      logoutLink.style.display = 'none';
+    }
+
+  });
+
+}
+
+/* =========================================================
+TABS
+========================================================= */
+
+document.querySelectorAll('.tab-btn').forEach(btn => {
+
+  btn.addEventListener('click', () => {
+
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+
+    btn.classList.add('active');
+    document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+
+  });
+
+});
+
+/* =========================================================
+EVENTS: LIST
+========================================================= */
+
+const db = () => window.mdtDb;
+
+let editingEventId = null;
+let editingPerfId = null;
+
+async function loadEvents(){
+
+  const listEl = document.getElementById('eventsList');
+  listEl.innerHTML = '<p class="hint">Loading…</p>';
+
+  try{
+
+    const snap = await db().collection('events').orderBy('startDateTime').get();
+
+    if(snap.empty){
+      listEl.innerHTML = '<div class="empty-note">No events yet. Click "+ Add Event" above.</div>';
+      return;
+    }
+
+    listEl.innerHTML = '';
+
+    snap.forEach(doc => {
+
+      const ev = doc.data();
+
+      const card = document.createElement('div');
+      card.className = 'item-card';
+
+      card.innerHTML = `
+        <div class="info">
+          <span class="meta">${ev.ticketsOnSale ? 'On Sale' : 'Not On Sale'} &middot; ${(ev.showDates || []).join(', ')}</span>
+          <h3>${escapeHtml(ev.title || '')}</h3>
+          <p>${escapeHtml(ev.venue || '')}</p>
+        </div>
+        <div class="item-actions">
+          <button class="btn btn-outline btn-small" data-action="edit">Edit</button>
+          <button class="btn btn-danger btn-small" data-action="delete">Delete</button>
+        </div>
+      `;
+
+      card.querySelector('[data-action="edit"]').addEventListener('click', () => openEventForm(doc.id, ev));
+      card.querySelector('[data-action="delete"]').addEventListener('click', () => deleteEvent(doc.id, ev.title));
+
+      listEl.appendChild(card);
+
+    });
+
+  } catch(err){
+
+    listEl.innerHTML = '<div class="empty-note">Could not load events: ' + escapeHtml(err.message) + '</div>';
+
+  }
+
+}
+
+async function deleteEvent(id, title){
+
+  if(!confirm('Delete "' + title + '"? This cannot be undone.')) return;
+
+  await db().collection('events').doc(id).delete();
+
+  loadEvents();
+
+}
+
+/* =========================================================
+EVENTS: FORM
+========================================================= */
+
+const eventForm = document.getElementById('eventForm');
+const eventFormStatus = document.getElementById('eventFormStatus');
+
+document.getElementById('addEventBtn').addEventListener('click', () => openEventForm(null, null));
+document.getElementById('cancelEventBtn').addEventListener('click', closeEventForm);
+
+document.getElementById('addTicketTypeBtn').addEventListener('click', () => addTicketTypeRow());
+
+function openEventForm(id, ev){
+
+  editingEventId = id;
+
+  document.getElementById('eventFormTitle').textContent = id ? 'Edit Event' : 'Add Event';
+  eventFormStatus.textContent = '';
+
+  document.getElementById('ev-title').value = ev ? ev.title || '' : '';
+  document.getElementById('ev-venue').value = ev ? ev.venue || '' : '';
+  document.getElementById('ev-subtitle').value = ev ? ev.subtitle || '' : '';
+  document.getElementById('ev-start').value = ev ? toLocalInputValue(ev.startDateTime) : '';
+  document.getElementById('ev-end').value = ev ? toLocalInputValue(ev.endDateTime) : '';
+  document.getElementById('ev-showdates').value = ev ? (ev.showDates || []).join(', ') : '';
+  document.getElementById('ev-currency').value = ev ? (ev.currency || 'BWP') : 'BWP';
+  document.getElementById('ev-onsale').checked = ev ? !!ev.ticketsOnSale : true;
+
+  document.getElementById('ticketTypeRows').innerHTML = '';
+
+  const types = (ev && ev.ticketTypes && ev.ticketTypes.length) ? ev.ticketTypes : [{ name: '', description: '', price: '' }];
+  types.forEach(t => addTicketTypeRow(t));
+
+  eventForm.classList.add('active');
+  eventForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+}
+
+function closeEventForm(){
+  eventForm.classList.remove('active');
+  editingEventId = null;
+}
+
+function addTicketTypeRow(t){
+
+  t = t || { name: '', description: '', price: '' };
+
+  const row = document.createElement('div');
+  row.className = 'ticket-type-row';
+
+  row.innerHTML = `
+    <input type="text" placeholder="Name (e.g. VIP)" class="tt-name" value="${escapeAttr(t.name)}">
+    <input type="text" placeholder="Description" class="tt-desc" value="${escapeAttr(t.description)}">
+    <input type="number" placeholder="Price" class="tt-price" value="${t.price !== undefined ? t.price : ''}">
+    <button type="button" class="remove-row-btn" title="Remove">&times;</button>
+  `;
+
+  row.querySelector('.remove-row-btn').addEventListener('click', () => row.remove());
+
+  document.getElementById('ticketTypeRows').appendChild(row);
+
+}
+
+document.getElementById('saveEventBtn').addEventListener('click', async () => {
+
+  const title = document.getElementById('ev-title').value.trim();
+  const venue = document.getElementById('ev-venue').value.trim();
+  const subtitle = document.getElementById('ev-subtitle').value.trim();
+  const start = document.getElementById('ev-start').value;
+  const end = document.getElementById('ev-end').value;
+  const showDatesRaw = document.getElementById('ev-showdates').value.trim();
+  const currency = document.getElementById('ev-currency').value.trim() || 'BWP';
+  const ticketsOnSale = document.getElementById('ev-onsale').checked;
+
+  if(!title || !start || !end || !showDatesRaw){
+    eventFormStatus.className = 'status-msg error';
+    eventFormStatus.textContent = 'Please fill in at least: title, run start, run end, and show dates.';
+    return;
+  }
+
+  const showDates = showDatesRaw.split(',').map(d => d.trim()).filter(Boolean);
+
+  const ticketTypes = Array.from(document.querySelectorAll('.ticket-type-row')).map((row, i) => {
+
+    const name = row.querySelector('.tt-name').value.trim();
+    const description = row.querySelector('.tt-desc').value.trim();
+    const price = parseFloat(row.querySelector('.tt-price').value) || 0;
+
+    return {
+      id: name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || ('type-' + i),
+      name, description, price
+    };
+
+  }).filter(t => t.name);
+
+  const data = {
+    title, venue, subtitle,
+    startDateTime: fromLocalInputValue(start),
+    endDateTime: fromLocalInputValue(end),
+    showDates,
+    currency,
+    ticketsOnSale,
+    ticketTypes
+  };
+
+  eventFormStatus.className = 'status-msg';
+  eventFormStatus.textContent = 'Saving…';
+
+  try{
+
+    if(editingEventId){
+      await db().collection('events').doc(editingEventId).set(data);
+    } else {
+      await db().collection('events').add(data);
+    }
+
+    eventFormStatus.className = 'status-msg success';
+    eventFormStatus.textContent = 'Saved.';
+
+    closeEventForm();
+    loadEvents();
+
+  } catch(err){
+
+    eventFormStatus.className = 'status-msg error';
+    eventFormStatus.textContent = 'Could not save: ' + err.message;
+
+  }
+
+});
+
+/* =========================================================
+PERFORMANCES: LIST
+========================================================= */
+
+async function loadPerformances(){
+
+  const listEl = document.getElementById('performancesList');
+  listEl.innerHTML = '<p class="hint">Loading…</p>';
+
+  try{
+
+    const snap = await db().collection('performances').orderBy('order').get();
+
+    if(snap.empty){
+      listEl.innerHTML = '<div class="empty-note">No performances yet. Click "+ Add Performance" above.</div>';
+      return;
+    }
+
+    listEl.innerHTML = '';
+
+    snap.forEach(doc => {
+
+      const pf = doc.data();
+
+      const card = document.createElement('div');
+      card.className = 'item-card';
+
+      card.innerHTML = `
+        <div class="info">
+          <span class="meta">Order ${pf.order != null ? pf.order : '-'}</span>
+          <h3>${escapeHtml(pf.title || '')}</h3>
+          <p>${escapeHtml(pf.subtitle || '')}</p>
+        </div>
+        <div class="item-actions">
+          <button class="btn btn-outline btn-small" data-action="edit">Edit</button>
+          <button class="btn btn-danger btn-small" data-action="delete">Delete</button>
+        </div>
+      `;
+
+      card.querySelector('[data-action="edit"]').addEventListener('click', () => openPerfForm(doc.id, pf));
+      card.querySelector('[data-action="delete"]').addEventListener('click', () => deletePerf(doc.id, pf.title));
+
+      listEl.appendChild(card);
+
+    });
+
+  } catch(err){
+
+    listEl.innerHTML = '<div class="empty-note">Could not load performances: ' + escapeHtml(err.message) + '</div>';
+
+  }
+
+}
+
+async function deletePerf(id, title){
+
+  if(!confirm('Delete "' + title + '"? This cannot be undone.')) return;
+
+  await db().collection('performances').doc(id).delete();
+
+  loadPerformances();
+
+}
+
+/* =========================================================
+PERFORMANCES: FORM
+========================================================= */
+
+const perfForm = document.getElementById('perfForm');
+const perfFormStatus = document.getElementById('perfFormStatus');
+
+document.getElementById('addPerfBtn').addEventListener('click', () => openPerfForm(null, null));
+document.getElementById('cancelPerfBtn').addEventListener('click', closePerfForm);
+
+function openPerfForm(id, pf){
+
+  editingPerfId = id;
+
+  document.getElementById('perfFormTitle').textContent = id ? 'Edit Performance' : 'Add Performance';
+  perfFormStatus.textContent = '';
+
+  document.getElementById('pf-title').value = pf ? pf.title || '' : '';
+  document.getElementById('pf-subtitle').value = pf ? pf.subtitle || '' : '';
+  document.getElementById('pf-image').value = pf ? pf.image || '' : '';
+  document.getElementById('pf-order').value = pf ? (pf.order != null ? pf.order : '') : '';
+
+  perfForm.classList.add('active');
+  perfForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+}
+
+function closePerfForm(){
+  perfForm.classList.remove('active');
+  editingPerfId = null;
+}
+
+document.getElementById('savePerfBtn').addEventListener('click', async () => {
+
+  const title = document.getElementById('pf-title').value.trim();
+  const subtitle = document.getElementById('pf-subtitle').value.trim();
+  const image = document.getElementById('pf-image').value.trim();
+  const order = parseInt(document.getElementById('pf-order').value, 10) || 0;
+
+  if(!title || !image){
+    perfFormStatus.className = 'status-msg error';
+    perfFormStatus.textContent = 'Please fill in at least a title and image URL.';
+    return;
+  }
+
+  const data = { title, subtitle, image, order };
+
+  perfFormStatus.className = 'status-msg';
+  perfFormStatus.textContent = 'Saving…';
+
+  try{
+
+    if(editingPerfId){
+      await db().collection('performances').doc(editingPerfId).set(data);
+    } else {
+      await db().collection('performances').add(data);
+    }
+
+    perfFormStatus.className = 'status-msg success';
+    perfFormStatus.textContent = 'Saved.';
+
+    closePerfForm();
+    loadPerformances();
+
+  } catch(err){
+
+    perfFormStatus.className = 'status-msg error';
+    perfFormStatus.textContent = 'Could not save: ' + err.message;
+
+  }
+
+});
+
+/* =========================================================
+HELPERS
+========================================================= */
+
+function escapeHtml(str){
+  return String(str || '').replace(/[&<>"']/g, m => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  })[m]);
+}
+
+function escapeAttr(str){
+  return escapeHtml(str);
+}
+
+function toLocalInputValue(isoString){
+  if(!isoString) return '';
+  return isoString.length >= 16 ? isoString.slice(0, 16) : isoString;
+}
+
+function fromLocalInputValue(value){
+  return value && value.length === 16 ? value + ':00' : value;
+}
+
+</script>
+
+</body>
+</html>
