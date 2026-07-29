@@ -12,12 +12,72 @@ MOPHATO DANCE THEATRE
 <meta name="viewport"
 content="width=device-width, initial-scale=1.0">
 
-<meta name="description"
-content="Mophato Dance Theatre - Contemporary Dance Theatre from Botswana">
-
 <title>
-Mophato Dance Theatre
+Mophato Dance Theatre | Contemporary African Dance &amp; Theatre Company, Botswana
 </title>
+
+<meta name="description"
+content="Mophato Dance Theatre is Botswana's leading contemporary dance theatre company — blending Setswana storytelling with powerful movement. Based in Gaborone, performing across Botswana, the SADC region, Africa and internationally.">
+
+<meta name="keywords"
+content="dance Botswana, theatre Botswana, contemporary dance Africa, dance company Gaborone, African dance theatre, Setswana storytelling dance, SADC dance company, art Botswana, creative arts Botswana, artistry Botswana, African contemporary dance company">
+
+<meta name="robots" content="index, follow, max-image-preview:large">
+
+<meta name="author" content="Mophato Dance Theatre">
+
+<link rel="canonical" href="https://YOUR-DOMAIN-HERE.com/">
+
+<!-- Geo targeting: helps establish local/regional relevance for Botswana & SADC searches -->
+<meta name="geo.region" content="BW">
+<meta name="geo.placename" content="Gaborone, Botswana">
+<meta name="ICBM" content="-24.6282, 25.9231">
+
+<!-- Open Graph (Facebook, LinkedIn, WhatsApp previews) -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Mophato Dance Theatre">
+<meta property="og:title" content="Mophato Dance Theatre | Contemporary African Dance &amp; Theatre Company, Botswana">
+<meta property="og:description" content="Botswana's leading contemporary dance theatre company — Setswana storytelling and powerful movement, performing across Botswana, SADC, Africa and internationally.">
+<meta property="og:image" content="https://YOUR-DOMAIN-HERE.com/a.jpg">
+<meta property="og:url" content="https://YOUR-DOMAIN-HERE.com/">
+<meta property="og:locale" content="en_BW">
+
+<!-- Twitter / X Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Mophato Dance Theatre | Contemporary African Dance &amp; Theatre Company">
+<meta name="twitter:description" content="Botswana's leading contemporary dance theatre company, performing across Botswana, SADC, Africa and internationally.">
+<meta name="twitter:image" content="https://YOUR-DOMAIN-HERE.com/a.jpg">
+
+<!-- Structured data: helps Google understand who Mophato is, where it's based, and where it performs -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "DanceGroup",
+  "name": "Mophato Dance Theatre",
+  "url": "https://YOUR-DOMAIN-HERE.com/",
+  "logo": "https://YOUR-DOMAIN-HERE.com/mdt.png",
+  "image": "https://YOUR-DOMAIN-HERE.com/a.jpg",
+  "description": "Botswana's internationally celebrated contemporary dance theatre company, blending traditional African storytelling and powerful movement.",
+  "foundingDate": "2009",
+  "founder": {
+    "@type": "Person",
+    "name": "Andrew Letso Kola"
+  },
+  "address": {
+    "@type": "PostalAddress",
+    "addressLocality": "Gaborone",
+    "addressCountry": "BW"
+  },
+  "areaServed": ["Botswana", "SADC", "Africa", "Worldwide"],
+  "sameAs": [
+    "https://www.facebook.com/share/1HFWY7sgNZ/?mibextid=wwXIfr",
+    "https://www.instagram.com/mophatodance_theatre?igsh=MW45eTVkM3d0azI3OQ==",
+    "https://www.tiktok.com/@mophatodancetheat?_r=1&_t=ZS-96cqFmmMBJo"
+  ],
+  "email": "mophatodancetheatre@gmail.com",
+  "telephone": "+267 75252777"
+}
+</script>
 
 <!-- =========================================================
 GOOGLE FONTS
@@ -33,7 +93,7 @@ crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;700&family=Poppins:wght@300;400;500;600;700&display=swap"
 rel="stylesheet">
 
-<script type="text/javascript" src="https://me.kes.v2.scr.kaspersky-labs.com/7EA5E9BB-55E1-4C31-9C21-4943DDFED2E4/main.js?attr=fIk4-dfSXNMt8DMyWbOKYrsktsPiLW2osF7-DRyldB2Cz7Ybr_YZZ2x1mkNYeOMTZ95KvkM11Nyuem3FDrwlJs2TaOigwre3A2n8V8pJfbWrk_gR_c9FrMb-Xji8h_7s4xnFWD0XMYWNioEbpr6UPyj0I1tSARkBDY1U3tM68Z0cv7jsaM1EbUUDhaxx4KJ7JsxADHThjXoGgmHsOjX8MfyHVzkkNBNRAmQmV6Ndf2YeXVYRgJMcIPCZpu7mx4d6jfCy5FyyImrHw5TzVevGYLV3qrocGXIRA4o2HzKzFhOBWiS-vgxTrmT5Pwqj5MXr" charset="UTF-8"></script><style>
+<style>
 
 /* =========================================================
 ROOT VARIABLES
@@ -442,6 +502,38 @@ BUTTONS
 
 }
 
+.ticket-btn{
+
+  display:inline-flex;
+
+  align-items:center;
+
+  gap:10px;
+
+  background:transparent;
+
+  color:var(--gold);
+
+  border:1px solid var(--gold);
+
+}
+
+.ticket-btn svg{
+
+  flex-shrink:0;
+
+}
+
+.ticket-btn:hover{
+
+  background:var(--gold);
+
+  color:black;
+
+  transform:translateY(-4px);
+
+}
+
 /* =========================================================
 SECTION TITLES
 ========================================================= */
@@ -556,7 +648,7 @@ GLOBE PERFORMANCE CAROUSEL
 
   width:100%;
 
-  height:560px;
+  height:720px;
 
   display:flex;
 
@@ -564,7 +656,7 @@ GLOBE PERFORMANCE CAROUSEL
 
   justify-content:center;
 
-  perspective:1800px;
+  perspective:2000px;
 
 }
 
@@ -574,9 +666,9 @@ GLOBE PERFORMANCE CAROUSEL
 
   bottom:6%;
 
-  width:min(560px,80%);
+  width:min(720px,85%);
 
-  height:140px;
+  height:170px;
 
   left:50%;
 
@@ -604,7 +696,7 @@ GLOBE PERFORMANCE CAROUSEL
 
   left:50%;
 
-  width:min(620px,88%);
+  width:min(780px,90%);
 
   aspect-ratio:5/1;
 
@@ -624,9 +716,9 @@ GLOBE PERFORMANCE CAROUSEL
 
   position:relative;
 
-  width:320px;
+  width:440px;
 
-  height:440px;
+  height:600px;
 
   transform-style:preserve-3d;
 
@@ -688,7 +780,7 @@ GLOBE PERFORMANCE CAROUSEL
 
   justify-content:flex-end;
 
-  padding:36px;
+  padding:44px;
 
   background:linear-gradient(
     to top,
@@ -709,17 +801,17 @@ GLOBE PERFORMANCE CAROUSEL
 
   text-transform:uppercase;
 
-  font-size:0.8rem;
+  font-size:0.9rem;
 
-  margin-bottom:14px;
+  margin-bottom:16px;
 
 }
 
 .globe-slide-info h3{
 
-  font-size:2.2rem;
+  font-size:2.7rem;
 
-  margin-bottom:8px;
+  margin-bottom:10px;
 
 }
 
@@ -727,7 +819,7 @@ GLOBE PERFORMANCE CAROUSEL
 
   color:var(--gray);
 
-  font-size:1rem;
+  font-size:1.1rem;
 
 }
 
@@ -1074,6 +1166,16 @@ EVENTS / FLYER / COUNTDOWN
 
 }
 
+.flyer-cta{
+
+  margin-top:36px;
+
+  position:relative;
+
+  z-index:1;
+
+}
+
 .no-shows{
 
   text-align:center;
@@ -1323,27 +1425,75 @@ FOOTER
 
 footer{
 
-  padding:40px 8%;
+  padding:60px 8% 46px;
 
   display:flex;
 
   justify-content:space-between;
 
+  align-items:center;
+
   flex-wrap:wrap;
 
-  gap:20px;
+  gap:30px;
 
-  border-top:1px solid rgba(255,255,255,0.05);
+  border-top:1px solid rgba(212,160,23,0.15);
+
+  background:linear-gradient(180deg, rgba(212,160,23,0.04), transparent 60%);
 
 }
 
-.social-links{
+.footer-brand{
 
   display:flex;
 
-  gap:20px;
+  align-items:center;
 
-  flex-wrap:wrap;
+  gap:16px;
+
+}
+
+.footer-logo{
+
+  width:42px;
+
+  height:42px;
+
+  object-fit:contain;
+
+  opacity:0.9;
+
+  mix-blend-mode:screen;
+
+}
+
+.footer-text h4{
+
+  font-size:0.95rem;
+
+  letter-spacing:2px;
+
+  text-transform:uppercase;
+
+  margin-bottom:6px;
+
+}
+
+.footer-text p{
+
+  color:var(--gray);
+
+  font-size:0.85rem;
+
+  letter-spacing:0.3px;
+
+}
+
+.footer-social{
+
+  display:flex;
+
+  gap:14px;
 
 }
 
@@ -1357,6 +1507,50 @@ footer{
 
 .social-links a:hover{
   color:var(--gold);
+}
+
+.social-icon{
+
+  width:44px;
+
+  height:44px;
+
+  border-radius:50%;
+
+  border:1px solid rgba(212,160,23,0.35);
+
+  display:flex;
+
+  align-items:center;
+
+  justify-content:center;
+
+  color:var(--gold);
+
+  transition:0.3s;
+
+  flex-shrink:0;
+
+}
+
+.social-icon svg{
+
+  width:18px;
+
+  height:18px;
+
+}
+
+.social-icon:hover{
+
+  background:var(--gold);
+
+  color:black;
+
+  border-color:var(--gold);
+
+  transform:translateY(-4px);
+
 }
 
 /* =========================================================
@@ -1485,12 +1679,12 @@ TABLET RESPONSIVE
   }
 
   .globe-stage{
-    height:480px;
+    height:600px;
   }
 
   .globe-ring{
-    width:270px;
-    height:380px;
+    width:360px;
+    height:490px;
   }
 
   .globe-nav{
@@ -1566,24 +1760,24 @@ MOBILE RESPONSIVE
   }
 
   .globe-stage{
-    height:420px;
+    height:540px;
   }
 
   .globe-ring{
-    width:230px;
-    height:320px;
+    width:310px;
+    height:420px;
   }
 
   .globe-slide-info{
-    padding:26px;
+    padding:30px;
   }
 
   .globe-slide-info h3{
-    font-size:1.6rem;
+    font-size:2rem;
   }
 
   .globe-slide-info p{
-    font-size:0.9rem;
+    font-size:1rem;
   }
 
   .globe-btn{
@@ -1627,6 +1821,14 @@ MOBILE RESPONSIVE
     justify-content:center;
 
     text-align:center;
+
+    flex-direction:column;
+
+  }
+
+  .footer-brand{
+
+    flex-direction:column;
 
   }
 
@@ -1691,20 +1893,20 @@ MOBILE RESPONSIVE
   }
 
   .globe-stage{
-    height:380px;
+    height:460px;
   }
 
   .globe-ring{
-    width:200px;
-    height:280px;
+    width:250px;
+    height:340px;
   }
 
   .globe-slide-info{
-    padding:20px;
+    padding:24px;
   }
 
   .globe-slide-info h3{
-    font-size:1.35rem;
+    font-size:1.6rem;
   }
 
   .globe-index{
@@ -1792,6 +1994,8 @@ alt="Mophato Dance Theatre Logo">
 
 <li><a href="#events">Events</a></li>
 
+<li><a href="tickets.html">Tickets</a></li>
+
 <li><a href="#performances">Performances</a></li>
 
 <li><a href="#impact">Impact</a></li>
@@ -1852,6 +2056,18 @@ onclick="openModal('bookingModal')">
 Book A Performance
 
 </button>
+
+<a href="tickets.html"
+class="btn ticket-btn">
+
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+<path d="M3 8a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-2a2 2 0 0 0 0-4V8Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+<path d="M10 6v12" stroke="currentColor" stroke-width="1.6" stroke-dasharray="2.2 2.2"/>
+</svg>
+
+Get Tickets
+
+</a>
 
 </div>
 
@@ -1963,62 +2179,7 @@ id="globeStage">
 <div class="globe-ring"
 id="globeRing">
 
-<div class="globe-slide">
-
-<img src="a.jpg"
-alt="THARI">
-
-<div class="globe-slide-info">
-
-<span class="globe-index">01</span>
-
-<h3>THARI</h3>
-
-<p>
-Women Who Carry The Nation
-</p>
-
-</div>
-
-</div>
-
-<div class="globe-slide">
-
-<img src="c.jpg"
-alt="TEEMANE">
-
-<div class="globe-slide-info">
-
-<span class="globe-index">02</span>
-
-<h3>TEEMANE</h3>
-
-<p>
-Our Diamond Story
-</p>
-
-</div>
-
-</div>
-
-<div class="globe-slide">
-
-<img src="a.jpg"
-alt="PULA">
-
-<div class="globe-slide-info">
-
-<span class="globe-index">03</span>
-
-<h3>PULA</h3>
-
-<p>
-World Premiere In New York
-</p>
-
-</div>
-
-</div>
+<!-- Slides are built by JS from the `performances` array -->
 
 </div>
 
@@ -2286,27 +2447,45 @@ FOOTER
 
 <footer>
 
-<p>
-© 2026 Mophato Dance Theatre
-</p>
+<div class="footer-brand">
 
-<div class="social-links">
+<img src="mdt.png" alt="" class="footer-logo">
 
-<a href="https://www.facebook.com/share/1HFWY7sgNZ/?mibextid=wwXIfr">
-Facebook
+<div class="footer-text">
+<h4>Mophato Dance Theatre</h4>
+<p>© 2026 Mophato Dance Theatre. All rights reserved.</p>
+</div>
+
+</div>
+
+<div class="footer-social">
+
+<a href="https://www.facebook.com/share/1HFWY7sgNZ/?mibextid=wwXIfr" class="social-icon" aria-label="Facebook" target="_blank" rel="noopener">
+<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M14 9h3V6h-3c-1.66 0-3 1.34-3 3v2H9v3h2v6h3v-6h2.5l.5-3H14V9.5c0-.28.22-.5.5-.5H14z" fill="currentColor"/></svg>
 </a>
 
-<a href="https://www.instagram.com/mophatodance_theatre?igsh=MW45eTVkM3d0azI3OQ==">
-Instagram
+<a href="https://www.instagram.com/mophatodance_theatre?igsh=MW45eTVkM3d0azI3OQ==" class="social-icon" aria-label="Instagram" target="_blank" rel="noopener">
+<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="4" width="16" height="16" rx="4" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="12" r="3.4" stroke="currentColor" stroke-width="1.6"/><circle cx="16.6" cy="7.4" r="1.1" fill="currentColor"/></svg>
 </a>
 
-<a href="https://www.tiktok.com/@mophatodancetheat?_r=1&_t=ZS-96cqFmmMBJo">
-TikTok
+<a href="https://www.tiktok.com/@mophatodancetheat?_r=1&_t=ZS-96cqFmmMBJo" class="social-icon" aria-label="TikTok" target="_blank" rel="noopener">
+<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M15.5 4c.4 2.1 1.7 3.5 3.9 3.7v2.6c-1.4.1-2.7-.3-3.9-1.1v6.1c0 3.1-2.5 5.2-5.3 4.9-2.3-.2-4.1-2.1-4.2-4.4-.1-2.6 2-4.8 4.6-4.8.3 0 .6 0 .9.1v2.7a2.2 2.2 0 1 0 1.6 2.1V4h2.4z" fill="currentColor"/></svg>
 </a>
 
 </div>
 
 </footer>
+
+<!-- =========================================================
+FIREBASE (powers admin.html so events & performances can be
+added/edited from any device without touching this code).
+See firebase-config.js — that is the only file you need to
+edit by hand, one time, with your free Firebase project keys.
+========================================================= -->
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
 
 <script>
 
@@ -2315,9 +2494,14 @@ UPCOMING EVENTS DATA
 =========================================================
 To add a new show, add an object to this array.
 To go back to "No Shows", empty the array: const events = [];
+
+NOTE: tickets.html has its own copy of this same array (it
+is a separate static file). If you add/change a show here,
+make the same edit in tickets.html so pricing and dates stay
+in sync.
 ========================================================= */
 
-const events = [
+let events = [
 
   {
 
@@ -2339,9 +2523,37 @@ const events = [
     startDateTime: "2026-09-01T18:00:00",
 
     // Run is considered over after this moment
-    endDateTime: "2026-09-05T23:59:59"
+    endDateTime: "2026-09-05T23:59:59",
+
+    // Ticket sales window & inventory
+    ticketsOnSale: true,
+
+    currency: "BWP",
+
+    ticketTypes: [
+      { id: "general", name: "General Admission", description: "Standard seating", price: 150 },
+      { id: "vip", name: "VIP", description: "Front rows + welcome drink", price: 300 },
+      { id: "student", name: "Student", description: "Valid student ID required at door", price: 80 }
+    ]
 
   }
+
+];
+
+/* =========================================================
+PAST PERFORMANCES DATA (fallback)
+=========================================================
+Powers the "Performances" carousel below. Once Firebase is
+connected, this is overridden by whatever is added in
+admin.html — edit this array only as a fallback / starting
+point.
+========================================================= */
+
+let performances = [
+
+  { title: "THARI", subtitle: "Women Who Carry The Nation", image: "a.jpg" },
+  { title: "TEEMANE", subtitle: "Our Diamond Story", image: "c.jpg" },
+  { title: "PULA", subtitle: "World Premiere In New York", image: "a.jpg" }
 
 ];
 
@@ -2388,6 +2600,67 @@ function pickCurrentEvent(list){
   .sort((a, b) => new Date(a.startDateTime) - new Date(b.startDateTime));
 
   return upcoming.length ? upcoming[0] : null;
+
+}
+
+/* =========================================================
+EVENT STRUCTURED DATA
+=========================================================
+Injects/updates a JSON-LD <script> tag describing the current
+event so Google can show rich results (dates, venue, ticket
+price) directly in search. Removes it when there's no event.
+========================================================= */
+
+function injectEventJsonLd(event){
+
+  const existing = document.getElementById('event-jsonld');
+
+  if(existing) existing.remove();
+
+  if(!event) return;
+
+  const script = document.createElement('script');
+
+  script.type = 'application/ld+json';
+  script.id = 'event-jsonld';
+
+  const offers = (event.ticketTypes || []).map(t => ({
+    "@type": "Offer",
+    "name": t.name,
+    "price": t.price,
+    "priceCurrency": event.currency || "BWP",
+    "availability": "https://schema.org/InStock",
+    "url": "https://YOUR-DOMAIN-HERE.com/tickets.html"
+  }));
+
+  script.textContent = JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "TheaterEvent",
+    "name": event.title,
+    "description": event.subtitle,
+    "startDate": event.startDateTime,
+    "endDate": event.endDateTime,
+    "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
+    "eventStatus": "https://schema.org/EventScheduled",
+    "location": {
+      "@type": "Place",
+      "name": event.venue,
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Gaborone",
+        "addressCountry": "BW"
+      }
+    },
+    "image": ["https://YOUR-DOMAIN-HERE.com/a.jpg"],
+    "organizer": {
+      "@type": "Organization",
+      "name": "Mophato Dance Theatre",
+      "url": "https://YOUR-DOMAIN-HERE.com/"
+    },
+    "offers": offers
+  });
+
+  document.head.appendChild(script);
 
 }
 
@@ -2491,6 +2764,16 @@ function renderEvents(){
 
       `}
 
+      <div class="flyer-cta">
+
+        <a class="btn gold-btn" href="tickets.html">
+
+          Get Tickets
+
+        </a>
+
+      </div>
+
     </div>
 
   `;
@@ -2558,13 +2841,11 @@ function startCountdown(targetDateTime){
 
 }
 
-renderEvents();
-
 /* =========================================================
 GLOBE PERFORMANCE CAROUSEL
 ========================================================= */
 
-(function(){
+function initGlobeCarousel(){
 
   const stage = document.getElementById('globeStage');
   const ring = document.getElementById('globeRing');
@@ -2732,7 +3013,81 @@ GLOBE PERFORMANCE CAROUSEL
 
   startAutoplay();
 
-})();
+}
+
+/* =========================================================
+LOAD REMOTE DATA (Firestore) + BOOT THE PAGE
+=========================================================
+If firebase-config.js has been filled in with real project
+keys, this pulls the live events/performances added via
+admin.html. If it hasn't been configured yet (or Firestore
+is briefly unreachable), the page quietly falls back to the
+arrays defined above so the site never breaks.
+========================================================= */
+
+async function loadRemoteData(){
+
+  if(!window.mdtFirestoreReady) return;
+
+  try{
+
+    const db = window.mdtDb;
+
+    const eventsSnap = await db.collection('events').orderBy('startDateTime').get();
+
+    if(!eventsSnap.empty){
+      events = eventsSnap.docs.map(doc => doc.data());
+    }
+
+    const perfSnap = await db.collection('performances').orderBy('order').get();
+
+    if(!perfSnap.empty){
+      performances = perfSnap.docs.map(doc => doc.data());
+    }
+
+  } catch(err){
+
+    console.warn('Mophato: using fallback content — Firestore not reachable yet.', err);
+
+  }
+
+}
+
+function buildGlobeSlides(){
+
+  const ring = document.getElementById('globeRing');
+
+  ring.innerHTML = performances.map((p, i) => `
+
+    <div class="globe-slide">
+
+      <img src="${p.image}" alt="${p.title}">
+
+      <div class="globe-slide-info">
+        <span class="globe-index">${String(i + 1).padStart(2, '0')}</span>
+        <h3>${p.title}</h3>
+        <p>${p.subtitle}</p>
+      </div>
+
+    </div>
+
+  `).join('');
+
+}
+
+async function initPage(){
+
+  await loadRemoteData();
+
+  renderEvents();
+
+  buildGlobeSlides();
+
+  initGlobeCarousel();
+
+}
+
+initPage();
 
 /* =========================================================
 MOBILE NAVIGATION
