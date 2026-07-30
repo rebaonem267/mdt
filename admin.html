@@ -284,19 +284,36 @@ main{
 
 .checkbox-field input{ width:auto; }
 
+.subsection-label{
+  display:block;
+  margin-bottom:12px;
+  font-size:0.85rem;
+  color:var(--gray);
+}
+
 .ticket-type-row{
   display:grid;
-  grid-template-columns:1.2fr 1.4fr 0.8fr auto;
+  grid-template-columns:1.1fr 1.2fr 0.7fr 1.1fr auto;
+  gap:10px;
+  margin-bottom:12px;
+  align-items:center;
+}
+
+.date-row{
+  display:grid;
+  grid-template-columns:1fr 1.6fr auto;
   gap:10px;
   margin-bottom:12px;
   align-items:center;
 }
 
 @media(max-width:640px){
-  .ticket-type-row{ grid-template-columns:1fr; }
+  .ticket-type-row,
+  .date-row{ grid-template-columns:1fr; }
 }
 
-.ticket-type-row input{
+.ticket-type-row input,
+.date-row input{
   padding:11px;
   border-radius:8px;
   border:1px solid rgba(255,255,255,0.12);
@@ -325,8 +342,9 @@ main{
 .hint{
   color:var(--gray);
   font-size:0.78rem;
-  margin-top:-10px;
+  margin-top:-4px;
   margin-bottom:18px;
+  line-height:1.6;
 }
 
 .status-msg{
@@ -423,11 +441,17 @@ main{
         </div>
       </div>
 
-      <div class="field">
-        <label>Show Dates</label>
-        <input type="text" id="ev-showdates" placeholder="2026-09-01, 2026-09-02, 2026-09-03">
-      </div>
-      <p class="hint">Comma-separated, format YYYY-MM-DD. These are the dates shown as selectable pills on the tickets page.</p>
+      <label class="subsection-label">Show Dates</label>
+
+      <div id="showDateRows"></div>
+
+      <button class="btn btn-outline btn-small" id="addShowDateBtn" type="button">+ Add Date</button>
+
+      <p class="hint" style="margin-top:14px;">
+        Leave "Status" blank for a normal, available date. Type anything you like to show a small badge
+        on that date on the Tickets page &mdash; e.g. <em>Sold Out</em>, <em>20 Tickets Left</em>, <em>Selling Fast</em>.
+        Typing "sold out" (any case) also automatically stops that date from being selected on the Tickets page.
+      </p>
 
       <div class="form-row">
         <div class="field">
@@ -440,11 +464,17 @@ main{
         </div>
       </div>
 
-      <label style="display:block; margin-bottom:12px; font-size:0.85rem; color:var(--gray);">Ticket Types</label>
+      <label class="subsection-label">Ticket Types</label>
 
       <div id="ticketTypeRows"></div>
 
       <button class="btn btn-outline btn-small" id="addTicketTypeBtn" type="button">+ Add Ticket Type</button>
+
+      <p class="hint" style="margin-top:14px;">
+        The Lemon Squeezy Variant ID links this ticket type to a specific product in your Lemon Squeezy store
+        (Products &gt; your product &gt; Variants). Add as many ticket types as you like &mdash; each with its own
+        variant &mdash; and customers will be able to select and pay for more than one type in the same visit.
+      </p>
 
       <div class="form-actions">
         <button class="btn btn-gold" id="saveEventBtn">Save Event</button>
@@ -627,12 +657,14 @@ async function loadEvents(){
 
       const ev = doc.data();
 
+      const dateLabels = (ev.showDates || []).map(d => typeof d === 'string' ? d : d.date).join(', ');
+
       const card = document.createElement('div');
       card.className = 'item-card';
 
       card.innerHTML = `
         <div class="info">
-          <span class="meta">${ev.ticketsOnSale ? 'On Sale' : 'Not On Sale'} &middot; ${(ev.showDates || []).join(', ')}</span>
+          <span class="meta">${ev.ticketsOnSale ? 'On Sale' : 'Not On Sale'} &middot; ${escapeHtml(dateLabels)}</span>
           <h3>${escapeHtml(ev.title || '')}</h3>
           <p>${escapeHtml(ev.venue || '')}</p>
         </div>
@@ -678,6 +710,7 @@ document.getElementById('addEventBtn').addEventListener('click', () => openEvent
 document.getElementById('cancelEventBtn').addEventListener('click', closeEventForm);
 
 document.getElementById('addTicketTypeBtn').addEventListener('click', () => addTicketTypeRow());
+document.getElementById('addShowDateBtn').addEventListener('click', () => addShowDateRow());
 
 function openEventForm(id, ev){
 
@@ -691,13 +724,20 @@ function openEventForm(id, ev){
   document.getElementById('ev-subtitle').value = ev ? ev.subtitle || '' : '';
   document.getElementById('ev-start').value = ev ? toLocalInputValue(ev.startDateTime) : '';
   document.getElementById('ev-end').value = ev ? toLocalInputValue(ev.endDateTime) : '';
-  document.getElementById('ev-showdates').value = ev ? (ev.showDates || []).join(', ') : '';
   document.getElementById('ev-currency').value = ev ? (ev.currency || 'BWP') : 'BWP';
   document.getElementById('ev-onsale').checked = ev ? !!ev.ticketsOnSale : true;
 
+  document.getElementById('showDateRows').innerHTML = '';
+
+  const rawDates = (ev && ev.showDates && ev.showDates.length) ? ev.showDates : [{ date: '', status: '' }];
+
+  rawDates
+    .map(d => (typeof d === 'string') ? { date: d, status: '' } : { date: d.date || '', status: d.status || '' })
+    .forEach(d => addShowDateRow(d));
+
   document.getElementById('ticketTypeRows').innerHTML = '';
 
-  const types = (ev && ev.ticketTypes && ev.ticketTypes.length) ? ev.ticketTypes : [{ name: '', description: '', price: '' }];
+  const types = (ev && ev.ticketTypes && ev.ticketTypes.length) ? ev.ticketTypes : [{ name: '', description: '', price: '', variantId: '' }];
   types.forEach(t => addTicketTypeRow(t));
 
   eventForm.classList.add('active');
@@ -710,9 +750,28 @@ function closeEventForm(){
   editingEventId = null;
 }
 
+function addShowDateRow(d){
+
+  d = d || { date: '', status: '' };
+
+  const row = document.createElement('div');
+  row.className = 'date-row';
+
+  row.innerHTML = `
+    <input type="date" class="sd-date" value="${escapeAttr(d.date)}">
+    <input type="text" placeholder="Status (optional) e.g. Sold Out, 20 Tickets Left" class="sd-status" value="${escapeAttr(d.status)}">
+    <button type="button" class="remove-row-btn" title="Remove">&times;</button>
+  `;
+
+  row.querySelector('.remove-row-btn').addEventListener('click', () => row.remove());
+
+  document.getElementById('showDateRows').appendChild(row);
+
+}
+
 function addTicketTypeRow(t){
 
-  t = t || { name: '', description: '', price: '' };
+  t = t || { name: '', description: '', price: '', variantId: '' };
 
   const row = document.createElement('div');
   row.className = 'ticket-type-row';
@@ -721,6 +780,7 @@ function addTicketTypeRow(t){
     <input type="text" placeholder="Name (e.g. VIP)" class="tt-name" value="${escapeAttr(t.name)}">
     <input type="text" placeholder="Description" class="tt-desc" value="${escapeAttr(t.description)}">
     <input type="number" placeholder="Price" class="tt-price" value="${t.price !== undefined ? t.price : ''}">
+    <input type="text" placeholder="Lemon Squeezy Variant ID" class="tt-variant" value="${escapeAttr(t.variantId)}">
     <button type="button" class="remove-row-btn" title="Remove">&times;</button>
   `;
 
@@ -737,27 +797,34 @@ document.getElementById('saveEventBtn').addEventListener('click', async () => {
   const subtitle = document.getElementById('ev-subtitle').value.trim();
   const start = document.getElementById('ev-start').value;
   const end = document.getElementById('ev-end').value;
-  const showDatesRaw = document.getElementById('ev-showdates').value.trim();
   const currency = document.getElementById('ev-currency').value.trim() || 'BWP';
   const ticketsOnSale = document.getElementById('ev-onsale').checked;
 
-  if(!title || !start || !end || !showDatesRaw){
+  const showDates = Array.from(document.querySelectorAll('#showDateRows .date-row')).map(row => {
+
+    const date = row.querySelector('.sd-date').value;
+    const status = row.querySelector('.sd-status').value.trim();
+
+    return date ? { date, status } : null;
+
+  }).filter(Boolean);
+
+  if(!title || !start || !end || showDates.length === 0){
     eventFormStatus.className = 'status-msg error';
-    eventFormStatus.textContent = 'Please fill in at least: title, run start, run end, and show dates.';
+    eventFormStatus.textContent = 'Please fill in at least: title, run start, run end, and at least one show date.';
     return;
   }
 
-  const showDates = showDatesRaw.split(',').map(d => d.trim()).filter(Boolean);
-
-  const ticketTypes = Array.from(document.querySelectorAll('.ticket-type-row')).map((row, i) => {
+  const ticketTypes = Array.from(document.querySelectorAll('#ticketTypeRows .ticket-type-row')).map((row, i) => {
 
     const name = row.querySelector('.tt-name').value.trim();
     const description = row.querySelector('.tt-desc').value.trim();
     const price = parseFloat(row.querySelector('.tt-price').value) || 0;
+    const variantId = row.querySelector('.tt-variant').value.trim();
 
     return {
       id: name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || ('type-' + i),
-      name, description, price
+      name, description, price, variantId
     };
 
   }).filter(t => t.name);
