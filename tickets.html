@@ -488,7 +488,9 @@ TICKETS PAGE
 
   justify-content:space-between;
 
-  gap:20px;
+  gap:16px;
+
+  flex-wrap:wrap;
 
   padding:22px;
 
@@ -498,23 +500,23 @@ TICKETS PAGE
 
   margin-bottom:16px;
 
-  cursor:pointer;
-
   transition:0.3s;
 
 }
 
-.ticket-type:hover{
-
-  border-color:rgba(212,160,23,0.5);
-
-}
-
-.ticket-type.selected{
+.ticket-type.has-qty{
 
   border-color:var(--gold);
 
   background:rgba(212,160,23,0.08);
+
+}
+
+.ticket-type-info{
+
+  flex:1 1 160px;
+
+  min-width:0;
 
 }
 
@@ -556,7 +558,7 @@ TICKETS PAGE
 
   gap:12px;
 
-  margin-bottom:32px;
+  margin-bottom:12px;
 
 }
 
@@ -604,7 +606,19 @@ TICKETS PAGE
 
 }
 
-.date-pill:hover{
+.date-pill .date-pill-status{
+
+  margin-top:6px;
+
+  font-size:0.68rem;
+
+  letter-spacing:0.4px;
+
+  color:var(--gold);
+
+}
+
+.date-pill:hover:not(:disabled){
 
   border-color:rgba(212,160,23,0.5);
 
@@ -626,6 +640,36 @@ TICKETS PAGE
 
 }
 
+.date-pill.soldout{
+
+  opacity:0.45;
+
+  cursor:not-allowed;
+
+  text-decoration:line-through;
+
+}
+
+.date-pill.soldout .date-pill-status{
+
+  color:#e07070;
+
+  text-decoration:none;
+
+}
+
+#dateAvailabilityNote{
+
+  color:#e07070;
+
+  font-size:0.85rem;
+
+  margin-bottom:24px;
+
+  min-height:1em;
+
+}
+
 .qty-stepper{
 
   display:flex;
@@ -634,15 +678,13 @@ TICKETS PAGE
 
   gap:14px;
 
-  margin-top:26px;
-
 }
 
 .qty-stepper button{
 
-  width:40px;
+  width:38px;
 
-  height:40px;
+  height:38px;
 
   border-radius:50%;
 
@@ -652,11 +694,13 @@ TICKETS PAGE
 
   color:var(--gold);
 
-  font-size:1.2rem;
+  font-size:1.1rem;
 
   cursor:pointer;
 
   transition:0.3s;
+
+  flex-shrink:0;
 
 }
 
@@ -670,11 +714,11 @@ TICKETS PAGE
 
 .qty-stepper span{
 
-  min-width:30px;
+  min-width:26px;
 
   text-align:center;
 
-  font-size:1.2rem;
+  font-size:1.1rem;
 
   font-family:'Oswald',sans-serif;
 
@@ -685,6 +729,8 @@ TICKETS PAGE
   display:flex;
 
   justify-content:space-between;
+
+  gap:14px;
 
   padding:14px 0;
 
@@ -756,9 +802,11 @@ TICKETS PAGE
 
   transition:0.3s;
 
+  text-align:center;
+
 }
 
-.pay-btn:hover{
+.pay-btn:hover:not(:disabled){
 
   border-color:var(--gold);
 
@@ -779,6 +827,16 @@ TICKETS PAGE
   border-color:rgba(255,255,255,0.15);
 
   color:white;
+
+}
+
+.pay-btn.done{
+
+  border-color:var(--gold);
+
+  color:var(--gold);
+
+  opacity:0.7;
 
 }
 
@@ -1039,6 +1097,12 @@ MOBILE RESPONSIVE
 
   }
 
+  .ticket-type{
+
+    padding:18px;
+
+  }
+
   footer{
 
     justify-content:center;
@@ -1179,11 +1243,38 @@ with your free Firebase project keys.
 <script>
 
 /* =========================================================
+LEMON SQUEEZY CONFIGURATION
+=========================================================
+Only your store ID lives here now. Each individual ticket
+type (Single Seat, Double Seat, VIP, etc.) carries its own
+Lemon Squeezy Variant ID, set per ticket type in the Admin
+page — so you can add or remove ticket types freely without
+ever touching this file again.
+
+Find your store ID in Lemon Squeezy under Settings > Stores.
+========================================================= */
+
+const LEMON_SQUEEZY_CONFIG = {
+
+  storeId: "YOUR_STORE_ID"
+
+};
+
+/* =========================================================
 UPCOMING EVENTS DATA
 =========================================================
-This is the same array that lives in index.html. It is
-duplicated here because each HTML file is a separate static
-page. If you add/change a show, update it in BOTH files.
+This is the same array that lives in index.html. If you
+add/change a show, update it in BOTH files.
+
+showDates entries: { date: "YYYY-MM-DD", status: "" }
+`status` is optional free text shown as a badge on a date's
+pill below — e.g. "Sold Out" or "20 Tickets Left". Text
+containing "sold out" automatically disables that date here
+on the tickets page.
+
+ticketTypes entries now include `variantId`, the Lemon
+Squeezy variant ID for that specific ticket product. Fill
+these in via the Admin page.
 ========================================================= */
 
 let events = [
@@ -1194,16 +1285,18 @@ let events = [
 
     subtitle: "Mophato Dance Theatre's 15th Anniversary Celebration & the launch of Mophato's book, \u201cBotswana's Story, Told in Dance.\u201d",
 
-    venue: "Civic Center Hall, Main Mall",
+    venue: "Civic Center (Gaborone City Council), Main Mall",
+
+    showTime: "19:30",
 
     showDates: [
-      "2026-09-01",
-      "2026-09-02",
-      "2026-09-03",
-      "2026-09-05"
+      { date: "2026-09-01", status: "" },
+      { date: "2026-09-02", status: "" },
+      { date: "2026-09-03", status: "" },
+      { date: "2026-09-05", status: "" }
     ],
 
-    startDateTime: "2026-09-01T18:00:00",
+    startDateTime: "2026-09-01T19:30:00",
 
     endDateTime: "2026-09-05T23:59:59",
 
@@ -1212,9 +1305,8 @@ let events = [
     currency: "BWP",
 
     ticketTypes: [
-      { id: "general", name: "General Admission", description: "Standard seating", price: 150 },
-      { id: "vip", name: "VIP", description: "Front rows + welcome drink", price: 300 },
-      { id: "student", name: "Student", description: "Valid student ID required at door", price: 80 }
+      { id: "single", name: "Single Seat", description: "One seat", price: 250, variantId: "YOUR_SINGLE_SEAT_VARIANT_ID" },
+      { id: "double", name: "Double Seat", description: "Two seats", price: 450, variantId: "YOUR_DOUBLE_SEAT_VARIANT_ID" }
     ]
 
   }
@@ -1225,11 +1317,11 @@ let events = [
 SHARED HELPERS
 ========================================================= */
 
-function formatShowDates(dateStrings){
+function formatShowDates(dateEntries){
 
-  if(!dateStrings || dateStrings.length === 0) return "";
+  if(!dateEntries || dateEntries.length === 0) return "";
 
-  const parsed = dateStrings.map(d => new Date(d + "T00:00:00"));
+  const parsed = dateEntries.map(d => new Date(d.date + "T00:00:00"));
 
   const monthYear = parsed[0].toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
 
@@ -1273,30 +1365,23 @@ function formatMoney(amount, currency){
 
 }
 
+function escapeHtml(str){
+  return String(str || '').replace(/[&<>"']/g, m => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  })[m]);
+}
+
+function isSoldOut(dateEntry){
+  return !!(dateEntry && dateEntry.status && /sold\s*out/i.test(dateEntry.status));
+}
+
 /* =========================================================
-TICKETS PAGE
+TICKETS PAGE STATE
 =========================================================
-Front-end ticket selector + checkout. Both Tingg and
-Virtual Pay require a merchant client ID / secret / API key
-that must stay on a server (never in browser JS), so the
-two "Pay" buttons below call small helper functions that
-POST the order to YOUR backend endpoint, which then talks
-to Tingg / Virtual Pay and returns a redirect URL.
-
-Until those backend endpoints exist, the buttons are wired
-up and fully functional in the UI, but will show a friendly
-"not connected yet" status instead of redirecting. Search
-"PAYMENT_CONFIG" below to plug in your real endpoints once
-you have Tingg / Virtual Pay merchant credentials.
+`quantities` is a map of ticketType.id -> quantity, so more
+than one ticket type can be selected and purchased together
+(e.g. 2 Single Seats AND 1 Double Seat in the same order).
 ========================================================= */
-
-const PAYMENT_CONFIG = {
-
-  tinggEndpoint: "/api/create-tingg-checkout",
-
-  virtualPayEndpoint: "/api/create-virtualpay-checkout"
-
-};
 
 let ticketState = {
 
@@ -1304,11 +1389,12 @@ let ticketState = {
 
   selectedDate: null,
 
-  selectedTypeId: null,
-
-  quantity: 1
+  quantities: {}
 
 };
+
+let checkoutQueue = [];
+let checkoutQueueDone = [];
 
 function formatPillDate(dateString){
 
@@ -1357,13 +1443,9 @@ function renderTickets(){
 
   if(!ticketState.selectedDate){
 
-    ticketState.selectedDate = event.showDates[0];
+    const firstAvailable = event.showDates.find(d => !isSoldOut(d));
 
-  }
-
-  if(!ticketState.selectedTypeId){
-
-    ticketState.selectedTypeId = event.ticketTypes[0].id;
+    ticketState.selectedDate = (firstAvailable || event.showDates[0]).date;
 
   }
 
@@ -1373,7 +1455,7 @@ function renderTickets(){
 
       <div class="ticket-event-head">
 
-        <span class="label">${formatShowDates(event.showDates)} &middot; ${event.venue}</span>
+        <span class="label">${formatShowDates(event.showDates)} at ${event.showTime} &middot; ${event.venue}</span>
 
         <h3>${event.title}</h3>
 
@@ -1389,19 +1471,15 @@ function renderTickets(){
 
           <div id="datePillList" class="date-pill-list"></div>
 
-          <h4>Choose Your Ticket</h4>
+          <p id="dateAvailabilityNote"></p>
+
+          <h4>Choose Your Tickets</h4>
+
+          <p class="hint" style="color:var(--gray); font-size:0.85rem; margin:-14px 0 20px;">
+            You can select more than one ticket type &mdash; e.g. Single Seats and Double Seats together.
+          </p>
 
           <div id="ticketTypeList"></div>
-
-          <div class="qty-stepper">
-
-            <button type="button" id="qtyMinus" aria-label="Decrease quantity">&minus;</button>
-
-            <span id="qtyValue">1</span>
-
-            <button type="button" id="qtyPlus" aria-label="Increase quantity">&plus;</button>
-
-          </div>
 
         </div>
 
@@ -1414,15 +1492,7 @@ function renderTickets(){
             <span id="summaryDate">-</span>
           </div>
 
-          <div class="ticket-summary-row">
-            <span id="summaryTypeName">-</span>
-            <span id="summaryUnitPrice">-</span>
-          </div>
-
-          <div class="ticket-summary-row">
-            <span>Quantity</span>
-            <span id="summaryQty">1</span>
-          </div>
+          <div id="summaryLines"></div>
 
           <div class="ticket-summary-row total">
             <span>Total</span>
@@ -1431,20 +1501,18 @@ function renderTickets(){
 
           <div class="payment-methods">
 
-            <button type="button" class="pay-btn" id="payTingg">
-              <span class="pay-logo">Tingg</span> by Cellulant
-            </button>
-
-            <button type="button" class="pay-btn" id="payVirtualPay">
-              <span class="pay-logo">Virtual Pay</span>
-            </button>
+            <div id="payLemonSqueezyWrap">
+              <button type="button" class="pay-btn" id="payLemonSqueezyBtn">
+                <span class="pay-logo">Pay with Lemon Squeezy</span>
+              </button>
+            </div>
 
           </div>
 
           <p class="form-status" id="ticketStatus" role="status" aria-live="polite"></p>
 
           <p class="ticket-note">
-            Payments are processed securely by Tingg / Virtual Pay. You'll be redirected to complete payment and returned here once it's done.
+            Payments are processed securely by Lemon Squeezy. You'll be redirected to complete payment.
           </p>
 
         </div>
@@ -1454,6 +1522,9 @@ function renderTickets(){
     </div>
 
   `;
+
+  checkoutQueue = [];
+  checkoutQueueDone = [];
 
   renderDatePills();
   renderTicketTypes();
@@ -1465,25 +1536,32 @@ function renderTickets(){
 function renderDatePills(){
 
   const list = document.getElementById('datePillList');
+  const noteEl = document.getElementById('dateAvailabilityNote');
 
   const event = ticketState.event;
 
   list.innerHTML = event.showDates.map(d => {
 
-    const parts = formatPillDate(d);
+    const parts = formatPillDate(d.date);
+    const soldOut = isSoldOut(d);
+    const hasStatus = d.status && d.status.trim() !== '';
 
     return `
 
-      <button type="button" class="date-pill ${d === ticketState.selectedDate ? 'selected' : ''}" data-date="${d}">
+      <button type="button"
+        class="date-pill ${d.date === ticketState.selectedDate ? 'selected' : ''} ${soldOut ? 'soldout' : ''}"
+        data-date="${d.date}"
+        ${soldOut ? 'disabled' : ''}>
         <span class="date-pill-weekday">${parts.weekday}</span>
         <span>${parts.dayMonth}</span>
+        ${hasStatus ? `<span class="date-pill-status">${escapeHtml(d.status)}</span>` : ''}
       </button>
 
     `;
 
   }).join('');
 
-  list.querySelectorAll('.date-pill').forEach(el => {
+  list.querySelectorAll('.date-pill:not(.soldout)').forEach(el => {
 
     el.addEventListener('click', () => {
 
@@ -1496,6 +1574,14 @@ function renderDatePills(){
 
   });
 
+  const selectedInfo = event.showDates.find(d => d.date === ticketState.selectedDate);
+
+  if(isSoldOut(selectedInfo)){
+    noteEl.textContent = 'This date is sold out — please choose another date above.';
+  } else {
+    noteEl.textContent = '';
+  }
+
 }
 
 function renderTicketTypes(){
@@ -1504,148 +1590,240 @@ function renderTicketTypes(){
 
   const event = ticketState.event;
 
-  list.innerHTML = event.ticketTypes.map(t => `
+  list.innerHTML = event.ticketTypes.map(t => {
 
-    <div class="ticket-type ${t.id === ticketState.selectedTypeId ? 'selected' : ''}" data-type-id="${t.id}">
+    const qty = ticketState.quantities[t.id] || 0;
 
-      <div class="ticket-type-info">
-        <h5>${t.name}</h5>
-        <span>${t.description}</span>
+    return `
+
+      <div class="ticket-type ${qty > 0 ? 'has-qty' : ''}" data-type-id="${t.id}">
+
+        <div class="ticket-type-info">
+          <h5>${t.name}</h5>
+          <span>${t.description}</span>
+        </div>
+
+        <div class="ticket-type-price">${formatMoney(t.price, event.currency)}</div>
+
+        <div class="qty-stepper" data-type-id="${t.id}">
+          <button type="button" class="qty-minus" aria-label="Decrease ${escapeHtml(t.name)} quantity">&minus;</button>
+          <span class="qty-display">${qty}</span>
+          <button type="button" class="qty-plus" aria-label="Increase ${escapeHtml(t.name)} quantity">&plus;</button>
+        </div>
+
       </div>
 
-      <div class="ticket-type-price">${formatMoney(t.price, event.currency)}</div>
+    `;
 
-    </div>
+  }).join('');
 
-  `).join('');
+  list.querySelectorAll('.ticket-type').forEach(row => {
 
-  list.querySelectorAll('.ticket-type').forEach(el => {
+    const typeId = row.getAttribute('data-type-id');
 
-    el.addEventListener('click', () => {
-
-      ticketState.selectedTypeId = el.getAttribute('data-type-id');
-
-      renderTicketTypes();
-      updateSummary();
-
-    });
+    row.querySelector('.qty-minus').addEventListener('click', () => changeQty(typeId, -1));
+    row.querySelector('.qty-plus').addEventListener('click', () => changeQty(typeId, 1));
 
   });
 
 }
 
-function getSelectedTicketType(){
+function changeQty(typeId, delta){
 
-  return ticketState.event.ticketTypes.find(t => t.id === ticketState.selectedTypeId);
+  const current = ticketState.quantities[typeId] || 0;
+
+  const next = Math.max(0, Math.min(10, current + delta));
+
+  ticketState.quantities[typeId] = next;
+
+  renderTicketTypes();
+  updateSummary();
+
+}
+
+function getSelectedLines(){
+
+  const event = ticketState.event;
+
+  return event.ticketTypes
+    .map(t => ({ type: t, qty: ticketState.quantities[t.id] || 0 }))
+    .filter(l => l.qty > 0);
 
 }
 
 function updateSummary(){
 
   const event = ticketState.event;
-  const type = getSelectedTicketType();
 
   document.getElementById('summaryDate').textContent = formatFullDate(ticketState.selectedDate);
-  document.getElementById('summaryTypeName').textContent = type.name;
-  document.getElementById('summaryUnitPrice').textContent = formatMoney(type.price, event.currency);
-  document.getElementById('summaryQty').textContent = ticketState.quantity;
-  document.getElementById('qtyValue').textContent = ticketState.quantity;
-  document.getElementById('summaryTotal').textContent = formatMoney(type.price * ticketState.quantity, event.currency);
+
+  const lines = getSelectedLines();
+
+  const linesEl = document.getElementById('summaryLines');
+
+  if(lines.length === 0){
+
+    linesEl.innerHTML = `<div class="ticket-summary-row"><span>No tickets selected</span><span>-</span></div>`;
+
+  } else {
+
+    linesEl.innerHTML = lines.map(l => `
+      <div class="ticket-summary-row">
+        <span>${escapeHtml(l.type.name)} &times; ${l.qty}</span>
+        <span>${formatMoney(l.type.price * l.qty, event.currency)}</span>
+      </div>
+    `).join('');
+
+  }
+
+  const total = lines.reduce((sum, l) => sum + l.type.price * l.qty, 0);
+
+  document.getElementById('summaryTotal').textContent = formatMoney(total, event.currency);
+
+  const selectedDateInfo = event.showDates.find(d => d.date === ticketState.selectedDate);
+  const soldOut = isSoldOut(selectedDateInfo);
+
+  const payBtn = document.getElementById('payLemonSqueezyBtn');
+
+  if(payBtn){
+    payBtn.disabled = lines.length === 0 || soldOut;
+  }
 
 }
 
 function bindTicketEvents(){
 
-  document.getElementById('qtyMinus').addEventListener('click', () => {
-
-    ticketState.quantity = Math.max(1, ticketState.quantity - 1);
-    updateSummary();
-
-  });
-
-  document.getElementById('qtyPlus').addEventListener('click', () => {
-
-    ticketState.quantity = Math.min(10, ticketState.quantity + 1);
-    updateSummary();
-
-  });
-
-  document.getElementById('payTingg').addEventListener('click', () => startCheckout('tingg'));
-  document.getElementById('payVirtualPay').addEventListener('click', () => startCheckout('virtualpay'));
+  document.getElementById('payLemonSqueezyBtn').addEventListener('click', startLemonSqueezyCheckout);
 
 }
 
-function buildOrderPayload(){
+/* =========================================================
+LEMON SQUEEZY CHECKOUT
+=========================================================
+Builds a Lemon Squeezy hosted checkout link for one ticket
+type + quantity, carrying the performance details as custom
+data (visible to you in the Lemon Squeezy order/webhook data).
+
+IMPORTANT LIMITATION: Lemon Squeezy's hosted checkout link
+only supports ONE product (variant) per checkout. There is no
+official multi-item "cart" for simple links like this (a true
+combined cart needs Lemon Squeezy's API from a server, which
+this static site doesn't have).
+
+So, when someone picks more than one ticket type (e.g. Single
+Seats AND Double Seats), we open one secure Lemon Squeezy
+checkout tab per ticket type, one after another, so they can
+complete each purchase in turn without losing their place on
+this page.
+========================================================= */
+
+function buildCheckoutUrl(type, qty){
 
   const event = ticketState.event;
-  const type = getSelectedTicketType();
 
-  return {
-    reference: `MDT-${Date.now()}`,
-    eventTitle: event.title,
-    performanceDate: formatFullDate(ticketState.selectedDate),
-    ticketType: type.name,
-    unitPrice: type.price,
-    quantity: ticketState.quantity,
-    total: type.price * ticketState.quantity,
-    currency: event.currency
-  };
+  const params = new URLSearchParams();
+
+  params.set('quantity', qty);
+  params.set('checkout[custom][ticket_type]', type.name);
+  params.set('checkout[custom][performance_date]', formatFullDate(ticketState.selectedDate));
+  params.set('checkout[custom][show_time]', event.showTime || '');
+  params.set('checkout[custom][venue]', event.venue || '');
+
+  return `https://${LEMON_SQUEEZY_CONFIG.storeId}.lemonsqueezy.com/checkout/buy/${type.variantId}?${params.toString()}`;
 
 }
 
-async function startCheckout(provider){
+function startLemonSqueezyCheckout(){
 
   const statusEl = document.getElementById('ticketStatus');
-  const payButtons = document.querySelectorAll('.pay-btn');
 
-  const order = buildOrderPayload();
+  const lines = getSelectedLines();
 
-  const endpoint = provider === 'tingg' ? PAYMENT_CONFIG.tinggEndpoint : PAYMENT_CONFIG.virtualPayEndpoint;
-  const providerLabel = provider === 'tingg' ? 'Tingg' : 'Virtual Pay';
-
-  payButtons.forEach(b => b.disabled = true);
-
-  statusEl.className = 'form-status';
-  statusEl.textContent = `Connecting to ${providerLabel}\u2026`;
-
-  try{
-
-    const response = await fetch(endpoint, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(order)
-    });
-
-    if(!response.ok) throw new Error('checkout endpoint not available');
-
-    const data = await response.json();
-
-    if(!data.redirectUrl) throw new Error('no redirect url returned');
-
-    window.location.href = data.redirectUrl;
-
-  } catch(err){
-
-    // This is expected until a real backend endpoint is wired
-    // up with your Tingg / Virtual Pay merchant credentials.
+  if(lines.length === 0){
 
     statusEl.className = 'form-status error';
-
-    statusEl.textContent = `${providerLabel} checkout isn't connected yet. Please call +267 75252777 or email mophatodancetheatre@gmail.com to book your seat for ${order.performanceDate}, quoting reference ${order.reference}.`;
-
-    payButtons.forEach(b => b.disabled = false);
+    statusEl.textContent = 'Please select at least one ticket.';
+    return;
 
   }
+
+  const badConfig = !LEMON_SQUEEZY_CONFIG.storeId
+    || LEMON_SQUEEZY_CONFIG.storeId === 'YOUR_STORE_ID'
+    || lines.some(l => !l.type.variantId || l.type.variantId.trim() === '' || /^YOUR_/.test(l.type.variantId));
+
+  if(badConfig){
+
+    statusEl.className = 'form-status error';
+    statusEl.textContent = 'Lemon Squeezy isn\u2019t fully configured for one of these ticket types yet. Please contact us directly to book.';
+    return;
+
+  }
+
+  checkoutQueue = lines;
+  checkoutQueueDone = [];
+
+  if(checkoutQueue.length === 1){
+
+    statusEl.className = 'form-status';
+    statusEl.textContent = 'Connecting to Lemon Squeezy\u2026';
+
+    window.location.href = buildCheckoutUrl(checkoutQueue[0].type, checkoutQueue[0].qty);
+    return;
+
+  }
+
+  renderCheckoutQueue();
+
+}
+
+function renderCheckoutQueue(){
+
+  const wrap = document.getElementById('payLemonSqueezyWrap');
+  const statusEl = document.getElementById('ticketStatus');
+
+  statusEl.className = 'form-status';
+  statusEl.textContent = 'You picked more than one ticket type, so we\u2019ll open one secure checkout per type below \u2014 complete each to finish your order (any order, either tab).';
+
+  wrap.innerHTML = checkoutQueue.map((item, i) => {
+
+    const done = checkoutQueueDone.includes(i);
+
+    return `
+      <button type="button" class="pay-btn ${done ? 'done' : ''}" data-idx="${i}">
+        <span class="pay-logo">${done ? '\u2713 Paid for ' : 'Pay for '}${escapeHtml(item.type.name)} (&times;${item.qty}) \u2014 Lemon Squeezy</span>
+      </button>
+    `;
+
+  }).join('');
+
+  wrap.querySelectorAll('button[data-idx]').forEach(btn => {
+
+    btn.addEventListener('click', () => {
+
+      const idx = parseInt(btn.getAttribute('data-idx'), 10);
+      const item = checkoutQueue[idx];
+
+      window.open(buildCheckoutUrl(item.type, item.qty), '_blank', 'noopener');
+
+      if(!checkoutQueueDone.includes(idx)) checkoutQueueDone.push(idx);
+
+      renderCheckoutQueue();
+
+      if(checkoutQueueDone.length === checkoutQueue.length){
+
+        statusEl.className = 'form-status success';
+        statusEl.textContent = 'All checkouts opened \u2014 complete payment in each tab to confirm your booking.';
+
+      }
+
+    });
+
+  });
 
 }
 
 /* =========================================================
 LOAD REMOTE DATA (Firestore) + BOOT THE PAGE
-=========================================================
-If firebase-config.js has been filled in with real project
-keys, this pulls the live events added via admin.html. If
-not configured yet (or briefly unreachable), the page falls
-back to the array defined above so it never breaks.
 ========================================================= */
 
 async function loadRemoteData(){
