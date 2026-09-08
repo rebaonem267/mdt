@@ -12,7 +12,7 @@ Authentication.
 
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin - Mophato Dance Theatre</title>
+<title>Admin — Mophato Dance Theatre</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1003,7 +1003,15 @@ document.getElementById('saveEventBtn').addEventListener('click', async () => {
     return;
   }
 
-  if(new Date(fromLocalInputValue(end)) < new Date(fromLocalInputValue(start))){
+  // Compare as zero-padded ISO strings ("YYYY-MM-DDTHH:MM:SS") rather than
+  // parsing into Date objects — some browsers interpret a timezone-less
+  // datetime string inconsistently, which could falsely flag valid dates
+  // as "out of order". String comparison sorts correctly here and sidesteps
+  // that entirely.
+  const startIso = fromLocalInputValue(start);
+  const endIso = fromLocalInputValue(end);
+
+  if(endIso < startIso){
     eventFormStatus.className = 'status-msg error';
     eventFormStatus.textContent = 'Run End must be after Run Start.';
     return;
