@@ -70,13 +70,16 @@ no re-uploading of anything.
 
 ========================================================= */
 
-const FIREBASE_CONFIG = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT_ID.appspot.com",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId: "YOUR_APP_ID"
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyDEUwIaOor4AZQx7d-OzydVHu3G_sXKwRM",
+  authDomain: "mophato.firebaseapp.com",
+  projectId: "mophato",
+  storageBucket: "mophato.firebasestorage.app",
+  messagingSenderId: "1093871152499",
+  appId: "1:1093871152499:web:3ea5f9c3ff72936fc12906",
+  measurementId: "G-70LCNKTG03"
 };
 
 /* =========================================================
