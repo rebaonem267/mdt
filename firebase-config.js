@@ -73,13 +73,7 @@ no re-uploading of anything.
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const FIREBASE_CONFIG = {
-  apiKey: "AIzaSyDEUwIaOor4AZQx7d-OzydVHu3G_sXKwRM",
-  authDomain: "mophato.firebaseapp.com",
-  projectId: "mophato",
-  storageBucket: "mophato.firebasestorage.app",
-  messagingSenderId: "1093871152499",
-  appId: "1:1093871152499:web:3ea5f9c3ff72936fc12906",
-  measurementId: "G-70LCNKTG03"
+ 
 };
 
 /* =========================================================
