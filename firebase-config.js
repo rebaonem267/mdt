@@ -239,6 +239,16 @@ used by browser applications.
 
 const FIREBASE_CONFIG = {
 
+  apiKey: "AIzaSyDEUwIaOor4AZQx7d-OzydVHu3G_sXKwRM",
+  authDomain: "mophato.firebaseapp.com",
+  projectId: "mophato",
+  storageBucket: "mophato.firebasestorage.app",
+  messagingSenderId: "1093871152499",
+  appId: "1:1093871152499:web:3ea5f9c3ff72936fc12906",
+  measurementId: "G-70LCNKTG03"
+};
+
+/* =========================================================
   apiKey: "YOUR_API_KEY",
 
   authDomain: "YOUR_PROJECT.firebaseapp.com",
