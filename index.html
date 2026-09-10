@@ -17,7 +17,7 @@ Mophato Dance Theatre | Contemporary African Dance &amp; Theatre Company, Botswa
 </title>
 
 <meta name="description"
-content="Mophato Dance Theatre is Botswana's leading contemporary dance theatre company — blending Setswana storytelling with powerful movement. Based in Gaborone, performing across Botswana, the SADC region, Africa and internationally.">
+content="Mophato Dance Theatre is Botswana's leading contemporary dance theatre company  blending Setswana storytelling with powerful movement. Based in Gaborone, performing across Botswana, the SADC region, Africa and internationally.">
 
 <meta name="keywords"
 content="dance Botswana, theatre Botswana, contemporary dance Africa, dance company Gaborone, African dance theatre, Setswana storytelling dance, SADC dance company, art Botswana, creative arts Botswana, artistry Botswana, African contemporary dance company">
@@ -37,7 +37,7 @@ content="dance Botswana, theatre Botswana, contemporary dance Africa, dance comp
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Mophato Dance Theatre">
 <meta property="og:title" content="Mophato Dance Theatre | Contemporary African Dance &amp; Theatre Company, Botswana">
-<meta property="og:description" content="Botswana's leading contemporary dance theatre company — Setswana storytelling and powerful movement, performing across Botswana, SADC, Africa and internationally.">
+<meta property="og:description" content="Botswana's leading contemporary dance theatre company  Setswana storytelling and powerful movement, performing across Botswana, SADC, Africa and internationally.">
 <meta property="og:image" content="https://YOUR-DOMAIN-HERE.com/a.jpg">
 <meta property="og:url" content="https://YOUR-DOMAIN-HERE.com/">
 <meta property="og:locale" content="en_BW">
@@ -52,7 +52,7 @@ content="dance Botswana, theatre Botswana, contemporary dance Africa, dance comp
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
-  "@type": "DanceCompnay",
+  "@type": "DanceCompany",
   "name": "Mophato Dance Theatre",
   "url": "https://YOUR-DOMAIN-HERE.com/",
   "logo": "https://YOUR-DOMAIN-HERE.com/mdt.png",
@@ -1283,23 +1283,45 @@ CONTACT SECTION
 
 .contact-box{
 
-  background:rgba(255,255,255,0.05);
+  background:linear-gradient(145deg,rgba(212,160,23,.16),#111 55%);
 
-  padding:35px;
+  padding:40px;
 
-  border-radius:25px;
+  border-radius:28px;
+
+  border:1px solid rgba(212,160,23,.4);
 
   min-width:0;
+
+  transition:.4s;
+
+}
+
+.contact-box:hover{
+
+  transform:translateY(-8px);
+
+  border-color:rgba(212,160,23,.65);
 
 }
 
 .contact-box h3{
+
+  color:var(--gold);
+
+  font-size:1.8rem;
+
+  margin-bottom:18px;
 
   overflow-wrap:break-word;
 
 }
 
 .contact-box p{
+
+  color:#aaa;
+
+  line-height:1.7;
 
   overflow-wrap:break-word;
 
@@ -1969,6 +1991,46 @@ MOBILE RESPONSIVE
 
 }
 
+
+/* =========================================================
+DANCE CLASSES
+========================================================= */
+.dance-classes{background:linear-gradient(180deg,#0d0d0d,#050505);overflow:hidden;}
+.dance-inner{max-width:1400px;margin:auto;}
+.dance-kicker,.mini-label{display:block;color:var(--gold);letter-spacing:5px;text-transform:uppercase;font-size:.8rem;margin-bottom:18px;}
+.dance-heading{font-size:clamp(2.8rem,7vw,5.5rem);line-height:1;margin-bottom:24px;}
+.dance-heading em{color:var(--gold);font-style:normal;}
+.dance-intro{max-width:760px;color:var(--gray);font-size:1.05rem;line-height:1.9;margin-bottom:55px;}
+.class-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;}
+.class-card{background:linear-gradient(145deg,rgba(212,160,23,.16),#111 55%);border:1px solid rgba(212,160,23,.4);border-radius:28px;padding:38px;min-height:330px;display:flex;flex-direction:column;justify-content:flex-end;position:relative;overflow:hidden;transition:.4s;}
+.class-card:hover{transform:translateY(-8px);border-color:rgba(212,160,23,.55);}
+.class-card.featured{background:linear-gradient(145deg,rgba(212,160,23,.16),#111 55%);border-color:rgba(212,160,23,.4);}
+.class-number{position:absolute;top:28px;left:30px;color:var(--gold);font-size:.72rem;letter-spacing:3px;}
+.class-card h3{font-size:2.4rem;margin-bottom:12px;}
+.class-age{color:var(--gray);}
+.class-card p{color:#aaa;line-height:1.7;margin-bottom:22px;}
+.class-time{font-size:.8rem;letter-spacing:2px;color:#ddd;text-transform:uppercase;margin-bottom:20px;}
+.class-price{font-family:'Oswald',sans-serif;font-size:2.2rem;color:var(--gold);}
+.class-price span{font-family:'Poppins',sans-serif;font-size:.8rem;color:#888;}
+.rhythm-feature{display:grid;grid-template-columns:1fr 1fr;margin-top:24px;border:1px solid rgba(212,160,23,.2);border-radius:28px;overflow:hidden;}
+.rhythm-panel,.registration-panel{padding:45px;}
+.rhythm-panel{background:var(--gold);color:#050505;}
+.rhythm-panel .mini-label{color:#050505;}
+.rhythm-panel h3,.registration-panel h3{font-size:2.2rem;margin-bottom:14px;}
+.rhythm-note,.registration-panel p{line-height:1.75;color:#777;}
+.rhythm-panel .rhythm-note{color:#211b08;}
+.registration-panel{background:#101010;}
+.genre-pills{display:flex;gap:10px;flex-wrap:wrap;margin-top:25px;}
+.genre-pills span{border:1px solid rgba(0,0,0,.3);padding:8px 14px;border-radius:30px;font-size:.75rem;text-transform:uppercase;letter-spacing:1px;}
+.registration-panel p{color:#aaa;margin-top:12px;}
+.dance-bottom{display:flex;justify-content:space-between;align-items:center;gap:25px;margin-top:35px;}
+.dance-contact small{display:block;color:#777;text-transform:uppercase;letter-spacing:2px;font-size:.7rem;margin-bottom:7px;}
+.dance-contact{color:white;font-size:1.15rem;}
+.dance-cta{display:inline-flex;align-items:center;gap:12px;padding:16px 25px;border:1px solid var(--gold);border-radius:50px;color:var(--gold);text-decoration:none;text-transform:uppercase;letter-spacing:2px;font-size:.75rem;transition:.3s;}
+.dance-cta:hover{background:var(--gold);color:#000;}
+@media(max-width:850px){.class-grid,.rhythm-feature{grid-template-columns:1fr}.class-card{min-height:280px}.dance-bottom{flex-direction:column;align-items:flex-start}}
+@media(max-width:480px){.class-card{padding:30px;min-height:300px}.class-card h3{font-size:2rem}.rhythm-panel,.registration-panel{padding:30px}.dance-heading{font-size:2.7rem}.dance-intro{font-size:.95rem}}
+
 </style>
 </head>
 
@@ -1993,6 +2055,8 @@ alt="Mophato Dance Theatre Logo">
 <li><a href="#story">Story</a></li>
 
 <li><a href="#events">Events</a></li>
+
+<li><a href="#classes">Classes</a></li>
 
 <li><a href="tickets.html">Tickets</a></li>
 
@@ -2149,6 +2213,23 @@ What's Next From Mophato
 </div>
 
 </section>
+
+<!-- =========================================================
+DANCE CLASSES
+========================================================= -->
+<section class="dance-classes fade" id="classes">
+<div class="dance-inner">
+<span class="dance-kicker">Find Your Rhythm</span>
+<h2 class="dance-heading">Move. Learn. <em>Become.</em></h2>
+<p class="dance-intro">Step into the Mophato Dance Theatre training space. Our classes give young dancers and adults a place to build confidence, develop technique and grow through movement.</p>
+<div class="class-grid">
+<article class="class-card featured"><span class="class-number">GROUP A · KIDS</span><h3>Ages 6–10</h3><p>Build confidence, creativity and a love for movement through contemporary and Afro fusion.</p><span class="class-time">TUE &amp; THU · 14:30–15:30</span><div class="class-price">P400 <span>/ month</span></div></article>
+<article class="class-card featured"><span class="class-number">GROUP B · YOUTH</span><h3>Ages 11–15</h3><p>Build technique, expression and stage confidence through focused training.</p><span class="class-time">TUE &amp; THU · 15:30–16:30</span><div class="class-price">P400 <span>/ month</span></div></article>
+<article class="class-card featured"><span class="class-number">ADULTS · ALL LEVELS</span><h3>Dance &amp; Fitness</h3><p>Move with confidence, build your technique and keep your energy alive through contemporary and Afro fusion.</p><span class="class-time">TUE &amp; THU · 17:30–19:00</span><div class="class-price">P550 <span>/ month</span></div></article>
+</div>
+<div class="rhythm-feature"><div class="rhythm-panel"><span class="mini-label">Saturday Sessions</span><h3>Never know what you'll dance next.</h3><p class="rhythm-note">Optional Saturday surprise-genre sessions keep the training fresh and exciting. Come ready for whatever rhythm walks through the door.</p><div class="genre-pills"><span>Hip Hop</span><span>Ballet</span><span>Amapiano</span><span>&amp; more</span></div></div><div class="registration-panel"><span class="mini-label">Your Journey</span><h3>Keep showing up.</h3><p><strong>Quarterly assessments</strong> help track development, while <strong>annual performances and prize giving</strong> give dancers a chance to celebrate their progress.</p><p>Selected dancers may also get the opportunity to perform with the professional Mophato Dance Theatre company.</p><p><strong>Registration commits you to a minimum of three consecutive months</strong> to support consistent growth and development.</p></div></div>
+<div class="dance-bottom"><div><div class="dance-contact"><small>Enquiries &amp; Registration</small>+267 76 956 517</div><p style="color:#888;margin:8px 0 0;font-size:.85rem;">Kids receive a once-off Mophato Dance Theatre T-shirt upon registration and payment of the first month.</p></div><a href="tel:+26776956517" class="dance-cta">Join the Classes <span>↗</span></a></div>
+</div></section>
 
 <!-- =========================================================
 PERFORMANCES
@@ -2480,7 +2561,7 @@ FOOTER
 <!-- =========================================================
 FIREBASE (powers admin.html so events & performances can be
 added/edited from any device without touching this code).
-See firebase-config.js — that is the only file you need to
+See firebase-config.js  that is the only file you need to
 edit by hand, one time, with your free Firebase project keys.
 ========================================================= -->
 
@@ -2548,7 +2629,7 @@ PAST PERFORMANCES DATA (fallback)
 =========================================================
 Powers the "Performances" carousel below. Once Firebase is
 connected, this is overridden by whatever is added in
-admin.html — edit this array only as a fallback / starting
+admin.html  edit this array only as a fallback / starting
 point.
 ========================================================= */
 
@@ -3050,7 +3131,7 @@ async function loadRemoteData(){
 
   } catch(err){
 
-    console.warn('Mophato: using fallback content — Firestore not reachable yet.', err);
+    console.warn('Mophato: using fallback content  Firestore not reachable yet.', err);
 
   }
 
