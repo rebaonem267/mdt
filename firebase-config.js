@@ -1,162 +1,555 @@
 /* =========================================================
-MOPHATO DANCE THEATRE — FIREBASE SETUP
+MOPHATO DANCE THEATRE
+FIREBASE SETUP
 =========================================================
-This is the ONLY file you should ever need to hand-edit.
-Everything else (index.html, tickets.html, admin.html) reads
-its content from the database this file connects to, so once
-this is set up, you manage the whole site from admin.html —
-no code editing, ever again.
 
-Takes about 10 minutes, no coding beyond pasting values below.
+This is the ONLY file that should normally need to be
+hand-edited for Firebase configuration.
 
+Once Firebase is configured, the following pages use it:
 
-STEP 1 — Create a free Firebase project
------------------------------------------------------------
-1. Go to https://console.firebase.google.com
-2. Click "Add project", name it (e.g. "mophato-dance-theatre"),
-   finish the wizard (Google Analytics is optional — skip it).
+- index.html
+- tickets.html
+- admin.html
 
+The public website reads content from Firestore.
+The Admin Portal manages events, performances and
+editable website content.
 
-STEP 2 — Register a Web App
------------------------------------------------------------
-1. On your new project's dashboard, click the "</>" (Web) icon.
-2. Give it a nickname (e.g. "Mophato Website"), click "Register app".
-3. Firebase shows you a `firebaseConfig` object. Copy it and paste
-   it over the placeholder FIREBASE_CONFIG object below.
+IMPORTANT:
+Do NOT put Firebase service-account keys, private keys,
+passwords or other server credentials in this file.
+
+======================================================== */
 
 
-STEP 3 — Turn on Firestore (the database)
------------------------------------------------------------
-1. In the left sidebar: Build → Firestore Database → Create database.
-2. Choose "Start in production mode" (NOT test mode).
-3. Pick the region closest to Botswana (e.g. europe-west or
-   a similar option Firebase offers you) and click Enable.
-4. Go to the "Rules" tab and replace the default rules with the
-   block at the bottom of this file (under SECURITY RULES),
-   then click "Publish". This is what stops strangers from
-   editing your events/performances — don't skip it.
+/* =========================================================
+STEP 1
+CREATE YOUR FIREBASE PROJECT
+=========================================================
+
+1. Go to:
+
+https://console.firebase.google.com
+
+2. Click "Add project".
+
+3. Give the project a name, for example:
+
+mophato-dance-theatre
+
+4. Complete the setup.
+
+Google Analytics is optional.
 
 
-STEP 4 — Turn on Authentication (so only YOU can edit the site)
------------------------------------------------------------
-1. In the left sidebar: Build → Authentication → Get started.
-2. Under "Sign-in method", enable "Email/Password" (click it,
-   toggle Enable, Save).
-3. Go to the "Users" tab → "Add user" → enter the email and
-   password you (or whoever manages the site) will sign in
-   with on admin.html. You can add more than one person here
-   later the same way.
+========================================================
+STEP 2
+REGISTER THE WEBSITE AS A WEB APP
+=========================================================
 
-   IMPORTANT: admin.html only has a Sign In screen, no public
-   "create account" option — so the only way anyone gets an
-   account is you creating it here, one at a time. Keep it
-   that way; don't add self-signup later.
+1. Open your Firebase project.
 
-4. Also worth doing once: Authentication → Settings →
-   "User actions" → make sure "Email enumeration protection"
-   is switched on (it's the Firebase default on new projects,
-   this just confirms it — it stops someone from being able to
-   tell, from the sign-in error alone, whether a given email
-   has an account).
+2. From the project dashboard, click the Web icon:
+
+</>
+
+3. Give the application a name, for example:
+
+Mophato Website
+
+4. Click "Register app".
+
+5. Firebase will display a configuration object similar
+   to the one below.
+
+6. Copy those values into FIREBASE_CONFIG.
 
 
-STEP 5 — Done
------------------------------------------------------------
-Upload this file, along with index.html, tickets.html and
-admin.html, to your web host. Open admin.html, sign in with
-the account from Step 4, and start adding events — they'll
-appear on the live site immediately, for every visitor, with
-no re-uploading of anything.
+========================================================
+STEP 3
+ENABLE FIRESTORE
+=========================================================
+
+1. Firebase Console
+2. Build
+3. Firestore Database
+4. Create database
+
+Choose:
+
+Production mode
+
+Do NOT use test mode for the live website.
+
+Choose a suitable Firebase region.
+
+After Firestore is created, go to:
+
+Firestore Database
+→ Rules
+
+Replace the rules with the SECURITY RULES provided at
+the bottom of this file.
+
+IMPORTANT:
+
+The rules below are designed so that public visitors can
+read the information needed by the website, while only
+approved administrator accounts can modify the data.
+
+========================================================
+STEP 4
+ENABLE AUTHENTICATION
+=========================================================
+
+1. Firebase Console
+2. Build
+3. Authentication
+4. Get started
+
+Enable:
+
+Email/Password
+
+Then go to:
+
+Authentication
+→ Users
+→ Add user
+
+Create the administrator account that will be used to
+access admin.html.
+
+There is intentionally NO public registration form on
+admin.html.
+
+Only accounts created inside Firebase Authentication
+should have access to the Admin Portal.
+
+========================================================
+STEP 5
+CREATE THE ADMIN ACCESS RECORD
+=========================================================
+
+After creating the administrator account:
+
+1. Copy the administrator's Firebase Authentication UID.
+
+2. Open:
+
+Firestore Database
+→ Data
+
+3. Create a collection:
+
+admins
+
+4. Create a document using the administrator's UID as
+   the document ID.
+
+Example:
+
+Collection:
+admins
+
+Document ID:
+YOUR_ADMIN_UID
+
+The document can contain:
+
+{
+  "active": true,
+  "role": "admin"
+}
+
+The security rules below use this admins collection to
+control who can modify the website.
+
+If another administrator needs access later, create
+another Firebase Authentication account and add that
+user's UID to the admins collection.
+
+========================================================
+STEP 6
+UPLOAD THE FILES
+=========================================================
+
+Your website should contain:
+
+index.html
+tickets.html
+admin.html
+firebase-config.js
+
+Make sure firebase-config.js is in the same directory
+as the HTML files unless the script paths are changed.
+
+========================================================
+STEP 7
+CONFIGURE LEMON SQUEEZY
+=========================================================
+
+Ticket payments are handled separately through the
+Lemon Squeezy configuration in tickets.html.
+
+Firebase is responsible for:
+
+- Events
+- Performances
+- Website content
+- Admin authentication
+
+Lemon Squeezy is responsible for:
+
+- Ticket checkout
+- Ticket payment
+
+======================================================== */
+
+
+/* =========================================================
+FIREBASE WEB APP CONFIGURATION
+=========================================================
+
+Paste the configuration Firebase gives you here.
+
+Example:
+
+const FIREBASE_CONFIG = {
+  apiKey: "AIza...",
+  authDomain: "mophato-dance-theatre.firebaseapp.com",
+  projectId: "mophato-dance-theatre",
+  storageBucket: "mophato-dance-theatre.firebasestorage.app",
+  messagingSenderId: "123456789",
+  appId: "1:123456789:web:abcdef"
+};
+
+Do NOT paste:
+
+- Firebase service-account JSON
+- Private keys
+- Admin SDK credentials
+- Passwords
+
+The Firebase Web App configuration is intended to be
+used by browser applications.
 
 ========================================================= */
 
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const FIREBASE_CONFIG = {
- 
+
+  apiKey: "YOUR_API_KEY",
+
+  authDomain: "YOUR_PROJECT.firebaseapp.com",
+
+  projectId: "YOUR_PROJECT_ID",
+
+  storageBucket: "YOUR_PROJECT.firebasestorage.app",
+
+  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+
+  appId: "YOUR_APP_ID"
+
 };
 
+
 /* =========================================================
-INITIALIZATION — you shouldn't need to touch anything below
+INITIALIZATION
+=========================================================
+
+You should normally NOT edit anything below this point.
+
+This section:
+
+1. Checks whether Firebase has been configured.
+2. Initializes Firebase.
+3. Creates the Firestore connection.
+4. Creates the Authentication connection when available.
+5. Sets mdtFirestoreReady so the website knows whether
+   Firebase is available.
+
 ========================================================= */
 
 (function () {
 
   const isConfigured =
+    FIREBASE_CONFIG &&
     FIREBASE_CONFIG.apiKey &&
     !FIREBASE_CONFIG.apiKey.startsWith("YOUR_") &&
+    FIREBASE_CONFIG.authDomain &&
+    !FIREBASE_CONFIG.authDomain.startsWith("YOUR_") &&
     FIREBASE_CONFIG.projectId &&
-    !FIREBASE_CONFIG.projectId.startsWith("YOUR_");
+    !FIREBASE_CONFIG.projectId.startsWith("YOUR_") &&
+    FIREBASE_CONFIG.appId &&
+    !FIREBASE_CONFIG.appId.startsWith("YOUR_");
+
+
+  /* -------------------------------------------------------
+  Firebase has not been configured yet.
+  ------------------------------------------------------- */
 
   if (!isConfigured) {
-    // Leave window.mdtFirestoreReady unset/false — every page already
-    // falls back gracefully to its built-in sample content when this
-    // happens, so an unconfigured site never looks broken.
+
     window.mdtFirestoreReady = false;
+
+    window.mdtDb = null;
+
+    window.mdtAuth = null;
+
+    console.info(
+      "Mophato: Firebase is not configured. " +
+      "The website will use its built-in fallback content."
+    );
+
     return;
+
   }
+
+
+  /* -------------------------------------------------------
+  Prevent duplicate Firebase initialization.
+  ------------------------------------------------------- */
 
   try {
 
-    firebase.initializeApp(FIREBASE_CONFIG);
+    let app;
 
-    window.mdtDb = firebase.firestore();
+    if (window.firebase.apps && window.firebase.apps.length) {
 
-    // firebase-auth-compat.js is only loaded on admin.html — guard so
-    // index.html / tickets.html (which don't load it) don't error out.
-    if (firebase.auth) {
-      window.mdtAuth = firebase.auth();
+      app = window.firebase.app();
+
+    } else {
+
+      app = window.firebase.initializeApp(FIREBASE_CONFIG);
+
     }
+
+
+    /* -----------------------------------------------------
+    Firestore
+    ----------------------------------------------------- */
+
+    window.mdtDb = window.firebase.firestore(app);
+
+
+    /* -----------------------------------------------------
+    Firebase Authentication
+
+    admin.html loads Firebase Authentication.
+
+    index.html and tickets.html may not load the
+    Authentication library, so this is safely checked.
+    ----------------------------------------------------- */
+
+    if (
+      window.firebase &&
+      typeof window.firebase.auth === "function"
+    ) {
+
+      window.mdtAuth = window.firebase.auth();
+
+    } else {
+
+      window.mdtAuth = null;
+
+    }
+
+
+    /* -----------------------------------------------------
+    Firebase is ready
+    ----------------------------------------------------- */
 
     window.mdtFirestoreReady = true;
 
+    console.info(
+      "Mophato: Firebase initialized successfully."
+    );
+
+
   } catch (err) {
 
-    console.warn("Mophato: Firebase failed to initialize — check FIREBASE_CONFIG values.", err);
     window.mdtFirestoreReady = false;
+
+    window.mdtDb = null;
+
+    window.mdtAuth = null;
+
+    console.error(
+      "Mophato: Firebase failed to initialize.",
+      err
+    );
+
+    console.warn(
+      "Check the FIREBASE_CONFIG values and make sure " +
+      "the Firebase scripts are loaded before this file."
+    );
 
   }
 
 })();
 
+
 /* =========================================================
-SECURITY RULES — paste this into Firebase Console →
-Firestore Database → Rules → Publish (Step 3 above)
+SECURITY RULES
 =========================================================
 
+IMPORTANT:
+
+The following rules should be copied into:
+
+Firebase Console
+→ Firestore Database
+→ Rules
+
+Then click:
+
+Publish
+
+These rules allow:
+
+PUBLIC:
+- Read events
+- Read performances
+- Read site content
+
+ADMIN:
+- Create events
+- Edit events
+- Delete events
+- Create performances
+- Edit performances
+- Delete performances
+- Edit site content
+
+The administrator must:
+
+1. Be signed into Firebase Authentication.
+2. Have an active document in:
+
+admins/{USER_UID}
+
+Example:
+
+admins
+  └── abc123456789
+       ├── active: true
+       └── role: "admin"
+
+
+======================================================== */
+
+
+/*
+
 rules_version = '2';
+
 service cloud.firestore {
+
   match /databases/{database}/documents {
 
-    // Anyone visiting the site can READ events and performances
-    // (that's how the public pages display them) —
-    // but only a signed-in admin account can WRITE (add/edit/delete).
+
+    // =====================================================
+    // ADMIN ACCESS
+    // =====================================================
+
+    function isAdmin() {
+
+      return request.auth != null
+        && exists(
+          /databases/$(database)/documents/admins/$(request.auth.uid)
+        )
+        && get(
+          /databases/$(database)/documents/admins/$(request.auth.uid)
+        ).data.active == true;
+
+    }
+
+
+    // =====================================================
+    // EVENTS
+    // =====================================================
+
     match /events/{eventId} {
+
+      // Website visitors can view events.
       allow read: if true;
-      allow write: if request.auth != null;
+
+      // Only approved administrators can change events.
+      allow create, update, delete: if isAdmin();
+
     }
 
-    match /performances/{perfId} {
+
+    // =====================================================
+    // PERFORMANCES
+    // =====================================================
+
+    match /performances/{performanceId} {
+
+      // Website visitors can view performances.
       allow read: if true;
-      allow write: if request.auth != null;
+
+      // Only approved administrators can change
+      // performances.
+      allow create, update, delete: if isAdmin();
+
     }
 
-    // Same pattern for the "Site Content" tab in admin.html — the
-    // hero, story, impact stats, contact info, footer and social
-    // links all live in this one document.
-    match /site/{docId} {
+
+    // =====================================================
+    // WEBSITE CONTENT
+    // =====================================================
+
+    match /site/{documentId} {
+
+      // Website visitors can read website content.
       allow read: if true;
-      allow write: if request.auth != null;
+
+      // Only approved administrators can change content.
+      allow create, update, delete: if isAdmin();
+
     }
 
-    // Deny everything else by default — this line matters:
-    // without it, a typo'd collection name elsewhere in your code
-    // could accidentally end up world-writable.
+
+    // =====================================================
+    // ADMIN RECORDS
+    // =====================================================
+
+    match /admins/{userId} {
+
+      // An authenticated user can only read their own
+      // administrator record.
+      allow read: if request.auth != null
+        && request.auth.uid == userId;
+
+      // Administrator records must NOT be created,
+      // changed or deleted from the website itself.
+
+      // Manage these records directly through Firebase
+      // Console or another secured administration process.
+      allow create, update, delete: if false;
+
+    }
+
+
+    // =====================================================
+    // DENY EVERYTHING ELSE
+    // =====================================================
+
     match /{document=**} {
+
       allow read, write: if false;
+
     }
 
   }
+
 }
 
+*/
+
+
+/* =========================================================
+END OF FIREBASE CONFIGURATION
 ========================================================= */
