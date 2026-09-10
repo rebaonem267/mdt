@@ -1,9 +1,18 @@
 <!-- =========================================================
-MOPHATO DANCE THEATRE — ADMIN
+MOPHATO DANCE THEATRE - ADMIN
 Add / edit / remove upcoming events and past performances.
-Requires firebase-config.js to be filled in (see that file
-for setup steps) and a user account created in Firebase
-Authentication.
+
+ACCESS:
+- Requires firebase-config.js to be configured.
+- Requires Firebase Authentication.
+- Requires the signed-in user to exist in:
+  admins/{USER_UID}
+- The admin document must contain:
+  active: true
+  role: "admin"
+
+The designer credit is protected and cannot be changed
+through this admin portal.
 ========================================================= -->
 
 <!DOCTYPE html>
@@ -12,7 +21,7 @@ Authentication.
 
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin — Mophato Dance Theatre</title>
+<title>Admin - Mophato Dance Theatre</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -28,7 +37,15 @@ Authentication.
   --danger:#e07070;
 }
 
-*{ margin:0; padding:0; box-sizing:border-box; }
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+html{
+  scroll-behavior:smooth;
+}
 
 body{
   background:#000;
@@ -37,7 +54,9 @@ body{
   min-height:100vh;
 }
 
-h1,h2,h3{ font-family:'Oswald',sans-serif; }
+h1,h2,h3{
+  font-family:'Oswald',sans-serif;
+}
 
 header{
   padding:26px 6%;
@@ -47,6 +66,17 @@ header{
   border-bottom:1px solid rgba(212,160,23,0.2);
   flex-wrap:wrap;
   gap:14px;
+  position:sticky;
+  top:0;
+  z-index:1000;
+  background:rgba(0,0,0,0.96);
+  transition:transform .35s ease, opacity .35s ease;
+}
+
+header.nav-hidden{
+  transform:translateY(-120%);
+  opacity:0;
+  pointer-events:none;
 }
 
 header a{
@@ -57,7 +87,9 @@ header a{
   text-transform:uppercase;
 }
 
-header a:hover{ color:var(--gold); }
+header a:hover{
+  color:var(--gold);
+}
 
 .brand{
   display:flex;
@@ -93,7 +125,9 @@ main{
   font-size:0.95rem;
 }
 
-.field{ margin-bottom:18px; }
+.field{
+  margin-bottom:18px;
+}
 
 .field label{
   display:block;
@@ -117,7 +151,8 @@ main{
 }
 
 .field input:focus,
-.field textarea:focus{
+.field textarea:focus,
+.field select:focus{
   outline:none;
   border-color:var(--gold);
 }
@@ -133,24 +168,41 @@ main{
   letter-spacing:0.5px;
 }
 
-.btn-gold{ background:var(--gold); color:#000; }
-.btn-gold:hover{ background:var(--gold-light); }
+.btn-gold{
+  background:var(--gold);
+  color:#000;
+}
+
+.btn-gold:hover{
+  background:var(--gold-light);
+}
 
 .btn-outline{
   background:transparent;
   border:1px solid rgba(255,255,255,0.25);
   color:#fff;
 }
-.btn-outline:hover{ border-color:var(--gold); color:var(--gold); }
+
+.btn-outline:hover{
+  border-color:var(--gold);
+  color:var(--gold);
+}
 
 .btn-danger{
   background:transparent;
   border:1px solid rgba(224,112,112,0.5);
   color:var(--danger);
 }
-.btn-danger:hover{ background:var(--danger); color:#000; }
 
-.btn-small{ padding:10px 18px; font-size:13px; }
+.btn-danger:hover{
+  background:var(--danger);
+  color:#000;
+}
+
+.btn-small{
+  padding:10px 18px;
+  font-size:13px;
+}
 
 #loginError{
   color:var(--danger);
@@ -174,7 +226,9 @@ main{
   line-height:1.7;
 }
 
-#dashboard{ display:none; }
+#dashboard{
+  display:none;
+}
 
 .tabs{
   display:flex;
@@ -195,14 +249,24 @@ main{
   transition:0.3s;
 }
 
+.tab-btn:hover{
+  border-color:var(--gold);
+  color:var(--gold);
+}
+
 .tab-btn.active{
   border-color:var(--gold);
   color:var(--gold);
   background:rgba(212,160,23,0.08);
 }
 
-.tab-panel{ display:none; }
-.tab-panel.active{ display:block; }
+.tab-panel{
+  display:none;
+}
+
+.tab-panel.active{
+  display:block;
+}
 
 .panel-head{
   display:flex;
@@ -213,7 +277,9 @@ main{
   gap:14px;
 }
 
-.panel-head h2{ font-size:1.6rem; }
+.panel-head h2{
+  font-size:1.6rem;
+}
 
 .item-card{
   background:var(--dark3);
@@ -227,9 +293,25 @@ main{
   flex-wrap:wrap;
 }
 
-.item-card .info h3{ font-size:1.1rem; margin-bottom:6px; }
-.item-card .info p{ color:var(--gray); font-size:0.88rem; line-height:1.5; }
-.item-card .info .meta{ color:var(--gold); font-size:0.78rem; letter-spacing:1px; text-transform:uppercase; margin-bottom:8px; display:block; }
+.item-card .info h3{
+  font-size:1.1rem;
+  margin-bottom:6px;
+}
+
+.item-card .info p{
+  color:var(--gray);
+  font-size:0.88rem;
+  line-height:1.5;
+}
+
+.item-card .info .meta{
+  color:var(--gold);
+  font-size:0.78rem;
+  letter-spacing:1px;
+  text-transform:uppercase;
+  margin-bottom:8px;
+  display:block;
+}
 
 .item-actions{
   display:flex;
@@ -255,9 +337,14 @@ main{
   display:none;
 }
 
-.form-card.active{ display:block; }
+.form-card.active{
+  display:block;
+}
 
-.form-card h3{ margin-bottom:24px; font-size:1.2rem; }
+.form-card h3{
+  margin-bottom:24px;
+  font-size:1.2rem;
+}
 
 .form-row{
   display:grid;
@@ -266,7 +353,9 @@ main{
 }
 
 @media(max-width:640px){
-  .form-row{ grid-template-columns:1fr; }
+  .form-row{
+    grid-template-columns:1fr;
+  }
 }
 
 .checkbox-field{
@@ -276,7 +365,9 @@ main{
   margin-bottom:18px;
 }
 
-.checkbox-field input{ width:auto; }
+.checkbox-field input{
+  width:auto;
+}
 
 .subsection-label{
   display:block;
@@ -302,8 +393,12 @@ main{
 }
 
 @media(max-width:640px){
+
   .ticket-type-row,
-  .date-row{ grid-template-columns:1fr; }
+  .date-row{
+    grid-template-columns:1fr;
+  }
+
 }
 
 .ticket-type-row input,
@@ -326,6 +421,11 @@ main{
   cursor:pointer;
 }
 
+.remove-row-btn:hover{
+  background:var(--danger);
+  color:#000;
+}
+
 .form-actions{
   display:flex;
   gap:14px;
@@ -346,8 +446,14 @@ main{
   font-size:0.85rem;
   margin-top:14px;
 }
-.status-msg.success{ color:var(--gold); }
-.status-msg.error{ color:var(--danger); }
+
+.status-msg.success{
+  color:var(--gold);
+}
+
+.status-msg.error{
+  color:var(--danger);
+}
 
 .content-group{
   margin-bottom:36px;
@@ -381,135 +487,410 @@ main{
   margin-bottom:0;
 }
 
+.locked-field{
+  background:#090909;
+  border:1px solid rgba(212,160,23,0.25);
+  border-radius:12px;
+  padding:16px 18px;
+  color:#fff;
+}
+
+.locked-field strong{
+  color:var(--gold);
+  font-weight:600;
+}
+
+.locked-field small{
+  display:block;
+  margin-top:7px;
+  color:#777;
+  line-height:1.5;
+  font-size:0.75rem;
+}
+
+.security-note{
+  background:rgba(212,160,23,0.06);
+  border:1px solid rgba(212,160,23,0.2);
+  border-radius:16px;
+  padding:18px;
+  margin-bottom:30px;
+  color:#aaa;
+  font-size:0.8rem;
+  line-height:1.6;
+}
+
+.security-note strong{
+  color:var(--gold);
+}
+
+@media(max-width:640px){
+
+  header{
+    padding:20px 5%;
+  }
+
+  header > div:last-child{
+    width:100%;
+    justify-content:space-between;
+  }
+
+  main{
+    padding:35px 5% 80px;
+  }
+
+  #loginScreen{
+    margin:55px auto;
+  }
+
+  .form-card{
+    padding:24px;
+  }
+
+}
+
 </style>
 </head>
 
 <body>
 
-<header>
+<header id="adminHeader">
+
   <div class="brand">
     <h1>Mophato Admin</h1>
   </div>
+
   <div style="display:flex; gap:24px; align-items:center;">
+
     <a href="index.html">&larr; Back to Site</a>
-    <a href="#" id="logoutLink" style="display:none;">Log Out</a>
+
+    <a href="#" id="logoutLink" style="display:none;">
+      Log Out
+    </a>
+
   </div>
+
 </header>
 
 <div id="configWarning">
-  <strong>Firebase isn't configured yet.</strong> Open <code>firebase-config.js</code> and follow the setup
-  steps at the top of that file (free, ~10 minutes, no coding beyond pasting your project keys once).
-  Until then, this admin page can't save anything, and the site will keep showing its built-in fallback content.
+
+  <strong>Firebase isn't configured yet.</strong>
+
+  Open <code>firebase-config.js</code> and add your Firebase project
+  configuration.
+
+  This admin portal requires Firebase Authentication and Firestore
+  before it can save events, performances or site content.
+
 </div>
 
 <div id="loginScreen">
+
   <h2>Sign In</h2>
-  <p>Enter the email &amp; password set up for you in Firebase Authentication.</p>
+
+  <p>
+    Enter the email and password set up for you in Firebase Authentication.
+  </p>
 
   <div class="field">
-    <label for="loginEmail">Email</label>
-    <input type="email" id="loginEmail" autocomplete="username">
+
+    <label for="loginEmail">
+      Email
+    </label>
+
+    <input
+      type="email"
+      id="loginEmail"
+      autocomplete="username"
+    >
+
   </div>
 
   <div class="field">
-    <label for="loginPassword">Password</label>
-    <input type="password" id="loginPassword" autocomplete="current-password">
+
+    <label for="loginPassword">
+      Password
+    </label>
+
+    <input
+      type="password"
+      id="loginPassword"
+      autocomplete="current-password"
+    >
+
   </div>
 
-  <button class="btn btn-gold" id="loginBtn">Sign In</button>
+  <button class="btn btn-gold" id="loginBtn">
+    Sign In
+  </button>
+
   <p id="loginError"></p>
+
 </div>
 
 <main id="dashboard">
 
-  <div class="tabs">
-    <button class="tab-btn active" data-tab="events">Upcoming Events</button>
-    <button class="tab-btn" data-tab="performances">Past Performances</button>
-    <button class="tab-btn" data-tab="sitecontent">Site Content</button>
+  <div class="security-note">
+
+    <strong>Administrator access</strong><br>
+
+    This portal is restricted to approved administrators.
+    Your Firebase account must be registered under
+    <code>admins/{USER_UID}</code> with
+    <code>active: true</code> and <code>role: "admin"</code>.
+
   </div>
 
-  <!-- ============ EVENTS TAB ============ -->
+  <div class="tabs">
+
+    <button
+      class="tab-btn active"
+      data-tab="events"
+    >
+      Upcoming Events
+    </button>
+
+    <button
+      class="tab-btn"
+      data-tab="performances"
+    >
+      Past Performances
+    </button>
+
+    <button
+      class="tab-btn"
+      data-tab="sitecontent"
+    >
+      Site Content
+    </button>
+
+  </div>
+
+  <!-- =========================================================
+  EVENTS TAB
+  ========================================================= -->
 
   <div class="tab-panel active" id="tab-events">
 
     <div class="panel-head">
-      <h2>Upcoming Events</h2>
-      <button class="btn btn-gold btn-small" id="addEventBtn">+ Add Event</button>
+
+      <h2>
+        Upcoming Events
+      </h2>
+
+      <button
+        class="btn btn-gold btn-small"
+        id="addEventBtn"
+      >
+        + Add Event
+      </button>
+
     </div>
 
     <div class="form-card" id="eventForm">
 
-      <h3 id="eventFormTitle">Add Event</h3>
+      <h3 id="eventFormTitle">
+        Add Event
+      </h3>
 
       <div class="form-row">
+
         <div class="field">
-          <label>Title</label>
-          <input type="text" id="ev-title" placeholder="e.g. Botswana's Story, Told in Dance">
+
+          <label>
+            Title
+          </label>
+
+          <input
+            type="text"
+            id="ev-title"
+            placeholder="e.g. Botswana's Story, Told in Dance"
+          >
+
         </div>
+
         <div class="field">
-          <label>Venue</label>
-          <input type="text" id="ev-venue" placeholder="e.g. Civic Center Hall, Main Mall">
+
+          <label>
+            Venue
+          </label>
+
+          <input
+            type="text"
+            id="ev-venue"
+            placeholder="e.g. Civic Center Hall, Main Mall"
+          >
+
         </div>
+
       </div>
 
       <div class="field">
-        <label>Subtitle / Description</label>
-        <textarea id="ev-subtitle" rows="3" placeholder="Shown under the title on the flyer and tickets page"></textarea>
+
+        <label>
+          Subtitle / Description
+        </label>
+
+        <textarea
+          id="ev-subtitle"
+          rows="3"
+          placeholder="Shown under the title on the flyer and tickets page"
+        ></textarea>
+
       </div>
 
       <div class="form-row">
+
         <div class="field">
-          <label>Run Starts (date &amp; time)</label>
-          <input type="datetime-local" id="ev-start">
+
+          <label>
+            Run Starts (date &amp; time)
+          </label>
+
+          <input
+            type="datetime-local"
+            id="ev-start"
+          >
+
         </div>
+
         <div class="field">
-          <label>Run Ends (date &amp; time)</label>
-          <input type="datetime-local" id="ev-end">
+
+          <label>
+            Run Ends (date &amp; time)
+          </label>
+
+          <input
+            type="datetime-local"
+            id="ev-end"
+          >
+
         </div>
+
       </div>
 
-      <label class="subsection-label">Show Dates</label>
+      <label class="subsection-label">
+        Show Dates
+      </label>
 
       <div id="showDateRows"></div>
 
-      <button class="btn btn-outline btn-small" id="addShowDateBtn" type="button">+ Add Date</button>
+      <button
+        class="btn btn-outline btn-small"
+        id="addShowDateBtn"
+        type="button"
+      >
+        + Add Date
+      </button>
 
-      <p class="hint" style="margin-top:14px;">
-        Leave "Status" blank for a normal, available date. Type anything you like to show a small badge
-        on that date on the Tickets page &mdash; e.g. <em>Sold Out</em>, <em>20 Tickets Left</em>, <em>Selling Fast</em>.
-        Typing "sold out" (any case) also automatically stops that date from being selected on the Tickets page.
+      <p
+        class="hint"
+        style="margin-top:14px;"
+      >
+
+        Leave "Status" blank for a normal, available date.
+
+        Type anything you like to show a small badge on that date
+        on the Tickets page.
+
+        Examples:
+        <em>Sold Out</em>,
+        <em>20 Tickets Left</em>,
+        <em>Selling Fast</em>.
+
+        Typing "sold out" also automatically stops that date
+        from being selected on the Tickets page.
+
       </p>
 
       <div class="form-row">
+
         <div class="field">
-          <label>Currency</label>
-          <input type="text" id="ev-currency" placeholder="BWP" value="BWP">
+
+          <label>
+            Currency
+          </label>
+
+          <input
+            type="text"
+            id="ev-currency"
+            placeholder="BWP"
+            value="BWP"
+          >
+
         </div>
-        <div class="checkbox-field" style="margin-top:34px;">
-          <input type="checkbox" id="ev-onsale" checked>
-          <label for="ev-onsale" style="margin:0;">Tickets on sale</label>
+
+        <div
+          class="checkbox-field"
+          style="margin-top:34px;"
+        >
+
+          <input
+            type="checkbox"
+            id="ev-onsale"
+            checked
+          >
+
+          <label
+            for="ev-onsale"
+            style="margin:0;"
+          >
+            Tickets on sale
+          </label>
+
         </div>
+
       </div>
 
-      <label class="subsection-label">Ticket Types</label>
+      <label class="subsection-label">
+        Ticket Types
+      </label>
 
       <div id="ticketTypeRows"></div>
 
-      <button class="btn btn-outline btn-small" id="addTicketTypeBtn" type="button">+ Add Ticket Type</button>
+      <button
+        class="btn btn-outline btn-small"
+        id="addTicketTypeBtn"
+        type="button"
+      >
+        + Add Ticket Type
+      </button>
 
-      <p class="hint" style="margin-top:14px;">
-        The Lemon Squeezy Variant ID links this ticket type to a specific product in your Lemon Squeezy store
-        (Products &gt; your product &gt; Variants). Add as many ticket types as you like &mdash; each with its own
-        variant &mdash; and customers will be able to select and pay for more than one type in the same visit.
-        Use only the ID itself (letters, numbers, dashes) &mdash; not a full URL.
+      <p
+        class="hint"
+        style="margin-top:14px;"
+      >
+
+        The Lemon Squeezy Variant ID links this ticket type to
+        a specific product in your Lemon Squeezy store.
+
+        Add as many ticket types as you need.
+
+        Use only the Variant ID itself.
+
       </p>
 
       <div class="form-actions">
-        <button class="btn btn-gold" id="saveEventBtn">Save Event</button>
-        <button class="btn btn-outline" id="cancelEventBtn">Cancel</button>
+
+        <button
+          class="btn btn-gold"
+          id="saveEventBtn"
+        >
+          Save Event
+        </button>
+
+        <button
+          class="btn btn-outline"
+          id="cancelEventBtn"
+        >
+          Cancel
+        </button>
+
       </div>
 
-      <p class="status-msg" id="eventFormStatus"></p>
+      <p
+        class="status-msg"
+        id="eventFormStatus"
+      ></p>
 
     </div>
 
@@ -517,48 +898,133 @@ main{
 
   </div>
 
-  <!-- ============ PERFORMANCES TAB ============ -->
+  <!-- =========================================================
+  PERFORMANCES TAB
+  ========================================================= -->
 
-  <div class="tab-panel" id="tab-performances">
+  <div
+    class="tab-panel"
+    id="tab-performances"
+  >
 
     <div class="panel-head">
-      <h2>Past Performances</h2>
-      <button class="btn btn-gold btn-small" id="addPerfBtn">+ Add Performance</button>
+
+      <h2>
+        Past Performances
+      </h2>
+
+      <button
+        class="btn btn-gold btn-small"
+        id="addPerfBtn"
+      >
+        + Add Performance
+      </button>
+
     </div>
 
-    <p class="hint" style="margin-bottom:24px;">These populate the "Performances" carousel on the home page. Add an image URL — you can host images anywhere (your own site, Google Drive share link, imgur, etc.) and paste the direct link here.</p>
+    <p
+      class="hint"
+      style="margin-bottom:24px;"
+    >
 
-    <div class="form-card" id="perfForm">
+      These populate the Performances carousel on the home page.
 
-      <h3 id="perfFormTitle">Add Performance</h3>
+      Add an image URL and display order for each performance.
+
+    </p>
+
+    <div
+      class="form-card"
+      id="perfForm"
+    >
+
+      <h3 id="perfFormTitle">
+        Add Performance
+      </h3>
 
       <div class="form-row">
+
         <div class="field">
-          <label>Title</label>
-          <input type="text" id="pf-title" placeholder="e.g. THARI">
+
+          <label>
+            Title
+          </label>
+
+          <input
+            type="text"
+            id="pf-title"
+            placeholder="e.g. THARI"
+          >
+
         </div>
+
         <div class="field">
-          <label>Display Order</label>
-          <input type="number" id="pf-order" placeholder="1" min="1">
+
+          <label>
+            Display Order
+          </label>
+
+          <input
+            type="number"
+            id="pf-order"
+            placeholder="1"
+            min="1"
+          >
+
         </div>
+
       </div>
 
       <div class="field">
-        <label>Subtitle</label>
-        <input type="text" id="pf-subtitle" placeholder="e.g. Women Who Carry The Nation">
+
+        <label>
+          Subtitle
+        </label>
+
+        <input
+          type="text"
+          id="pf-subtitle"
+          placeholder="e.g. Women Who Carry The Nation"
+        >
+
       </div>
 
       <div class="field">
-        <label>Image URL</label>
-        <input type="text" id="pf-image" placeholder="https://...">
+
+        <label>
+          Image URL
+        </label>
+
+        <input
+          type="text"
+          id="pf-image"
+          placeholder="https://..."
+        >
+
       </div>
 
       <div class="form-actions">
-        <button class="btn btn-gold" id="savePerfBtn">Save Performance</button>
-        <button class="btn btn-outline" id="cancelPerfBtn">Cancel</button>
+
+        <button
+          class="btn btn-gold"
+          id="savePerfBtn"
+        >
+          Save Performance
+        </button>
+
+        <button
+          class="btn btn-outline"
+          id="cancelPerfBtn"
+        >
+          Cancel
+        </button>
+
       </div>
 
-      <p class="status-msg" id="perfFormStatus"></p>
+      <p
+        class="status-msg"
+        id="perfFormStatus"
+      ></p>
 
     </div>
 
@@ -566,177 +1032,672 @@ main{
 
   </div>
 
-  <!-- ============ SITE CONTENT TAB ============ -->
+  <!-- =========================================================
+  SITE CONTENT TAB
+  ========================================================= -->
 
-  <div class="tab-panel" id="tab-sitecontent">
+  <div
+    class="tab-panel"
+    id="tab-sitecontent"
+  >
 
     <div class="panel-head">
-      <h2>Site Content</h2>
+
+      <h2>
+        Site Content
+      </h2>
+
     </div>
 
-    <p class="hint" style="margin-bottom:30px;">
-      Everything below controls text and images shown across the live site — hero section, story,
-      impact numbers, contact details, and footer. Changes appear on the site as soon as you click Save.
+    <p
+      class="hint"
+      style="margin-bottom:30px;"
+    >
+
+      Everything below controls text and images shown across
+      the live site.
+
+      Changes appear on the site after you click Save Site Content.
+
     </p>
 
-    <div class="form-card active" style="display:block;">
+    <div
+      class="form-card active"
+      style="display:block;"
+    >
+
+      <!-- LOGO -->
 
       <div class="content-group">
-        <h3>Logo</h3>
+
+        <h3>
+          Logo
+        </h3>
+
         <div class="field">
-          <label>Logo Image URL</label>
-          <input type="text" id="sc-logo" placeholder="https://... (or leave as mdt.png to use the uploaded file)">
+
+          <label>
+            Logo Image URL
+          </label>
+
+          <input
+            type="text"
+            id="sc-logo"
+            placeholder="https://... or mdt.png"
+          >
+
         </div>
+
       </div>
 
-      <div class="content-group">
-        <h3>Hero Section</h3>
-        <div class="field">
-          <label>Eyebrow Text</label>
-          <input type="text" id="sc-hero-eyebrow" placeholder="e.g. Rhythm. Heritage. Movement.">
-        </div>
-        <div class="form-row">
-          <div class="field">
-            <label>Title — Line 1</label>
-            <input type="text" id="sc-hero-title1" placeholder="e.g. Mophato">
-          </div>
-          <div class="field">
-            <label>Title — Line 2</label>
-            <input type="text" id="sc-hero-title2" placeholder="e.g. Dance Theatre">
-          </div>
-        </div>
-        <div class="field">
-          <label>Description</label>
-          <textarea id="sc-hero-description" rows="3"></textarea>
-        </div>
-      </div>
+      <!-- HERO -->
 
       <div class="content-group">
-        <h3>Story Section</h3>
+
+        <h3>
+          Hero Section
+        </h3>
+
         <div class="field">
-          <label>Eyebrow Text</label>
-          <input type="text" id="sc-story-eyebrow" placeholder="e.g. Our Story">
+
+          <label>
+            Eyebrow Text
+          </label>
+
+          <input
+            type="text"
+            id="sc-hero-eyebrow"
+            placeholder="e.g. Rhythm. Heritage. Movement."
+          >
+
         </div>
-        <div class="field">
-          <label>Heading</label>
-          <input type="text" id="sc-story-heading">
-        </div>
+
         <div class="form-row">
+
           <div class="field">
-            <label>Founding Year</label>
-            <input type="text" id="sc-story-year" placeholder="e.g. 2009">
+
+            <label>
+              Title - Line 1
+            </label>
+
+            <input
+              type="text"
+              id="sc-hero-title1"
+              placeholder="e.g. Mophato"
+            >
+
           </div>
+
           <div class="field">
-            <label>Founder Credit</label>
-            <input type="text" id="sc-story-founder" placeholder="e.g. Founded by Andrew Letso Kola">
+
+            <label>
+              Title - Line 2
+            </label>
+
+            <input
+              type="text"
+              id="sc-hero-title2"
+              placeholder="e.g. Dance Theatre"
+            >
+
           </div>
+
         </div>
+
         <div class="field">
-          <label>Paragraph 1</label>
-          <textarea id="sc-story-p1" rows="2"></textarea>
+
+          <label>
+            Description
+          </label>
+
+          <textarea
+            id="sc-hero-description"
+            rows="3"
+          ></textarea>
+
         </div>
-        <div class="field">
-          <label>Paragraph 2</label>
-          <textarea id="sc-story-p2" rows="2"></textarea>
-        </div>
-        <div class="field">
-          <label>Story Image URL</label>
-          <input type="text" id="sc-story-image" placeholder="https://...">
-        </div>
+
       </div>
 
+      <!-- STORY -->
+
       <div class="content-group">
-        <h3>Community Impact Section</h3>
+
+        <h3>
+          Story Section
+        </h3>
+
+        <div class="field">
+
+          <label>
+            Eyebrow Text
+          </label>
+
+          <input
+            type="text"
+            id="sc-story-eyebrow"
+            placeholder="e.g. Our Story"
+          >
+
+        </div>
+
+        <div class="field">
+
+          <label>
+            Heading
+          </label>
+
+          <input
+            type="text"
+            id="sc-story-heading"
+          >
+
+        </div>
+
         <div class="form-row">
+
           <div class="field">
-            <label>Eyebrow Text</label>
-            <input type="text" id="sc-impact-eyebrow" placeholder="e.g. Community Impact">
+
+            <label>
+              Founding Year
+            </label>
+
+            <input
+              type="text"
+              id="sc-story-year"
+              placeholder="e.g. 2009"
+            >
+
           </div>
+
           <div class="field">
-            <label>Heading</label>
-            <input type="text" id="sc-impact-heading">
+
+            <label>
+              Founder Credit
+            </label>
+
+            <input
+              type="text"
+              id="sc-story-founder"
+              placeholder="e.g. Founded by Andrew Letso Kola"
+            >
+
           </div>
+
+        </div>
+
+        <div class="field">
+
+          <label>
+            Paragraph 1
+          </label>
+
+          <textarea
+            id="sc-story-p1"
+            rows="2"
+          ></textarea>
+
+        </div>
+
+        <div class="field">
+
+          <label>
+            Paragraph 2
+          </label>
+
+          <textarea
+            id="sc-story-p2"
+            rows="2"
+          ></textarea>
+
+        </div>
+
+        <div class="field">
+
+          <label>
+            Story Image URL
+          </label>
+
+          <input
+            type="text"
+            id="sc-story-image"
+            placeholder="https://..."
+          >
+
+        </div>
+
+      </div>
+
+      <!-- COMMUNITY IMPACT -->
+
+      <div class="content-group">
+
+        <h3>
+          Community Impact Section
+        </h3>
+
+        <div class="form-row">
+
+          <div class="field">
+
+            <label>
+              Eyebrow Text
+            </label>
+
+            <input
+              type="text"
+              id="sc-impact-eyebrow"
+              placeholder="e.g. Community Impact"
+            >
+
+          </div>
+
+          <div class="field">
+
+            <label>
+              Heading
+            </label>
+
+            <input
+              type="text"
+              id="sc-impact-heading"
+            >
+
+          </div>
+
         </div>
 
         <div class="impact-card-fields">
+
           <div class="form-row">
-            <div class="field"><label>Stat 1 Number</label><input type="text" id="sc-impact-num1" placeholder="e.g. 400+"></div>
-            <div class="field"><label>Stat 1 Text</label><input type="text" id="sc-impact-text1"></div>
+
+            <div class="field">
+
+              <label>
+                Stat 1 Number
+              </label>
+
+              <input
+                type="text"
+                id="sc-impact-num1"
+                placeholder="e.g. 400+"
+              >
+
+            </div>
+
+            <div class="field">
+
+              <label>
+                Stat 1 Text
+              </label>
+
+              <input
+                type="text"
+                id="sc-impact-text1"
+              >
+
+            </div>
+
           </div>
+
         </div>
 
         <div class="impact-card-fields">
+
           <div class="form-row">
-            <div class="field"><label>Stat 2 Number</label><input type="text" id="sc-impact-num2" placeholder="e.g. 10+"></div>
-            <div class="field"><label>Stat 2 Text</label><input type="text" id="sc-impact-text2"></div>
+
+            <div class="field">
+
+              <label>
+                Stat 2 Number
+              </label>
+
+              <input
+                type="text"
+                id="sc-impact-num2"
+                placeholder="e.g. 10+"
+              >
+
+            </div>
+
+            <div class="field">
+
+              <label>
+                Stat 2 Text
+              </label>
+
+              <input
+                type="text"
+                id="sc-impact-text2"
+              >
+
+            </div>
+
           </div>
+
         </div>
 
         <div class="impact-card-fields">
+
           <div class="form-row">
-            <div class="field"><label>Stat 3 Number</label><input type="text" id="sc-impact-num3" placeholder="e.g. 35+"></div>
-            <div class="field"><label>Stat 3 Text</label><input type="text" id="sc-impact-text3"></div>
+
+            <div class="field">
+
+              <label>
+                Stat 3 Number
+              </label>
+
+              <input
+                type="text"
+                id="sc-impact-num3"
+                placeholder="e.g. 35+"
+              >
+
+            </div>
+
+            <div class="field">
+
+              <label>
+                Stat 3 Text
+              </label>
+
+              <input
+                type="text"
+                id="sc-impact-text3"
+              >
+
+            </div>
+
           </div>
+
         </div>
+
       </div>
 
+      <!-- CONTACT -->
+
       <div class="content-group">
-        <h3>Book Mophato / Contact Section</h3>
+
+        <h3>
+          Book Mophato / Contact Section
+        </h3>
+
         <div class="form-row">
+
           <div class="field">
-            <label>Eyebrow Text</label>
-            <input type="text" id="sc-contact-eyebrow" placeholder="e.g. Book Mophato">
+
+            <label>
+              Eyebrow Text
+            </label>
+
+            <input
+              type="text"
+              id="sc-contact-eyebrow"
+              placeholder="e.g. Book Mophato"
+            >
+
           </div>
+
           <div class="field">
-            <label>Heading</label>
-            <input type="text" id="sc-contact-heading">
+
+            <label>
+              Heading
+            </label>
+
+            <input
+              type="text"
+              id="sc-contact-heading"
+            >
+
           </div>
+
         </div>
+
         <div class="field">
-          <label>Availability Text</label>
-          <textarea id="sc-contact-availability" rows="2"></textarea>
+
+          <label>
+            Availability Text
+          </label>
+
+          <textarea
+            id="sc-contact-availability"
+            rows="2"
+          ></textarea>
+
         </div>
 
-        <label class="subsection-label">Marketing & Partnerships Contact</label>
-        <div class="form-row">
-          <div class="field"><label>Label</label><input type="text" id="sc-contact-mkt-label"></div>
-          <div class="field"><label>Phone</label><input type="text" id="sc-contact-mkt-phone"></div>
-        </div>
-        <div class="field"><label>Email</label><input type="email" id="sc-contact-mkt-email"></div>
+        <label class="subsection-label">
+          Marketing &amp; Partnerships Contact
+        </label>
 
-        <label class="subsection-label" style="margin-top:10px;">Founder & Artistic Director Contact</label>
         <div class="form-row">
-          <div class="field"><label>Label</label><input type="text" id="sc-contact-fdr-label"></div>
-          <div class="field"><label>Phone</label><input type="text" id="sc-contact-fdr-phone"></div>
+
+          <div class="field">
+
+            <label>
+              Label
+            </label>
+
+            <input
+              type="text"
+              id="sc-contact-mkt-label"
+            >
+
+          </div>
+
+          <div class="field">
+
+            <label>
+              Phone
+            </label>
+
+            <input
+              type="text"
+              id="sc-contact-mkt-phone"
+            >
+
+          </div>
+
         </div>
-        <div class="field"><label>Email</label><input type="email" id="sc-contact-fdr-email"></div>
+
+        <div class="field">
+
+          <label>
+            Email
+          </label>
+
+          <input
+            type="email"
+            id="sc-contact-mkt-email"
+          >
+
+        </div>
+
+        <label
+          class="subsection-label"
+          style="margin-top:10px;"
+        >
+          Founder &amp; Artistic Director Contact
+        </label>
+
+        <div class="form-row">
+
+          <div class="field">
+
+            <label>
+              Label
+            </label>
+
+            <input
+              type="text"
+              id="sc-contact-fdr-label"
+            >
+
+          </div>
+
+          <div class="field">
+
+            <label>
+              Phone
+            </label>
+
+            <input
+              type="text"
+              id="sc-contact-fdr-phone"
+            >
+
+          </div>
+
+        </div>
+
+        <div class="field">
+
+          <label>
+            Email
+          </label>
+
+          <input
+            type="email"
+            id="sc-contact-fdr-email"
+          >
+
+        </div>
+
       </div>
 
+      <!-- FOOTER -->
+
       <div class="content-group">
-        <h3>Footer & Social Links</h3>
+
+        <h3>
+          Footer &amp; Social Links
+        </h3>
+
         <div class="form-row">
-          <div class="field"><label>Brand Name</label><input type="text" id="sc-footer-brand"></div>
-          <div class="field"><label>Designer Credit</label><input type="text" id="sc-footer-designer"></div>
+
+          <div class="field">
+
+            <label>
+              Brand Name
+            </label>
+
+            <input
+              type="text"
+              id="sc-footer-brand"
+            >
+
+          </div>
+
+          <div class="field">
+
+            <label>
+              Designer Credit
+            </label>
+
+            <div class="locked-field">
+
+              <strong>
+                Designed by Rebaone Lesly Mochabeng
+              </strong>
+
+              <small>
+                This credit is protected and cannot be changed
+                from the admin portal. It is hard-coded in the
+                public index.html and is not controlled by Firestore.
+              </small>
+
+            </div>
+
+          </div>
+
         </div>
-        <div class="field"><label>Copyright Line</label><input type="text" id="sc-footer-copyright"></div>
+
+        <div class="field">
+
+          <label>
+            Copyright Line
+          </label>
+
+          <input
+            type="text"
+            id="sc-footer-copyright"
+          >
+
+        </div>
+
         <div class="form-row">
-          <div class="field"><label>Facebook URL</label><input type="text" id="sc-footer-facebook" placeholder="https://facebook.com/..."></div>
-          <div class="field"><label>Instagram URL</label><input type="text" id="sc-footer-instagram" placeholder="https://instagram.com/..."></div>
+
+          <div class="field">
+
+            <label>
+              Facebook URL
+            </label>
+
+            <input
+              type="text"
+              id="sc-footer-facebook"
+              placeholder="https://facebook.com/..."
+            >
+
+          </div>
+
+          <div class="field">
+
+            <label>
+              Instagram URL
+            </label>
+
+            <input
+              type="text"
+              id="sc-footer-instagram"
+              placeholder="https://instagram.com/..."
+            >
+
+          </div>
+
         </div>
-        <div class="field"><label>TikTok URL</label><input type="text" id="sc-footer-tiktok" placeholder="https://tiktok.com/..."></div>
+
+        <div class="field">
+
+          <label>
+            TikTok URL
+          </label>
+
+          <input
+            type="text"
+            id="sc-footer-tiktok"
+            placeholder="https://tiktok.com/..."
+          >
+
+        </div>
+
       </div>
 
       <div class="form-actions">
-        <button class="btn btn-gold" id="saveSiteContentBtn">Save Site Content</button>
+
+        <button
+          class="btn btn-gold"
+          id="saveSiteContentBtn"
+        >
+          Save Site Content
+        </button>
+
       </div>
 
-      <p class="status-msg" id="siteContentStatus"></p>
+      <p
+        class="status-msg"
+        id="siteContentStatus"
+      ></p>
 
     </div>
 
   </div>
 
 </main>
+
+<!-- =========================================================
+FIREBASE
+========================================================= -->
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
@@ -745,99 +1706,311 @@ main{
 
 <script>
 
-if(!window.mdtFirestoreReady){
-  document.getElementById('configWarning').style.display = 'block';
-  document.getElementById('loginScreen').style.display = 'none';
-}
+/* =========================================================
+CONFIGURATION
+========================================================= */
 
 const loginScreen = document.getElementById('loginScreen');
 const dashboard = document.getElementById('dashboard');
 const logoutLink = document.getElementById('logoutLink');
-
-async function attemptLogin(){
-
-  const email = document.getElementById('loginEmail').value.trim();
-  const password = document.getElementById('loginPassword').value;
-  const errEl = document.getElementById('loginError');
-
-  errEl.textContent = '';
-
-  if(!window.mdtAuth){
-    errEl.textContent = 'Firebase Authentication is not configured. See firebase-config.js.';
-    return;
-  }
-
-  try{
-    await window.mdtAuth.signInWithEmailAndPassword(email, password);
-  } catch(err){
-    errEl.textContent = 'Sign-in failed: check your email and password.';
-  }
-
-}
-
-document.getElementById('loginBtn').addEventListener('click', attemptLogin);
-
-document.getElementById('loginPassword').addEventListener('keydown', (e) => {
-  if(e.key === 'Enter') attemptLogin();
-});
-
-logoutLink.addEventListener('click', (e) => {
-  e.preventDefault();
-  window.mdtAuth.signOut();
-});
-
-if(window.mdtAuth){
-
-  window.mdtAuth.onAuthStateChanged(user => {
-
-    if(user){
-      loginScreen.style.display = 'none';
-      dashboard.style.display = 'block';
-      logoutLink.style.display = 'inline';
-      loadEvents();
-      loadPerformances();
-      loadSiteContentForm();
-    } else {
-      loginScreen.style.display = 'block';
-      dashboard.style.display = 'none';
-      logoutLink.style.display = 'none';
-    }
-
-  });
-
-}
-
-document.querySelectorAll('.tab-btn').forEach(btn => {
-
-  btn.addEventListener('click', () => {
-
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-
-    btn.classList.add('active');
-    document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
-
-  });
-
-});
-
-const db = () => window.mdtDb;
+const configWarning = document.getElementById('configWarning');
 
 let editingEventId = null;
 let editingPerfId = null;
 
-async function loadEvents(){
+const db = () => window.mdtDb;
 
-  const listEl = document.getElementById('eventsList');
-  listEl.innerHTML = '<p class="hint">Loading…</p>';
+
+/* =========================================================
+CONFIG CHECK
+========================================================= */
+
+if(!window.mdtFirestoreReady){
+
+  configWarning.style.display = 'block';
+  loginScreen.style.display = 'none';
+
+}
+
+
+/* =========================================================
+ADMIN ACCESS CHECK
+========================================================= */
+
+async function requireAdmin(){
+
+  const user = window.mdtAuth
+    ? window.mdtAuth.currentUser
+    : null;
+
+  if(!user){
+    throw new Error('You must be signed in.');
+  }
+
+  if(!window.mdtDb){
+    throw new Error('Firestore is not available.');
+  }
+
+  const adminDoc = await db()
+    .collection('admins')
+    .doc(user.uid)
+    .get();
+
+  if(!adminDoc.exists){
+
+    throw new Error(
+      'Administrator access is required.'
+    );
+
+  }
+
+  const adminData = adminDoc.data() || {};
+
+  if(
+    adminData.active !== true ||
+    adminData.role !== 'admin'
+  ){
+
+    throw new Error(
+      'Administrator access is required.'
+    );
+
+  }
+
+  return true;
+
+}
+
+
+/* =========================================================
+LOGIN
+========================================================= */
+
+async function attemptLogin(){
+
+  const email =
+    document.getElementById('loginEmail')
+      .value
+      .trim();
+
+  const password =
+    document.getElementById('loginPassword')
+      .value;
+
+  const errEl =
+    document.getElementById('loginError');
+
+  errEl.textContent = '';
+
+  if(!window.mdtAuth){
+
+    errEl.textContent =
+      'Firebase Authentication is not configured. See firebase-config.js.';
+
+    return;
+
+  }
+
+  if(!email || !password){
+
+    errEl.textContent =
+      'Please enter your email and password.';
+
+    return;
+
+  }
 
   try{
 
-    const snap = await db().collection('events').orderBy('startDateTime').get();
+    await window.mdtAuth
+      .signInWithEmailAndPassword(
+        email,
+        password
+      );
+
+  }catch(err){
+
+    errEl.textContent =
+      'Sign-in failed: check your email and password.';
+
+  }
+
+}
+
+
+document
+  .getElementById('loginBtn')
+  .addEventListener(
+    'click',
+    attemptLogin
+  );
+
+
+document
+  .getElementById('loginPassword')
+  .addEventListener(
+    'keydown',
+    (e) => {
+
+      if(e.key === 'Enter'){
+        attemptLogin();
+      }
+
+    }
+  );
+
+
+/* =========================================================
+LOGOUT
+========================================================= */
+
+logoutLink.addEventListener(
+  'click',
+  async (e) => {
+
+    e.preventDefault();
+
+    if(window.mdtAuth){
+      await window.mdtAuth.signOut();
+    }
+
+  }
+);
+
+
+/* =========================================================
+AUTH STATE
+========================================================= */
+
+if(window.mdtAuth){
+
+  window.mdtAuth.onAuthStateChanged(
+    async user => {
+
+      if(!user){
+
+        loginScreen.style.display = 'block';
+        dashboard.style.display = 'none';
+        logoutLink.style.display = 'none';
+
+        return;
+
+      }
+
+      try{
+
+        await requireAdmin();
+
+        loginScreen.style.display = 'none';
+        dashboard.style.display = 'block';
+        logoutLink.style.display = 'inline';
+
+        await Promise.all([
+          loadEvents(),
+          loadPerformances(),
+          loadSiteContentForm()
+        ]);
+
+      }catch(err){
+
+        console.warn(
+          'Mophato admin access denied:',
+          err
+        );
+
+        try{
+          await window.mdtAuth.signOut();
+        }catch(signOutError){
+          console.warn(
+            'Could not sign out rejected account.',
+            signOutError
+          );
+        }
+
+        loginScreen.style.display = 'block';
+        dashboard.style.display = 'none';
+        logoutLink.style.display = 'none';
+
+        document.getElementById(
+          'loginError'
+        ).textContent =
+          'Access denied. This account is not an approved administrator.';
+
+      }
+
+    }
+  );
+
+}
+
+
+/* =========================================================
+TABS
+========================================================= */
+
+document
+  .querySelectorAll('.tab-btn')
+  .forEach(btn => {
+
+    btn.addEventListener(
+      'click',
+      () => {
+
+        document
+          .querySelectorAll('.tab-btn')
+          .forEach(
+            b => b.classList.remove('active')
+          );
+
+        document
+          .querySelectorAll('.tab-panel')
+          .forEach(
+            p => p.classList.remove('active')
+          );
+
+        btn.classList.add('active');
+
+        document
+          .getElementById(
+            'tab-' + btn.dataset.tab
+          )
+          .classList.add('active');
+
+      }
+    );
+
+  });
+
+
+/* =========================================================
+EVENTS
+========================================================= */
+
+async function loadEvents(){
+
+  const listEl =
+    document.getElementById('eventsList');
+
+  listEl.innerHTML =
+    '<p class="hint">Loading...</p>';
+
+  try{
+
+    const snap =
+      await db()
+        .collection('events')
+        .orderBy('startDateTime')
+        .get();
 
     if(snap.empty){
-      listEl.innerHTML = '<div class="empty-note">No events yet. Click "+ Add Event" above.</div>';
+
+      listEl.innerHTML =
+        '<div class="empty-note">' +
+        'No events yet. Click "+ Add Event" above.' +
+        '</div>';
+
       return;
+
     }
 
     listEl.innerHTML = '';
@@ -846,619 +2019,2349 @@ async function loadEvents(){
 
       const ev = doc.data();
 
-      const dateLabels = (ev.showDates || []).map(d => typeof d === 'string' ? d : d.date).join(', ');
+      const dateLabels =
+        (ev.showDates || [])
+          .map(
+            d =>
+              typeof d === 'string'
+                ? d
+                : d.date
+          )
+          .join(', ');
 
-      const card = document.createElement('div');
+      const card =
+        document.createElement('div');
+
       card.className = 'item-card';
 
       card.innerHTML = `
+
         <div class="info">
-          <span class="meta">${ev.ticketsOnSale ? 'On Sale' : 'Not On Sale'} &middot; ${escapeHtml(dateLabels)}</span>
-          <h3>${escapeHtml(ev.title || '')}</h3>
-          <p>${escapeHtml(ev.venue || '')}</p>
+
+          <span class="meta">
+
+            ${ev.ticketsOnSale
+              ? 'On Sale'
+              : 'Not On Sale'}
+
+            &middot;
+
+            ${escapeHtml(dateLabels)}
+
+          </span>
+
+          <h3>
+            ${escapeHtml(ev.title || '')}
+          </h3>
+
+          <p>
+            ${escapeHtml(ev.venue || '')}
+          </p>
+
         </div>
+
         <div class="item-actions">
-          <button class="btn btn-outline btn-small" data-action="edit">Edit</button>
-          <button class="btn btn-danger btn-small" data-action="delete">Delete</button>
+
+          <button
+            class="btn btn-outline btn-small"
+            data-action="edit"
+          >
+            Edit
+          </button>
+
+          <button
+            class="btn btn-danger btn-small"
+            data-action="delete"
+          >
+            Delete
+          </button>
+
         </div>
+
       `;
 
-      card.querySelector('[data-action="edit"]').addEventListener('click', () => openEventForm(doc.id, ev));
-      card.querySelector('[data-action="delete"]').addEventListener('click', () => deleteEvent(doc.id, ev.title));
+      card
+        .querySelector(
+          '[data-action="edit"]'
+        )
+        .addEventListener(
+          'click',
+          () =>
+            openEventForm(
+              doc.id,
+              ev
+            )
+        );
+
+      card
+        .querySelector(
+          '[data-action="delete"]'
+        )
+        .addEventListener(
+          'click',
+          () =>
+            deleteEvent(
+              doc.id,
+              ev.title
+            )
+        );
 
       listEl.appendChild(card);
 
     });
 
-  } catch(err){
+  }catch(err){
 
-    listEl.innerHTML = '<div class="empty-note">Could not load events. Check your connection and Firestore rules.</div>';
+    console.error(
+      'Could not load events:',
+      err
+    );
+
+    listEl.innerHTML =
+      '<div class="empty-note">' +
+      'Could not load events. Check your connection and Firestore rules.' +
+      '</div>';
 
   }
 
 }
 
-async function deleteEvent(id, title){
 
-  if(!confirm('Delete "' + title + '"? This cannot be undone.')) return;
+/* =========================================================
+DELETE EVENT
+========================================================= */
+
+async function deleteEvent(
+  id,
+  title
+){
 
   try{
-    await db().collection('events').doc(id).delete();
-    loadEvents();
-  } catch(err){
-    alert('Could not delete: ' + err.message);
+
+    await requireAdmin();
+
+  }catch(err){
+
+    alert(
+      'Administrator access is required.'
+    );
+
+    return;
+
+  }
+
+  if(
+    !confirm(
+      'Delete "' +
+      title +
+      '"? This cannot be undone.'
+    )
+  ){
+
+    return;
+
+  }
+
+  try{
+
+    await requireAdmin();
+
+    await db()
+      .collection('events')
+      .doc(id)
+      .delete();
+
+    await loadEvents();
+
+  }catch(err){
+
+    alert(
+      'Could not delete: ' +
+      err.message
+    );
+
   }
 
 }
 
-const eventForm = document.getElementById('eventForm');
-const eventFormStatus = document.getElementById('eventFormStatus');
 
-document.getElementById('addEventBtn').addEventListener('click', () => openEventForm(null, null));
-document.getElementById('cancelEventBtn').addEventListener('click', closeEventForm);
+/* =========================================================
+EVENT FORM
+========================================================= */
 
-document.getElementById('addTicketTypeBtn').addEventListener('click', () => addTicketTypeRow());
-document.getElementById('addShowDateBtn').addEventListener('click', () => addShowDateRow());
+const eventForm =
+  document.getElementById('eventForm');
 
-function openEventForm(id, ev){
+const eventFormStatus =
+  document.getElementById(
+    'eventFormStatus'
+  );
+
+
+document
+  .getElementById('addEventBtn')
+  .addEventListener(
+    'click',
+    () =>
+      openEventForm(
+        null,
+        null
+      )
+  );
+
+
+document
+  .getElementById('cancelEventBtn')
+  .addEventListener(
+    'click',
+    closeEventForm
+  );
+
+
+document
+  .getElementById('addTicketTypeBtn')
+  .addEventListener(
+    'click',
+    () =>
+      addTicketTypeRow()
+  );
+
+
+document
+  .getElementById('addShowDateBtn')
+  .addEventListener(
+    'click',
+    () =>
+      addShowDateRow()
+  );
+
+
+function openEventForm(
+  id,
+  ev
+){
 
   editingEventId = id;
 
-  document.getElementById('eventFormTitle').textContent = id ? 'Edit Event' : 'Add Event';
+  document.getElementById(
+    'eventFormTitle'
+  ).textContent =
+    id
+      ? 'Edit Event'
+      : 'Add Event';
+
   eventFormStatus.textContent = '';
 
-  document.getElementById('ev-title').value = ev ? ev.title || '' : '';
-  document.getElementById('ev-venue').value = ev ? ev.venue || '' : '';
-  document.getElementById('ev-subtitle').value = ev ? ev.subtitle || '' : '';
-  document.getElementById('ev-start').value = ev ? toLocalInputValue(ev.startDateTime) : '';
-  document.getElementById('ev-end').value = ev ? toLocalInputValue(ev.endDateTime) : '';
-  document.getElementById('ev-currency').value = ev ? (ev.currency || 'BWP') : 'BWP';
-  document.getElementById('ev-onsale').checked = ev ? !!ev.ticketsOnSale : true;
+  document.getElementById(
+    'ev-title'
+  ).value =
+    ev
+      ? ev.title || ''
+      : '';
 
-  document.getElementById('showDateRows').innerHTML = '';
+  document.getElementById(
+    'ev-venue'
+  ).value =
+    ev
+      ? ev.venue || ''
+      : '';
 
-  const rawDates = (ev && ev.showDates && ev.showDates.length) ? ev.showDates : [{ date: '', status: '' }];
+  document.getElementById(
+    'ev-subtitle'
+  ).value =
+    ev
+      ? ev.subtitle || ''
+      : '';
+
+  document.getElementById(
+    'ev-start'
+  ).value =
+    ev
+      ? toLocalInputValue(
+          ev.startDateTime
+        )
+      : '';
+
+  document.getElementById(
+    'ev-end'
+  ).value =
+    ev
+      ? toLocalInputValue(
+          ev.endDateTime
+        )
+      : '';
+
+  document.getElementById(
+    'ev-currency'
+  ).value =
+    ev
+      ? (
+          ev.currency ||
+          'BWP'
+        )
+      : 'BWP';
+
+  document.getElementById(
+    'ev-onsale'
+  ).checked =
+    ev
+      ? !!ev.ticketsOnSale
+      : true;
+
+  document.getElementById(
+    'showDateRows'
+  ).innerHTML = '';
+
+  const rawDates =
+    (
+      ev &&
+      ev.showDates &&
+      ev.showDates.length
+    )
+      ? ev.showDates
+      : [
+          {
+            date:'',
+            status:''
+          }
+        ];
 
   rawDates
-    .map(d => (typeof d === 'string') ? { date: d, status: '' } : { date: d.date || '', status: d.status || '' })
-    .forEach(d => addShowDateRow(d));
+    .map(
+      d =>
+        typeof d === 'string'
+          ? {
+              date:d,
+              status:''
+            }
+          : {
+              date:d.date || '',
+              status:d.status || ''
+            }
+    )
+    .forEach(
+      d =>
+        addShowDateRow(d)
+    );
 
-  document.getElementById('ticketTypeRows').innerHTML = '';
+  document.getElementById(
+    'ticketTypeRows'
+  ).innerHTML = '';
 
-  const types = (ev && ev.ticketTypes && ev.ticketTypes.length) ? ev.ticketTypes : [{ name: '', description: '', price: '', variantId: '' }];
-  types.forEach(t => addTicketTypeRow(t));
+  const types =
+    (
+      ev &&
+      ev.ticketTypes &&
+      ev.ticketTypes.length
+    )
+      ? ev.ticketTypes
+      : [
+          {
+            name:'',
+            description:'',
+            price:'',
+            variantId:''
+          }
+        ];
+
+  types.forEach(
+    t =>
+      addTicketTypeRow(t)
+  );
 
   eventForm.classList.add('active');
-  eventForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  eventForm.scrollIntoView({
+    behavior:'smooth',
+    block:'start'
+  });
 
 }
+
 
 function closeEventForm(){
+
   eventForm.classList.remove('active');
+
   editingEventId = null;
+
 }
+
+
+/* =========================================================
+SHOW DATE ROW
+========================================================= */
 
 function addShowDateRow(d){
 
-  d = d || { date: '', status: '' };
+  d =
+    d ||
+    {
+      date:'',
+      status:''
+    };
 
-  const row = document.createElement('div');
+  const row =
+    document.createElement('div');
+
   row.className = 'date-row';
 
   row.innerHTML = `
-    <input type="date" class="sd-date" value="${escapeAttr(d.date)}">
-    <input type="text" placeholder="Status (optional) e.g. Sold Out, 20 Tickets Left" class="sd-status" value="${escapeAttr(d.status)}">
-    <button type="button" class="remove-row-btn" title="Remove">&times;</button>
+
+    <input
+      type="date"
+      class="sd-date"
+      value="${escapeAttr(d.date)}"
+    >
+
+    <input
+      type="text"
+      placeholder="Status (optional) e.g. Sold Out, 20 Tickets Left"
+      class="sd-status"
+      value="${escapeAttr(d.status)}"
+    >
+
+    <button
+      type="button"
+      class="remove-row-btn"
+      title="Remove"
+    >
+      &times;
+    </button>
+
   `;
 
-  row.querySelector('.remove-row-btn').addEventListener('click', () => row.remove());
+  row
+    .querySelector(
+      '.remove-row-btn'
+    )
+    .addEventListener(
+      'click',
+      () =>
+        row.remove()
+    );
 
-  document.getElementById('showDateRows').appendChild(row);
+  document
+    .getElementById(
+      'showDateRows'
+    )
+    .appendChild(row);
 
 }
+
+
+/* =========================================================
+TICKET TYPE ROW
+========================================================= */
 
 function addTicketTypeRow(t){
 
-  t = t || { name: '', description: '', price: '', variantId: '' };
+  t =
+    t ||
+    {
+      name:'',
+      description:'',
+      price:'',
+      variantId:''
+    };
 
-  const row = document.createElement('div');
-  row.className = 'ticket-type-row';
+  const row =
+    document.createElement('div');
+
+  row.className =
+    'ticket-type-row';
 
   row.innerHTML = `
-    <input type="text" placeholder="Name (e.g. VIP)" class="tt-name" value="${escapeAttr(t.name)}">
-    <input type="text" placeholder="Description" class="tt-desc" value="${escapeAttr(t.description)}">
-    <input type="number" placeholder="Price" class="tt-price" value="${t.price !== undefined ? t.price : ''}">
-    <input type="text" placeholder="Lemon Squeezy Variant ID" class="tt-variant" value="${escapeAttr(t.variantId)}">
-    <button type="button" class="remove-row-btn" title="Remove">&times;</button>
+
+    <input
+      type="text"
+      placeholder="Name (e.g. VIP)"
+      class="tt-name"
+      value="${escapeAttr(t.name)}"
+    >
+
+    <input
+      type="text"
+      placeholder="Description"
+      class="tt-desc"
+      value="${escapeAttr(t.description)}"
+    >
+
+    <input
+      type="number"
+      placeholder="Price"
+      class="tt-price"
+      value="${
+        t.price !== undefined
+          ? t.price
+          : ''
+      }"
+    >
+
+    <input
+      type="text"
+      placeholder="Lemon Squeezy Variant ID"
+      class="tt-variant"
+      value="${escapeAttr(t.variantId)}"
+    >
+
+    <button
+      type="button"
+      class="remove-row-btn"
+      title="Remove"
+    >
+      &times;
+    </button>
+
   `;
 
-  row.querySelector('.remove-row-btn').addEventListener('click', () => row.remove());
+  row
+    .querySelector(
+      '.remove-row-btn'
+    )
+    .addEventListener(
+      'click',
+      () =>
+        row.remove()
+    );
 
-  document.getElementById('ticketTypeRows').appendChild(row);
+  document
+    .getElementById(
+      'ticketTypeRows'
+    )
+    .appendChild(row);
 
 }
 
-document.getElementById('saveEventBtn').addEventListener('click', async () => {
 
-  const title = document.getElementById('ev-title').value.trim();
-  const venue = document.getElementById('ev-venue').value.trim();
-  const subtitle = document.getElementById('ev-subtitle').value.trim();
-  const start = document.getElementById('ev-start').value;
-  const end = document.getElementById('ev-end').value;
-  const currency = document.getElementById('ev-currency').value.trim() || 'BWP';
-  const ticketsOnSale = document.getElementById('ev-onsale').checked;
+/* =========================================================
+SAVE EVENT
+========================================================= */
 
-  const showDates = Array.from(document.querySelectorAll('#showDateRows .date-row')).map(row => {
+document
+  .getElementById(
+    'saveEventBtn'
+  )
+  .addEventListener(
+    'click',
+    async () => {
 
-    const date = row.querySelector('.sd-date').value;
-    const status = row.querySelector('.sd-status').value.trim();
+      try{
 
-    return date ? { date, status } : null;
+        await requireAdmin();
 
-  }).filter(Boolean);
+      }catch(err){
 
-  if(!title || !start || !end || showDates.length === 0){
-    eventFormStatus.className = 'status-msg error';
-    eventFormStatus.textContent = 'Please fill in at least: title, run start, run end, and at least one show date.';
-    return;
-  }
+        eventFormStatus.className =
+          'status-msg error';
 
-  // Compare as zero-padded ISO strings ("YYYY-MM-DDTHH:MM:SS") rather than
-  // parsing into Date objects — some browsers interpret a timezone-less
-  // datetime string inconsistently, which could falsely flag valid dates
-  // as "out of order". String comparison sorts correctly here and sidesteps
-  // that entirely.
-  const startIso = fromLocalInputValue(start);
-  const endIso = fromLocalInputValue(end);
+        eventFormStatus.textContent =
+          'Administrator access is required.';
 
-  if(endIso < startIso){
-    eventFormStatus.className = 'status-msg error';
-    eventFormStatus.textContent = 'Run End must be after Run Start.';
-    return;
-  }
+        return;
 
-  const ticketTypes = Array.from(document.querySelectorAll('#ticketTypeRows .ticket-type-row')).map((row, i) => {
+      }
 
-    const name = row.querySelector('.tt-name').value.trim();
-    const description = row.querySelector('.tt-desc').value.trim();
-    const price = Math.max(0, parseFloat(row.querySelector('.tt-price').value) || 0);
-    const variantId = row.querySelector('.tt-variant').value.trim().replace(/[^a-zA-Z0-9_-]/g, '');
+      const title =
+        document.getElementById(
+          'ev-title'
+        ).value.trim();
 
-    return {
-      id: name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || ('type-' + i),
-      name, description, price, variantId
-    };
+      const venue =
+        document.getElementById(
+          'ev-venue'
+        ).value.trim();
 
-  }).filter(t => t.name);
+      const subtitle =
+        document.getElementById(
+          'ev-subtitle'
+        ).value.trim();
 
-  const data = {
-    title, venue, subtitle,
-    startDateTime: fromLocalInputValue(start),
-    endDateTime: fromLocalInputValue(end),
-    showDates,
-    currency,
-    ticketsOnSale,
-    ticketTypes
-  };
+      const start =
+        document.getElementById(
+          'ev-start'
+        ).value;
 
-  eventFormStatus.className = 'status-msg';
-  eventFormStatus.textContent = 'Saving…';
+      const end =
+        document.getElementById(
+          'ev-end'
+        ).value;
 
-  try{
+      const currency =
+        document.getElementById(
+          'ev-currency'
+        ).value.trim() ||
+        'BWP';
 
-    if(editingEventId){
-      await db().collection('events').doc(editingEventId).set(data);
-    } else {
-      await db().collection('events').add(data);
+      const ticketsOnSale =
+        document.getElementById(
+          'ev-onsale'
+        ).checked;
+
+      const showDates =
+        Array
+          .from(
+            document.querySelectorAll(
+              '#showDateRows .date-row'
+            )
+          )
+          .map(
+            row => {
+
+              const date =
+                row
+                  .querySelector(
+                    '.sd-date'
+                  )
+                  .value;
+
+              const status =
+                row
+                  .querySelector(
+                    '.sd-status'
+                  )
+                  .value
+                  .trim();
+
+              return date
+                ? {
+                    date,
+                    status
+                  }
+                : null;
+
+            }
+          )
+          .filter(Boolean);
+
+      if(
+        !title ||
+        !start ||
+        !end ||
+        showDates.length === 0
+      ){
+
+        eventFormStatus.className =
+          'status-msg error';
+
+        eventFormStatus.textContent =
+          'Please fill in at least: title, run start, run end, and at least one show date.';
+
+        return;
+
+      }
+
+      const startIso =
+        fromLocalInputValue(
+          start
+        );
+
+      const endIso =
+        fromLocalInputValue(
+          end
+        );
+
+      if(endIso < startIso){
+
+        eventFormStatus.className =
+          'status-msg error';
+
+        eventFormStatus.textContent =
+          'Run End must be after Run Start.';
+
+        return;
+
+      }
+
+      const ticketTypes =
+        Array
+          .from(
+            document.querySelectorAll(
+              '#ticketTypeRows .ticket-type-row'
+            )
+          )
+          .map(
+            (row, i) => {
+
+              const name =
+                row
+                  .querySelector(
+                    '.tt-name'
+                  )
+                  .value
+                  .trim();
+
+              const description =
+                row
+                  .querySelector(
+                    '.tt-desc'
+                  )
+                  .value
+                  .trim();
+
+              const price =
+                Math.max(
+                  0,
+                  parseFloat(
+                    row
+                      .querySelector(
+                        '.tt-price'
+                      )
+                      .value
+                  ) || 0
+                );
+
+              const variantId =
+                row
+                  .querySelector(
+                    '.tt-variant'
+                  )
+                  .value
+                  .trim()
+                  .replace(
+                    /[^a-zA-Z0-9_-]/g,
+                    ''
+                  );
+
+              return {
+
+                id:
+                  name
+                    .toLowerCase()
+                    .replace(
+                      /[^a-z0-9]+/g,
+                      '-'
+                    )
+                    .replace(
+                      /(^-|-$)/g,
+                      ''
+                    ) ||
+                  ('type-' + i),
+
+                name,
+                description,
+                price,
+                variantId
+
+              };
+
+            }
+          )
+          .filter(
+            t =>
+              t.name
+          );
+
+      const data = {
+
+        title,
+        venue,
+        subtitle,
+
+        startDateTime:
+          startIso,
+
+        endDateTime:
+          endIso,
+
+        showDates,
+
+        currency,
+
+        ticketsOnSale,
+
+        ticketTypes
+
+      };
+
+      eventFormStatus.className =
+        'status-msg';
+
+      eventFormStatus.textContent =
+        'Saving...';
+
+      try{
+
+        await requireAdmin();
+
+        if(editingEventId){
+
+          await db()
+            .collection('events')
+            .doc(editingEventId)
+            .set(data);
+
+        }else{
+
+          await db()
+            .collection('events')
+            .add(data);
+
+        }
+
+        eventFormStatus.className =
+          'status-msg success';
+
+        eventFormStatus.textContent =
+          'Saved.';
+
+        closeEventForm();
+
+        await loadEvents();
+
+      }catch(err){
+
+        console.error(
+          'Could not save event:',
+          err
+        );
+
+        eventFormStatus.className =
+          'status-msg error';
+
+        eventFormStatus.textContent =
+          'Could not save. Check your connection and Firestore rules.';
+
+      }
+
     }
+  );
 
-    eventFormStatus.className = 'status-msg success';
-    eventFormStatus.textContent = 'Saved.';
 
-    closeEventForm();
-    loadEvents();
-
-  } catch(err){
-
-    eventFormStatus.className = 'status-msg error';
-    eventFormStatus.textContent = 'Could not save — check your connection and Firestore rules, then try again.';
-
-  }
-
-});
+/* =========================================================
+PERFORMANCES
+========================================================= */
 
 async function loadPerformances(){
 
-  const listEl = document.getElementById('performancesList');
-  listEl.innerHTML = '<p class="hint">Loading…</p>';
+  const listEl =
+    document.getElementById(
+      'performancesList'
+    );
+
+  listEl.innerHTML =
+    '<p class="hint">Loading...</p>';
 
   try{
 
-    const snap = await db().collection('performances').orderBy('order').get();
+    const snap =
+      await db()
+        .collection('performances')
+        .orderBy('order')
+        .get();
 
     if(snap.empty){
-      listEl.innerHTML = '<div class="empty-note">No performances yet. Click "+ Add Performance" above.</div>';
+
+      listEl.innerHTML =
+        '<div class="empty-note">' +
+        'No performances yet. Click "+ Add Performance" above.' +
+        '</div>';
+
       return;
+
     }
 
     listEl.innerHTML = '';
 
     snap.forEach(doc => {
 
-      const pf = doc.data();
+      const pf =
+        doc.data();
 
-      const card = document.createElement('div');
-      card.className = 'item-card';
+      const card =
+        document.createElement('div');
+
+      card.className =
+        'item-card';
 
       card.innerHTML = `
+
         <div class="info">
-          <span class="meta">Order ${pf.order != null ? pf.order : '-'}</span>
-          <h3>${escapeHtml(pf.title || '')}</h3>
-          <p>${escapeHtml(pf.subtitle || '')}</p>
+
+          <span class="meta">
+            Order ${
+              pf.order != null
+                ? pf.order
+                : '-'
+            }
+          </span>
+
+          <h3>
+            ${escapeHtml(
+              pf.title || ''
+            )}
+          </h3>
+
+          <p>
+            ${escapeHtml(
+              pf.subtitle || ''
+            )}
+          </p>
+
         </div>
+
         <div class="item-actions">
-          <button class="btn btn-outline btn-small" data-action="edit">Edit</button>
-          <button class="btn btn-danger btn-small" data-action="delete">Delete</button>
+
+          <button
+            class="btn btn-outline btn-small"
+            data-action="edit"
+          >
+            Edit
+          </button>
+
+          <button
+            class="btn btn-danger btn-small"
+            data-action="delete"
+          >
+            Delete
+          </button>
+
         </div>
+
       `;
 
-      card.querySelector('[data-action="edit"]').addEventListener('click', () => openPerfForm(doc.id, pf));
-      card.querySelector('[data-action="delete"]').addEventListener('click', () => deletePerf(doc.id, pf.title));
+      card
+        .querySelector(
+          '[data-action="edit"]'
+        )
+        .addEventListener(
+          'click',
+          () =>
+            openPerfForm(
+              doc.id,
+              pf
+            )
+        );
+
+      card
+        .querySelector(
+          '[data-action="delete"]'
+        )
+        .addEventListener(
+          'click',
+          () =>
+            deletePerf(
+              doc.id,
+              pf.title
+            )
+        );
 
       listEl.appendChild(card);
 
     });
 
-  } catch(err){
+  }catch(err){
 
-    listEl.innerHTML = '<div class="empty-note">Could not load performances. Check your connection and Firestore rules.</div>';
+    console.error(
+      'Could not load performances:',
+      err
+    );
+
+    listEl.innerHTML =
+      '<div class="empty-note">' +
+      'Could not load performances. Check your connection and Firestore rules.' +
+      '</div>';
 
   }
 
 }
 
-async function deletePerf(id, title){
 
-  if(!confirm('Delete "' + title + '"? This cannot be undone.')) return;
+/* =========================================================
+DELETE PERFORMANCE
+========================================================= */
+
+async function deletePerf(
+  id,
+  title
+){
 
   try{
-    await db().collection('performances').doc(id).delete();
-    loadPerformances();
-  } catch(err){
-    alert('Could not delete: ' + err.message);
+
+    await requireAdmin();
+
+  }catch(err){
+
+    alert(
+      'Administrator access is required.'
+    );
+
+    return;
+
+  }
+
+  if(
+    !confirm(
+      'Delete "' +
+      title +
+      '"? This cannot be undone.'
+    )
+  ){
+
+    return;
+
+  }
+
+  try{
+
+    await requireAdmin();
+
+    await db()
+      .collection('performances')
+      .doc(id)
+      .delete();
+
+    await loadPerformances();
+
+  }catch(err){
+
+    alert(
+      'Could not delete: ' +
+      err.message
+    );
+
   }
 
 }
 
-const perfForm = document.getElementById('perfForm');
-const perfFormStatus = document.getElementById('perfFormStatus');
 
-document.getElementById('addPerfBtn').addEventListener('click', () => openPerfForm(null, null));
-document.getElementById('cancelPerfBtn').addEventListener('click', closePerfForm);
+/* =========================================================
+PERFORMANCE FORM
+========================================================= */
 
-function openPerfForm(id, pf){
+const perfForm =
+  document.getElementById(
+    'perfForm'
+  );
+
+const perfFormStatus =
+  document.getElementById(
+    'perfFormStatus'
+  );
+
+
+document
+  .getElementById(
+    'addPerfBtn'
+  )
+  .addEventListener(
+    'click',
+    () =>
+      openPerfForm(
+        null,
+        null
+      )
+  );
+
+
+document
+  .getElementById(
+    'cancelPerfBtn'
+  )
+  .addEventListener(
+    'click',
+    closePerfForm
+  );
+
+
+function openPerfForm(
+  id,
+  pf
+){
 
   editingPerfId = id;
 
-  document.getElementById('perfFormTitle').textContent = id ? 'Edit Performance' : 'Add Performance';
+  document.getElementById(
+    'perfFormTitle'
+  ).textContent =
+    id
+      ? 'Edit Performance'
+      : 'Add Performance';
+
   perfFormStatus.textContent = '';
 
-  document.getElementById('pf-title').value = pf ? pf.title || '' : '';
-  document.getElementById('pf-subtitle').value = pf ? pf.subtitle || '' : '';
-  document.getElementById('pf-image').value = pf ? pf.image || '' : '';
-  document.getElementById('pf-order').value = pf ? (pf.order != null ? pf.order : '') : '';
+  document.getElementById(
+    'pf-title'
+  ).value =
+    pf
+      ? pf.title || ''
+      : '';
 
-  perfForm.classList.add('active');
-  perfForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  document.getElementById(
+    'pf-subtitle'
+  ).value =
+    pf
+      ? pf.subtitle || ''
+      : '';
+
+  document.getElementById(
+    'pf-image'
+  ).value =
+    pf
+      ? pf.image || ''
+      : '';
+
+  document.getElementById(
+    'pf-order'
+  ).value =
+    pf
+      ? (
+          pf.order != null
+            ? pf.order
+            : ''
+        )
+      : '';
+
+  perfForm.classList.add(
+    'active'
+  );
+
+  perfForm.scrollIntoView({
+    behavior:'smooth',
+    block:'start'
+  });
 
 }
+
 
 function closePerfForm(){
-  perfForm.classList.remove('active');
+
+  perfForm.classList.remove(
+    'active'
+  );
+
   editingPerfId = null;
+
 }
 
-document.getElementById('savePerfBtn').addEventListener('click', async () => {
-
-  const title = document.getElementById('pf-title').value.trim();
-  const subtitle = document.getElementById('pf-subtitle').value.trim();
-  const image = document.getElementById('pf-image').value.trim();
-  const order = parseInt(document.getElementById('pf-order').value, 10) || 0;
-
-  if(!title || !image){
-    perfFormStatus.className = 'status-msg error';
-    perfFormStatus.textContent = 'Please fill in at least a title and image URL.';
-    return;
-  }
-
-  if(!/^https?:\/\//i.test(image)){
-    perfFormStatus.className = 'status-msg error';
-    perfFormStatus.textContent = 'Image URL must start with http:// or https://';
-    return;
-  }
-
-  const data = { title, subtitle, image, order };
-
-  perfFormStatus.className = 'status-msg';
-  perfFormStatus.textContent = 'Saving…';
-
-  try{
-
-    if(editingPerfId){
-      await db().collection('performances').doc(editingPerfId).set(data);
-    } else {
-      await db().collection('performances').add(data);
-    }
-
-    perfFormStatus.className = 'status-msg success';
-    perfFormStatus.textContent = 'Saved.';
-
-    closePerfForm();
-    loadPerformances();
-
-  } catch(err){
-
-    perfFormStatus.className = 'status-msg error';
-    perfFormStatus.textContent = 'Could not save — check your connection and Firestore rules, then try again.';
-
-  }
-
-});
 
 /* =========================================================
-SITE CONTENT TAB
+SAVE PERFORMANCE
 ========================================================= */
 
+document
+  .getElementById(
+    'savePerfBtn'
+  )
+  .addEventListener(
+    'click',
+    async () => {
+
+      try{
+
+        await requireAdmin();
+
+      }catch(err){
+
+        perfFormStatus.className =
+          'status-msg error';
+
+        perfFormStatus.textContent =
+          'Administrator access is required.';
+
+        return;
+
+      }
+
+      const title =
+        document.getElementById(
+          'pf-title'
+        ).value.trim();
+
+      const subtitle =
+        document.getElementById(
+          'pf-subtitle'
+        ).value.trim();
+
+      const image =
+        document.getElementById(
+          'pf-image'
+        ).value.trim();
+
+      const order =
+        parseInt(
+          document.getElementById(
+            'pf-order'
+          ).value,
+          10
+        ) || 0;
+
+      if(!title || !image){
+
+        perfFormStatus.className =
+          'status-msg error';
+
+        perfFormStatus.textContent =
+          'Please fill in at least a title and image URL.';
+
+        return;
+
+      }
+
+      if(
+        !/^https?:\/\//i.test(
+          image
+        )
+      ){
+
+        perfFormStatus.className =
+          'status-msg error';
+
+        perfFormStatus.textContent =
+          'Image URL must start with http:// or https://';
+
+        return;
+
+      }
+
+      const data = {
+        title,
+        subtitle,
+        image,
+        order
+      };
+
+      perfFormStatus.className =
+        'status-msg';
+
+      perfFormStatus.textContent =
+        'Saving...';
+
+      try{
+
+        await requireAdmin();
+
+        if(editingPerfId){
+
+          await db()
+            .collection(
+              'performances'
+            )
+            .doc(
+              editingPerfId
+            )
+            .set(
+              data
+            );
+
+        }else{
+
+          await db()
+            .collection(
+              'performances'
+            )
+            .add(
+              data
+            );
+
+        }
+
+        perfFormStatus.className =
+          'status-msg success';
+
+        perfFormStatus.textContent =
+          'Saved.';
+
+        closePerfForm();
+
+        await loadPerformances();
+
+      }catch(err){
+
+        console.error(
+          'Could not save performance:',
+          err
+        );
+
+        perfFormStatus.className =
+          'status-msg error';
+
+        perfFormStatus.textContent =
+          'Could not save. Check your connection and Firestore rules.';
+
+      }
+
+    }
+  );
+
+
+/* =========================================================
+SITE CONTENT
+========================================================= */
+
+const PROTECTED_DESIGNER =
+  'Designed by Rebaone Lesly Mochabeng';
+
+
 const defaultSiteContentAdmin = {
-  logo: "mdt.png",
+
+  logo:
+    'mdt.png',
+
   hero: {
-    eyebrow: "Rhythm. Heritage. Movement.",
-    titleLine1: "Mophato",
-    titleLine2: "Dance Theatre",
-    description: "Botswana's internationally celebrated contemporary dance theatre company. Blending traditional African storytelling and powerful movement."
+
+    eyebrow:
+      'Rhythm. Heritage. Movement.',
+
+    titleLine1:
+      'Mophato',
+
+    titleLine2:
+      'Dance Theatre',
+
+    description:
+      "Botswana's internationally celebrated contemporary dance theatre company. Blending traditional African storytelling and powerful movement."
+
   },
+
   story: {
-    eyebrow: "Our Story",
-    heading: "Dance that carries the soul of Botswana",
-    year: "2009",
-    founder: "Founded by Andrew Letso Kola",
-    paragraph1: "Mophato Dance Theatre has become one of Botswana's most influential contemporary dance companies.",
-    paragraph2: "The company has performed internationally while celebrating Setswana storytelling traditions.",
-    image: "a.jpg"
+
+    eyebrow:
+      'Our Story',
+
+    heading:
+      'Dance that carries the soul of Botswana',
+
+    year:
+      '2009',
+
+    founder:
+      'Founded by Andrew Letso Kola',
+
+    paragraph1:
+      "Mophato Dance Theatre has become one of Botswana's most influential contemporary dance companies.",
+
+    paragraph2:
+      'The company has performed internationally while celebrating Setswana storytelling traditions.',
+
+    image:
+      'a.jpg'
+
   },
+
   impact: {
-    eyebrow: "Community Impact",
-    heading: "Transforming lives through creativity",
+
+    eyebrow:
+      'Community Impact',
+
+    heading:
+      'Transforming lives through creativity',
+
     cards: [
-      { number: "400+", text: "Youth empowered through workshops and mentorship." },
-      { number: "10+", text: "International collaborations and partnerships." },
-      { number: "35+", text: "Creative professionals involved in productions." }
+
+      {
+        number:
+          '400+',
+
+        text:
+          'Youth empowered through workshops and mentorship.'
+      },
+
+      {
+        number:
+          '10+',
+
+        text:
+          'International collaborations and partnerships.'
+      },
+
+      {
+        number:
+          '35+',
+
+        text:
+          'Creative professionals involved in productions.'
+      }
+
     ]
+
   },
+
   contact: {
-    eyebrow: "Book Mophato",
-    heading: "Let's create unforgettable experiences together",
-    availability: "Available for festivals, workshops, corporate events and theatre productions.",
-    marketing: { label: "Marketing & Partnerships", phone: "+267 72345678", email: "steph@gmail.com" },
-    founder: { label: "Founder & Artistic Director", phone: "+267 75252777", email: "mophatodancetheatre@gmail.com" }
+
+    eyebrow:
+      'Book Mophato',
+
+    heading:
+      "Let's create unforgettable experiences together",
+
+    availability:
+      'Available for festivals, workshops, corporate events and theatre productions.',
+
+    marketing: {
+
+      label:
+        'Marketing & Partnerships',
+
+      phone:
+        '+267 72345678',
+
+      email:
+        'steph@gmail.com'
+
+    },
+
+    founder: {
+
+      label:
+        'Founder & Artistic Director',
+
+      phone:
+        '+267 75252777',
+
+      email:
+        'mophatodancetheatre@gmail.com'
+
+    }
+
   },
+
   footer: {
-    brandName: "Mophato Dance Theatre",
-    copyright: "© 2026 Mophato Dance Theatre. All rights reserved.",
-    designer: "Designed by Rebaone Lesly Mochabeng",
-    facebook: "https://www.facebook.com/share/1HFWY7sgNZ/?mibextid=wwXIfr",
-    instagram: "https://www.instagram.com/mophatodance_theatre?igsh=MW45eTVkM3d0azI3OQ==",
-    tiktok: "https://www.tiktok.com/@mophatodancetheat?_r=1&_t=ZS-96cqFmmMBJo"
+
+    brandName:
+      'Mophato Dance Theatre',
+
+    copyright:
+      '© 2026 Mophato Dance Theatre. All rights reserved.',
+
+    designer:
+      PROTECTED_DESIGNER,
+
+    facebook:
+      'https://www.facebook.com/share/1HFWY7sgNZ/?mibextid=wwXIfr',
+
+    instagram:
+      'https://www.instagram.com/mophatodance_theatre?igsh=MW45eTVkM3d0azI3OQ==',
+
+    tiktok:
+      'https://www.tiktok.com/@mophatodancetheat?_r=1&_t=ZS-96cqFmmMBJo'
+
   }
+
 };
+
+
+/* =========================================================
+FILL SITE CONTENT FORM
+========================================================= */
 
 function fillSiteContentForm(c){
 
-  document.getElementById('sc-logo').value = c.logo || '';
+  document.getElementById(
+    'sc-logo'
+  ).value =
+    c.logo || '';
 
-  document.getElementById('sc-hero-eyebrow').value = c.hero.eyebrow || '';
-  document.getElementById('sc-hero-title1').value = c.hero.titleLine1 || '';
-  document.getElementById('sc-hero-title2').value = c.hero.titleLine2 || '';
-  document.getElementById('sc-hero-description').value = c.hero.description || '';
+  document.getElementById(
+    'sc-hero-eyebrow'
+  ).value =
+    c.hero.eyebrow || '';
 
-  document.getElementById('sc-story-eyebrow').value = c.story.eyebrow || '';
-  document.getElementById('sc-story-heading').value = c.story.heading || '';
-  document.getElementById('sc-story-year').value = c.story.year || '';
-  document.getElementById('sc-story-founder').value = c.story.founder || '';
-  document.getElementById('sc-story-p1').value = c.story.paragraph1 || '';
-  document.getElementById('sc-story-p2').value = c.story.paragraph2 || '';
-  document.getElementById('sc-story-image').value = c.story.image || '';
+  document.getElementById(
+    'sc-hero-title1'
+  ).value =
+    c.hero.titleLine1 || '';
 
-  document.getElementById('sc-impact-eyebrow').value = c.impact.eyebrow || '';
-  document.getElementById('sc-impact-heading').value = c.impact.heading || '';
+  document.getElementById(
+    'sc-hero-title2'
+  ).value =
+    c.hero.titleLine2 || '';
 
-  const cards = c.impact.cards || [];
-  for(let i = 0; i < 3; i++){
-    document.getElementById('sc-impact-num' + (i + 1)).value = (cards[i] && cards[i].number) || '';
-    document.getElementById('sc-impact-text' + (i + 1)).value = (cards[i] && cards[i].text) || '';
+  document.getElementById(
+    'sc-hero-description'
+  ).value =
+    c.hero.description || '';
+
+  document.getElementById(
+    'sc-story-eyebrow'
+  ).value =
+    c.story.eyebrow || '';
+
+  document.getElementById(
+    'sc-story-heading'
+  ).value =
+    c.story.heading || '';
+
+  document.getElementById(
+    'sc-story-year'
+  ).value =
+    c.story.year || '';
+
+  document.getElementById(
+    'sc-story-founder'
+  ).value =
+    c.story.founder || '';
+
+  document.getElementById(
+    'sc-story-p1'
+  ).value =
+    c.story.paragraph1 || '';
+
+  document.getElementById(
+    'sc-story-p2'
+  ).value =
+    c.story.paragraph2 || '';
+
+  document.getElementById(
+    'sc-story-image'
+  ).value =
+    c.story.image || '';
+
+  document.getElementById(
+    'sc-impact-eyebrow'
+  ).value =
+    c.impact.eyebrow || '';
+
+  document.getElementById(
+    'sc-impact-heading'
+  ).value =
+    c.impact.heading || '';
+
+  const cards =
+    c.impact.cards || [];
+
+  for(
+    let i = 0;
+    i < 3;
+    i++
+  ){
+
+    document.getElementById(
+      'sc-impact-num' +
+      (i + 1)
+    ).value =
+      (
+        cards[i] &&
+        cards[i].number
+      ) || '';
+
+    document.getElementById(
+      'sc-impact-text' +
+      (i + 1)
+    ).value =
+      (
+        cards[i] &&
+        cards[i].text
+      ) || '';
+
   }
 
-  document.getElementById('sc-contact-eyebrow').value = c.contact.eyebrow || '';
-  document.getElementById('sc-contact-heading').value = c.contact.heading || '';
-  document.getElementById('sc-contact-availability').value = c.contact.availability || '';
+  document.getElementById(
+    'sc-contact-eyebrow'
+  ).value =
+    c.contact.eyebrow || '';
 
-  document.getElementById('sc-contact-mkt-label').value = c.contact.marketing.label || '';
-  document.getElementById('sc-contact-mkt-phone').value = c.contact.marketing.phone || '';
-  document.getElementById('sc-contact-mkt-email').value = c.contact.marketing.email || '';
+  document.getElementById(
+    'sc-contact-heading'
+  ).value =
+    c.contact.heading || '';
 
-  document.getElementById('sc-contact-fdr-label').value = c.contact.founder.label || '';
-  document.getElementById('sc-contact-fdr-phone').value = c.contact.founder.phone || '';
-  document.getElementById('sc-contact-fdr-email').value = c.contact.founder.email || '';
+  document.getElementById(
+    'sc-contact-availability'
+  ).value =
+    c.contact.availability || '';
 
-  document.getElementById('sc-footer-brand').value = c.footer.brandName || '';
-  document.getElementById('sc-footer-designer').value = c.footer.designer || '';
-  document.getElementById('sc-footer-copyright').value = c.footer.copyright || '';
-  document.getElementById('sc-footer-facebook').value = c.footer.facebook || '';
-  document.getElementById('sc-footer-instagram').value = c.footer.instagram || '';
-  document.getElementById('sc-footer-tiktok').value = c.footer.tiktok || '';
+  document.getElementById(
+    'sc-contact-mkt-label'
+  ).value =
+    c.contact.marketing.label || '';
+
+  document.getElementById(
+    'sc-contact-mkt-phone'
+  ).value =
+    c.contact.marketing.phone || '';
+
+  document.getElementById(
+    'sc-contact-mkt-email'
+  ).value =
+    c.contact.marketing.email || '';
+
+  document.getElementById(
+    'sc-contact-fdr-label'
+  ).value =
+    c.contact.founder.label || '';
+
+  document.getElementById(
+    'sc-contact-fdr-phone'
+  ).value =
+    c.contact.founder.phone || '';
+
+  document.getElementById(
+    'sc-contact-fdr-email'
+  ).value =
+    c.contact.founder.email || '';
+
+  document.getElementById(
+    'sc-footer-brand'
+  ).value =
+    c.footer.brandName || '';
+
+  /*
+    Designer credit is always forced to the protected value.
+    It is never taken from Firestore.
+  */
+
+  const designerDisplay =
+    document.querySelector(
+      '.locked-field strong'
+    );
+
+  if(designerDisplay){
+
+    designerDisplay.textContent =
+      PROTECTED_DESIGNER;
+
+  }
+
+  document.getElementById(
+    'sc-footer-copyright'
+  ).value =
+    c.footer.copyright || '';
+
+  document.getElementById(
+    'sc-footer-facebook'
+  ).value =
+    c.footer.facebook || '';
+
+  document.getElementById(
+    'sc-footer-instagram'
+  ).value =
+    c.footer.instagram || '';
+
+  document.getElementById(
+    'sc-footer-tiktok'
+  ).value =
+    c.footer.tiktok || '';
 
 }
+
+
+/* =========================================================
+LOAD SITE CONTENT
+========================================================= */
 
 async function loadSiteContentForm(){
 
-  fillSiteContentForm(defaultSiteContentAdmin);
+  fillSiteContentForm(
+    defaultSiteContentAdmin
+  );
 
   try{
 
-    const doc = await db().collection('site').doc('content').get();
+    const doc =
+      await db()
+        .collection('site')
+        .doc('content')
+        .get();
 
     if(doc.exists){
-      // shallow-merge each top-level section over the defaults so a
-      // partially-saved doc still fills every field in the form
-      const data = doc.data();
+
+      const data =
+        doc.data();
+
       const merged = {
-        logo: data.logo || defaultSiteContentAdmin.logo,
-        hero: { ...defaultSiteContentAdmin.hero, ...(data.hero || {}) },
-        story: { ...defaultSiteContentAdmin.story, ...(data.story || {}) },
+
+        logo:
+          data.logo ||
+          defaultSiteContentAdmin.logo,
+
+        hero: {
+
+          ...defaultSiteContentAdmin.hero,
+
+          ...(data.hero || {})
+
+        },
+
+        story: {
+
+          ...defaultSiteContentAdmin.story,
+
+          ...(data.story || {})
+
+        },
+
         impact: {
-          eyebrow: (data.impact && data.impact.eyebrow) || defaultSiteContentAdmin.impact.eyebrow,
-          heading: (data.impact && data.impact.heading) || defaultSiteContentAdmin.impact.heading,
-          cards: (data.impact && data.impact.cards && data.impact.cards.length === 3) ? data.impact.cards : defaultSiteContentAdmin.impact.cards
+
+          eyebrow:
+            (
+              data.impact &&
+              data.impact.eyebrow
+            ) ||
+            defaultSiteContentAdmin
+              .impact
+              .eyebrow,
+
+          heading:
+            (
+              data.impact &&
+              data.impact.heading
+            ) ||
+            defaultSiteContentAdmin
+              .impact
+              .heading,
+
+          cards:
+            (
+              data.impact &&
+              data.impact.cards &&
+              data.impact.cards.length === 3
+            )
+              ? data.impact.cards
+              : defaultSiteContentAdmin
+                  .impact
+                  .cards
+
         },
+
         contact: {
-          eyebrow: (data.contact && data.contact.eyebrow) || defaultSiteContentAdmin.contact.eyebrow,
-          heading: (data.contact && data.contact.heading) || defaultSiteContentAdmin.contact.heading,
-          availability: (data.contact && data.contact.availability) || defaultSiteContentAdmin.contact.availability,
-          marketing: { ...defaultSiteContentAdmin.contact.marketing, ...((data.contact && data.contact.marketing) || {}) },
-          founder: { ...defaultSiteContentAdmin.contact.founder, ...((data.contact && data.contact.founder) || {}) }
+
+          eyebrow:
+            (
+              data.contact &&
+              data.contact.eyebrow
+            ) ||
+            defaultSiteContentAdmin
+              .contact
+              .eyebrow,
+
+          heading:
+            (
+              data.contact &&
+              data.contact.heading
+            ) ||
+            defaultSiteContentAdmin
+              .contact
+              .heading,
+
+          availability:
+            (
+              data.contact &&
+              data.contact.availability
+            ) ||
+            defaultSiteContentAdmin
+              .contact
+              .availability,
+
+          marketing: {
+
+            ...defaultSiteContentAdmin
+              .contact
+              .marketing,
+
+            ...(
+              (
+                data.contact &&
+                data.contact.marketing
+              ) || {}
+            )
+
+          },
+
+          founder: {
+
+            ...defaultSiteContentAdmin
+              .contact
+              .founder,
+
+            ...(
+              (
+                data.contact &&
+                data.contact.founder
+              ) || {}
+            )
+
+          }
+
         },
-        footer: { ...defaultSiteContentAdmin.footer, ...(data.footer || {}) }
+
+        footer: {
+
+          ...defaultSiteContentAdmin.footer,
+
+          ...(data.footer || {}),
+
+          /*
+            Never accept a Firestore value for the designer.
+          */
+
+          designer:
+            PROTECTED_DESIGNER
+
+        }
+
       };
-      fillSiteContentForm(merged);
+
+      fillSiteContentForm(
+        merged
+      );
+
     }
 
-  } catch(err){
+  }catch(err){
 
-    // form already has defaults filled in — just let the admin know saving
-    // will work once connectivity/rules are sorted, without blocking them
-    console.warn('Mophato: could not load saved site content yet.', err);
+    console.warn(
+      'Mophato: could not load saved site content yet.',
+      err
+    );
 
   }
 
 }
 
-document.getElementById('saveSiteContentBtn').addEventListener('click', async () => {
 
-  const statusEl = document.getElementById('siteContentStatus');
+/* =========================================================
+SAVE SITE CONTENT
+========================================================= */
 
-  const urlOrEmpty = (id) => {
-    const v = document.getElementById(id).value.trim();
-    return v;
-  };
+document
+  .getElementById(
+    'saveSiteContentBtn'
+  )
+  .addEventListener(
+    'click',
+    async () => {
 
-  const socialLinks = {
-    facebook: urlOrEmpty('sc-footer-facebook'),
-    instagram: urlOrEmpty('sc-footer-instagram'),
-    tiktok: urlOrEmpty('sc-footer-tiktok')
-  };
+      const statusEl =
+        document.getElementById(
+          'siteContentStatus'
+        );
 
-  for(const key in socialLinks){
-    if(socialLinks[key] && !/^https?:\/\//i.test(socialLinks[key])){
-      statusEl.className = 'status-msg error';
-      statusEl.textContent = 'Social links must start with http:// or https:// (check ' + key + ').';
-      return;
-    }
-  }
+      try{
 
-  const data = {
+        await requireAdmin();
 
-    logo: document.getElementById('sc-logo').value.trim(),
+      }catch(err){
 
-    hero: {
-      eyebrow: document.getElementById('sc-hero-eyebrow').value.trim(),
-      titleLine1: document.getElementById('sc-hero-title1').value.trim(),
-      titleLine2: document.getElementById('sc-hero-title2').value.trim(),
-      description: document.getElementById('sc-hero-description').value.trim()
-    },
+        statusEl.className =
+          'status-msg error';
 
-    story: {
-      eyebrow: document.getElementById('sc-story-eyebrow').value.trim(),
-      heading: document.getElementById('sc-story-heading').value.trim(),
-      year: document.getElementById('sc-story-year').value.trim(),
-      founder: document.getElementById('sc-story-founder').value.trim(),
-      paragraph1: document.getElementById('sc-story-p1').value.trim(),
-      paragraph2: document.getElementById('sc-story-p2').value.trim(),
-      image: document.getElementById('sc-story-image').value.trim()
-    },
+        statusEl.textContent =
+          'Administrator access is required.';
 
-    impact: {
-      eyebrow: document.getElementById('sc-impact-eyebrow').value.trim(),
-      heading: document.getElementById('sc-impact-heading').value.trim(),
-      cards: [1, 2, 3].map(i => ({
-        number: document.getElementById('sc-impact-num' + i).value.trim(),
-        text: document.getElementById('sc-impact-text' + i).value.trim()
-      }))
-    },
+        return;
 
-    contact: {
-      eyebrow: document.getElementById('sc-contact-eyebrow').value.trim(),
-      heading: document.getElementById('sc-contact-heading').value.trim(),
-      availability: document.getElementById('sc-contact-availability').value.trim(),
-      marketing: {
-        label: document.getElementById('sc-contact-mkt-label').value.trim(),
-        phone: document.getElementById('sc-contact-mkt-phone').value.trim(),
-        email: document.getElementById('sc-contact-mkt-email').value.trim()
-      },
-      founder: {
-        label: document.getElementById('sc-contact-fdr-label').value.trim(),
-        phone: document.getElementById('sc-contact-fdr-phone').value.trim(),
-        email: document.getElementById('sc-contact-fdr-email').value.trim()
       }
-    },
 
-    footer: {
-      brandName: document.getElementById('sc-footer-brand').value.trim(),
-      designer: document.getElementById('sc-footer-designer').value.trim(),
-      copyright: document.getElementById('sc-footer-copyright').value.trim(),
-      facebook: socialLinks.facebook,
-      instagram: socialLinks.instagram,
-      tiktok: socialLinks.tiktok
+      const urlOrEmpty =
+        id => {
+
+          return document
+            .getElementById(id)
+            .value
+            .trim();
+
+        };
+
+
+      const socialLinks = {
+
+        facebook:
+          urlOrEmpty(
+            'sc-footer-facebook'
+          ),
+
+        instagram:
+          urlOrEmpty(
+            'sc-footer-instagram'
+          ),
+
+        tiktok:
+          urlOrEmpty(
+            'sc-footer-tiktok'
+          )
+
+      };
+
+
+      for(
+        const key in socialLinks
+      ){
+
+        if(
+          socialLinks[key] &&
+          !/^https?:\/\//i.test(
+            socialLinks[key]
+          )
+        ){
+
+          statusEl.className =
+            'status-msg error';
+
+          statusEl.textContent =
+            'Social links must start with http:// or https:// (check ' +
+            key +
+            ').';
+
+          return;
+
+        }
+
+      }
+
+
+      const data = {
+
+        logo:
+          document
+            .getElementById(
+              'sc-logo'
+            )
+            .value
+            .trim(),
+
+        hero: {
+
+          eyebrow:
+            document
+              .getElementById(
+                'sc-hero-eyebrow'
+              )
+              .value
+              .trim(),
+
+          titleLine1:
+            document
+              .getElementById(
+                'sc-hero-title1'
+              )
+              .value
+              .trim(),
+
+          titleLine2:
+            document
+              .getElementById(
+                'sc-hero-title2'
+              )
+              .value
+              .trim(),
+
+          description:
+            document
+              .getElementById(
+                'sc-hero-description'
+              )
+              .value
+              .trim()
+
+        },
+
+        story: {
+
+          eyebrow:
+            document
+              .getElementById(
+                'sc-story-eyebrow'
+              )
+              .value
+              .trim(),
+
+          heading:
+            document
+              .getElementById(
+                'sc-story-heading'
+              )
+              .value
+              .trim(),
+
+          year:
+            document
+              .getElementById(
+                'sc-story-year'
+              )
+              .value
+              .trim(),
+
+          founder:
+            document
+              .getElementById(
+                'sc-story-founder'
+              )
+              .value
+              .trim(),
+
+          paragraph1:
+            document
+              .getElementById(
+                'sc-story-p1'
+              )
+              .value
+              .trim(),
+
+          paragraph2:
+            document
+              .getElementById(
+                'sc-story-p2'
+              )
+              .value
+              .trim(),
+
+          image:
+            document
+              .getElementById(
+                'sc-story-image'
+              )
+              .value
+              .trim()
+
+        },
+
+        impact: {
+
+          eyebrow:
+            document
+              .getElementById(
+                'sc-impact-eyebrow'
+              )
+              .value
+              .trim(),
+
+          heading:
+            document
+              .getElementById(
+                'sc-impact-heading'
+              )
+              .value
+              .trim(),
+
+          cards:
+            [1,2,3].map(
+              i => ({
+
+                number:
+                  document
+                    .getElementById(
+                      'sc-impact-num' +
+                      i
+                    )
+                    .value
+                    .trim(),
+
+                text:
+                  document
+                    .getElementById(
+                      'sc-impact-text' +
+                      i
+                    )
+                    .value
+                    .trim()
+
+              })
+            )
+
+        },
+
+        contact: {
+
+          eyebrow:
+            document
+              .getElementById(
+                'sc-contact-eyebrow'
+              )
+              .value
+              .trim(),
+
+          heading:
+            document
+              .getElementById(
+                'sc-contact-heading'
+              )
+              .value
+              .trim(),
+
+          availability:
+            document
+              .getElementById(
+                'sc-contact-availability'
+              )
+              .value
+              .trim(),
+
+          marketing: {
+
+            label:
+              document
+                .getElementById(
+                  'sc-contact-mkt-label'
+                )
+                .value
+                .trim(),
+
+            phone:
+              document
+                .getElementById(
+                  'sc-contact-mkt-phone'
+                )
+                .value
+                .trim(),
+
+            email:
+              document
+                .getElementById(
+                  'sc-contact-mkt-email'
+                )
+                .value
+                .trim()
+
+          },
+
+          founder: {
+
+            label:
+              document
+                .getElementById(
+                  'sc-contact-fdr-label'
+                )
+                .value
+                .trim(),
+
+            phone:
+              document
+                .getElementById(
+                  'sc-contact-fdr-phone'
+                )
+                .value
+                .trim(),
+
+            email:
+              document
+                .getElementById(
+                  'sc-contact-fdr-email'
+                )
+                .value
+                .trim()
+
+          }
+
+        },
+
+        footer: {
+
+          brandName:
+            document
+              .getElementById(
+                'sc-footer-brand'
+              )
+              .value
+              .trim(),
+
+          /*
+            IMPORTANT:
+            The designer credit is never read from an input
+            and never taken from Firestore.
+          */
+
+          designer:
+            PROTECTED_DESIGNER,
+
+          copyright:
+            document
+              .getElementById(
+                'sc-footer-copyright'
+              )
+              .value
+              .trim(),
+
+          facebook:
+            socialLinks.facebook,
+
+          instagram:
+            socialLinks.instagram,
+
+          tiktok:
+            socialLinks.tiktok
+
+        }
+
+      };
+
+
+      statusEl.className =
+        'status-msg';
+
+      statusEl.textContent =
+        'Saving...';
+
+
+      try{
+
+        await requireAdmin();
+
+        await db()
+          .collection('site')
+          .doc('content')
+          .set(
+            data,
+            {
+              merge:true
+            }
+          );
+
+        statusEl.className =
+          'status-msg success';
+
+        statusEl.textContent =
+          'Saved. Changes are now live on the site.';
+
+      }catch(err){
+
+        console.error(
+          'Could not save site content:',
+          err
+        );
+
+        statusEl.className =
+          'status-msg error';
+
+        statusEl.textContent =
+          'Could not save. Check your connection and Firestore rules.';
+
+      }
+
     }
+  );
 
-  };
 
-  statusEl.className = 'status-msg';
-  statusEl.textContent = 'Saving…';
-
-  try{
-
-    await db().collection('site').doc('content').set(data, { merge: true });
-
-    statusEl.className = 'status-msg success';
-    statusEl.textContent = 'Saved — changes are now live on the site.';
-
-  } catch(err){
-
-    statusEl.className = 'status-msg error';
-    statusEl.textContent = 'Could not save — check your connection and Firestore rules, then try again.';
-
-  }
-
-});
+/* =========================================================
+UTILITY FUNCTIONS
+========================================================= */
 
 function escapeHtml(str){
-  return String(str || '').replace(/[&<>"']/g, m => ({
-    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
-  })[m]);
+
+  return String(
+    str || ''
+  ).replace(
+    /[&<>"']/g,
+    m => ({
+
+      '&':
+        '&amp;',
+
+      '<':
+        '&lt;',
+
+      '>':
+        '&gt;',
+
+      '"':
+        '&quot;',
+
+      "'":
+        '&#39;'
+
+    })[m]
+  );
+
 }
+
 
 function escapeAttr(str){
+
   return escapeHtml(str);
+
 }
 
-function toLocalInputValue(isoString){
-  if(!isoString) return '';
-  return isoString.length >= 16 ? isoString.slice(0, 16) : isoString;
+
+function toLocalInputValue(
+  isoString
+){
+
+  if(!isoString){
+    return '';
+  }
+
+  return isoString.length >= 16
+    ? isoString.slice(
+        0,
+        16
+      )
+    : isoString;
+
 }
 
-function fromLocalInputValue(value){
-  return value && value.length === 16 ? value + ':00' : value;
+
+function fromLocalInputValue(
+  value
+){
+
+  return value &&
+    value.length === 16
+
+    ? value + ':00'
+
+    : value;
+
 }
+
+
+/* =========================================================
+HIDE HEADER WHILE SCROLLING DOWN
+SHOW HEADER WHILE SCROLLING UP
+========================================================= */
+
+(function(){
+
+  const header =
+    document.getElementById(
+      'adminHeader'
+    );
+
+  if(!header){
+    return;
+  }
+
+  let lastScrollY =
+    window.scrollY;
+
+  window.addEventListener(
+    'scroll',
+    function(){
+
+      const currentScrollY =
+        window.scrollY;
+
+      if(
+        currentScrollY >
+          lastScrollY &&
+        currentScrollY >
+          80
+      ){
+
+        header.classList.add(
+          'nav-hidden'
+        );
+
+      }else if(
+        currentScrollY <
+        lastScrollY
+      ){
+
+        header.classList.remove(
+          'nav-hidden'
+        );
+
+      }
+
+      if(
+        currentScrollY <= 20
+      ){
+
+        header.classList.remove(
+          'nav-hidden'
+        );
+
+      }
+
+      lastScrollY =
+        currentScrollY;
+
+    },
+    {
+      passive:true
+    }
+  );
+
+})();
 
 </script>
 
