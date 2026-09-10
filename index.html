@@ -2031,6 +2031,16 @@ DANCE CLASSES
 @media(max-width:850px){.class-grid,.rhythm-feature{grid-template-columns:1fr}.class-card{min-height:280px}.dance-bottom{flex-direction:column;align-items:flex-start}}
 @media(max-width:480px){.class-card{padding:30px;min-height:300px}.class-card h3{font-size:2rem}.rhythm-panel,.registration-panel{padding:30px}.dance-heading{font-size:2.7rem}.dance-intro{font-size:.95rem}}
 
+
+/* Hide navigation while scrolling down */
+nav {
+    transition: transform .35s ease, opacity .35s ease;
+}
+nav.nav-hidden {
+    transform: translateY(-120%);
+    opacity: 0;
+    pointer-events: none;
+}
 </style>
 </head>
 
@@ -2221,7 +2231,7 @@ DANCE CLASSES
 <div class="dance-inner">
 <span class="dance-kicker">Find Your Rhythm</span>
 <h2 class="dance-heading">Move. Learn. <em>Become.</em></h2>
-<p class="dance-intro">Step into the Mophato Dance Theatre training space at University of Botswana. Our classes give young dancers and adults a place to build confidence, develop technique and grow through movement.</p>
+<p class="dance-intro">Step into the Mophato Dance Theatre training space. Our classes give young dancers and adults a place to build confidence, develop technique and grow through movement.</p>
 <div class="class-grid">
 <article class="class-card featured"><span class="class-number">GROUP A · KIDS</span><h3>Ages 6–10</h3><p>Build confidence, creativity and a love for movement through contemporary and Afro fusion.</p><span class="class-time">TUE &amp; THU · 14:30–15:30</span><div class="class-price">P400 <span>/ month</span></div></article>
 <article class="class-card featured"><span class="class-number">GROUP B · YOUTH</span><h3>Ages 11–15</h3><p>Build technique, expression and stage confidence through focused training.</p><span class="class-time">TUE &amp; THU · 15:30–16:30</span><div class="class-price">P400 <span>/ month</span></div></article>
@@ -3279,5 +3289,30 @@ document.querySelector('#bookingModal form').addEventListener('submit',(e)=>{e.p
 
 </script>
 
+
+<script>
+(function () {
+    const nav = document.querySelector('nav');
+    if (!nav) return;
+
+    let lastScrollY = window.scrollY;
+
+    window.addEventListener('scroll', function () {
+        const currentScrollY = window.scrollY;
+
+        if (currentScrollY > lastScrollY && currentScrollY > 80) {
+            nav.classList.add('nav-hidden');
+        } else if (currentScrollY < lastScrollY) {
+            nav.classList.remove('nav-hidden');
+        }
+
+        if (currentScrollY <= 20) {
+            nav.classList.remove('nav-hidden');
+        }
+
+        lastScrollY = currentScrollY;
+    }, { passive: true });
+})();
+</script>
 </body>
 </html>
