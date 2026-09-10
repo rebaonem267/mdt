@@ -1,1703 +1,540 @@
-<!-- =========================================================
-MOPHATO DANCE THEATRE - ADMIN
-Add / edit / remove upcoming events and past performances.
-
-ACCESS:
-- Requires firebase-config.js to be configured.
-- Requires Firebase Authentication.
-- Requires the signed-in user to exist in:
-  admins/{USER_UID}
-- The admin document must contain:
-  active: true
-  role: "admin"
-
-The designer credit is protected and cannot be changed
-through this admin portal.
-========================================================= -->
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin - Mophato Dance Theatre</title>
-
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
-
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Admin | Mophato Dance Theatre</title>
 <style>
-
-:root{
-  --gold:#d4a017;
-  --gold-light:#f4c542;
-  --dark3:#141414;
-  --gray:#c0c0c0;
-  --danger:#e07070;
-}
-
-*{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
-}
-
-html{
-  scroll-behavior:smooth;
-}
-
-body{
-  background:#000;
-  color:#fff;
-  font-family:'Poppins',sans-serif;
-  min-height:100vh;
-}
-
-h1,h2,h3{
-  font-family:'Oswald',sans-serif;
-}
-
-header{
-  padding:26px 6%;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  border-bottom:1px solid rgba(212,160,23,0.2);
-  flex-wrap:wrap;
-  gap:14px;
-  position:sticky;
-  top:0;
-  z-index:1000;
-  background:rgba(0,0,0,0.96);
-  transition:transform .35s ease, opacity .35s ease;
-}
-
-header.nav-hidden{
-  transform:translateY(-120%);
-  opacity:0;
-  pointer-events:none;
-}
-
-header a{
-  color:var(--gray);
-  text-decoration:none;
-  font-size:0.85rem;
-  letter-spacing:1px;
-  text-transform:uppercase;
-}
-
-header a:hover{
-  color:var(--gold);
-}
-
-.brand{
-  display:flex;
-  align-items:center;
-  gap:14px;
-}
-
-.brand h1{
-  font-size:1.3rem;
-  letter-spacing:1px;
-}
-
-main{
-  max-width:1000px;
-  margin:0 auto;
-  padding:50px 6% 100px;
-}
-
-#loginScreen{
-  max-width:420px;
-  margin:80px auto;
-  padding:0 6%;
-}
-
-#loginScreen h2{
-  font-size:2rem;
-  margin-bottom:10px;
-}
-
-#loginScreen p{
-  color:var(--gray);
-  margin-bottom:30px;
-  font-size:0.95rem;
-}
-
-.field{
-  margin-bottom:18px;
-}
-
-.field label{
-  display:block;
-  margin-bottom:8px;
-  font-size:0.85rem;
-  letter-spacing:0.5px;
-  color:var(--gray);
-}
-
-.field input,
-.field textarea,
-.field select{
-  width:100%;
-  padding:14px;
-  border-radius:10px;
-  border:1px solid rgba(255,255,255,0.12);
-  background:#111;
-  color:#fff;
-  font-family:'Poppins',sans-serif;
-  font-size:15px;
-}
-
-.field input:focus,
-.field textarea:focus,
-.field select:focus{
-  outline:none;
-  border-color:var(--gold);
-}
-
-.btn{
-  padding:14px 30px;
-  border-radius:50px;
-  border:none;
-  cursor:pointer;
-  font-weight:600;
-  font-size:14px;
-  transition:0.3s;
-  letter-spacing:0.5px;
-}
-
-.btn-gold{
-  background:var(--gold);
-  color:#000;
-}
-
-.btn-gold:hover{
-  background:var(--gold-light);
-}
-
-.btn-outline{
-  background:transparent;
-  border:1px solid rgba(255,255,255,0.25);
-  color:#fff;
-}
-
-.btn-outline:hover{
-  border-color:var(--gold);
-  color:var(--gold);
-}
-
-.btn-danger{
-  background:transparent;
-  border:1px solid rgba(224,112,112,0.5);
-  color:var(--danger);
-}
-
-.btn-danger:hover{
-  background:var(--danger);
-  color:#000;
-}
-
-.btn-small{
-  padding:10px 18px;
-  font-size:13px;
-}
-
-#loginError{
-  color:var(--danger);
-  font-size:0.9rem;
-  min-height:20px;
-  margin-top:14px;
-}
-
-#configWarning{
-  display:none;
-  background:rgba(224,112,112,0.1);
-  border:1px solid rgba(224,112,112,0.4);
-  border-radius:16px;
-  padding:24px;
-  margin:40px 6%;
-  max-width:700px;
-  margin-left:auto;
-  margin-right:auto;
-  color:#f0c0c0;
-  font-size:0.9rem;
-  line-height:1.7;
-}
-
-#dashboard{
-  display:none;
-}
-
-.tabs{
-  display:flex;
-  gap:10px;
-  margin-bottom:36px;
-  flex-wrap:wrap;
-}
-
-.tab-btn{
-  padding:12px 24px;
-  border-radius:50px;
-  border:1px solid rgba(255,255,255,0.15);
-  background:transparent;
-  color:var(--gray);
-  cursor:pointer;
-  font-size:14px;
-  letter-spacing:0.5px;
-  transition:0.3s;
-}
-
-.tab-btn:hover{
-  border-color:var(--gold);
-  color:var(--gold);
-}
-
-.tab-btn.active{
-  border-color:var(--gold);
-  color:var(--gold);
-  background:rgba(212,160,23,0.08);
-}
-
-.tab-panel{
-  display:none;
-}
-
-.tab-panel.active{
-  display:block;
-}
-
-.panel-head{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  margin-bottom:24px;
-  flex-wrap:wrap;
-  gap:14px;
-}
-
-.panel-head h2{
-  font-size:1.6rem;
-}
-
-.item-card{
-  background:var(--dark3);
-  border:1px solid rgba(255,255,255,0.08);
-  border-radius:20px;
-  padding:26px;
-  margin-bottom:16px;
-  display:flex;
-  justify-content:space-between;
-  gap:20px;
-  flex-wrap:wrap;
-}
-
-.item-card .info h3{
-  font-size:1.1rem;
-  margin-bottom:6px;
-}
-
-.item-card .info p{
-  color:var(--gray);
-  font-size:0.88rem;
-  line-height:1.5;
-}
-
-.item-card .info .meta{
-  color:var(--gold);
-  font-size:0.78rem;
-  letter-spacing:1px;
-  text-transform:uppercase;
-  margin-bottom:8px;
-  display:block;
-}
-
-.item-actions{
-  display:flex;
-  gap:10px;
-  align-self:flex-start;
-}
-
-.empty-note{
-  color:var(--gray);
-  border:1px dashed rgba(255,255,255,0.15);
-  border-radius:16px;
-  padding:30px;
-  text-align:center;
-  font-size:0.9rem;
-}
-
-.form-card{
-  background:var(--dark3);
-  border:1px solid rgba(212,160,23,0.25);
-  border-radius:22px;
-  padding:34px;
-  margin-bottom:30px;
-  display:none;
-}
-
-.form-card.active{
-  display:block;
-}
-
-.form-card h3{
-  margin-bottom:24px;
-  font-size:1.2rem;
-}
-
-.form-row{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:18px;
-}
-
-@media(max-width:640px){
-  .form-row{
-    grid-template-columns:1fr;
-  }
-}
-
-.checkbox-field{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  margin-bottom:18px;
-}
-
-.checkbox-field input{
-  width:auto;
-}
-
-.subsection-label{
-  display:block;
-  margin-bottom:12px;
-  font-size:0.85rem;
-  color:var(--gray);
-}
-
-.ticket-type-row{
-  display:grid;
-  grid-template-columns:1.1fr 1.2fr 0.7fr 1.1fr auto;
-  gap:10px;
-  margin-bottom:12px;
-  align-items:center;
-}
-
-.date-row{
-  display:grid;
-  grid-template-columns:1fr 1.6fr auto;
-  gap:10px;
-  margin-bottom:12px;
-  align-items:center;
-}
-
-@media(max-width:640px){
-
-  .ticket-type-row,
-  .date-row{
-    grid-template-columns:1fr;
-  }
-
-}
-
-.ticket-type-row input,
-.date-row input{
-  padding:11px;
-  border-radius:8px;
-  border:1px solid rgba(255,255,255,0.12);
-  background:#111;
-  color:#fff;
-  font-size:14px;
-}
-
-.remove-row-btn{
-  background:transparent;
-  border:1px solid rgba(224,112,112,0.5);
-  color:var(--danger);
-  border-radius:8px;
-  width:36px;
-  height:36px;
-  cursor:pointer;
-}
-
-.remove-row-btn:hover{
-  background:var(--danger);
-  color:#000;
-}
-
-.form-actions{
-  display:flex;
-  gap:14px;
-  margin-top:24px;
-  flex-wrap:wrap;
-}
-
-.hint{
-  color:var(--gray);
-  font-size:0.78rem;
-  margin-top:-4px;
-  margin-bottom:18px;
-  line-height:1.6;
-}
-
-.status-msg{
-  min-height:20px;
-  font-size:0.85rem;
-  margin-top:14px;
-}
-
-.status-msg.success{
-  color:var(--gold);
-}
-
-.status-msg.error{
-  color:var(--danger);
-}
-
-.content-group{
-  margin-bottom:36px;
-  padding-bottom:32px;
-  border-bottom:1px solid rgba(255,255,255,0.08);
-}
-
-.content-group:last-child{
-  border-bottom:none;
-  margin-bottom:0;
-  padding-bottom:0;
-}
-
-.content-group h3{
-  font-size:1rem;
-  letter-spacing:1px;
-  text-transform:uppercase;
-  color:var(--gold);
-  margin-bottom:18px;
-}
-
-.impact-card-fields{
-  background:#111;
-  border:1px solid rgba(255,255,255,0.08);
-  border-radius:14px;
-  padding:18px;
-  margin-bottom:14px;
-}
-
-.impact-card-fields .form-row{
-  margin-bottom:0;
-}
-
-.locked-field{
-  background:#090909;
-  border:1px solid rgba(212,160,23,0.25);
-  border-radius:12px;
-  padding:16px 18px;
-  color:#fff;
-}
-
-.locked-field strong{
-  color:var(--gold);
-  font-weight:600;
-}
-
-.locked-field small{
-  display:block;
-  margin-top:7px;
-  color:#777;
-  line-height:1.5;
-  font-size:0.75rem;
-}
-
-.security-note{
-  background:rgba(212,160,23,0.06);
-  border:1px solid rgba(212,160,23,0.2);
-  border-radius:16px;
-  padding:18px;
-  margin-bottom:30px;
-  color:#aaa;
-  font-size:0.8rem;
-  line-height:1.6;
-}
-
-.security-note strong{
-  color:var(--gold);
-}
-
-@media(max-width:640px){
-
-  header{
-    padding:20px 5%;
-  }
-
-  header > div:last-child{
-    width:100%;
-    justify-content:space-between;
-  }
-
-  main{
-    padding:35px 5% 80px;
-  }
-
-  #loginScreen{
-    margin:55px auto;
-  }
-
-  .form-card{
-    padding:24px;
-  }
-
-}
-
+:root{--gold:#d4a017;--gold2:#f4c542;--bg:#050505;--panel:#111;--line:#2a2a2a;--muted:#999}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:#fff;font-family:Arial,sans-serif}button,input,textarea,select{font:inherit}header{position:sticky;top:0;z-index:20;background:#000;border-bottom:1px solid #222;padding:18px 5%;display:flex;justify-content:space-between;align-items:center;transition:transform .3s ease}header.nav-hidden{transform:translateY(-110%)}header h1{font-size:18px;margin:0;letter-spacing:2px;text-transform:uppercase}header .actions{display:flex;gap:10px}.btn{border:1px solid var(--gold);background:transparent;color:var(--gold);padding:11px 16px;border-radius:30px;cursor:pointer}.btn.primary{background:var(--gold);color:#000}.btn.danger{border-color:#b33;color:#f77}.wrap{max-width:1250px;margin:auto;padding:35px 5% 80px}.login{max-width:460px;margin:12vh auto;background:var(--panel);border:1px solid #292929;border-radius:22px;padding:35px}.login h2{margin-top:0}.field{margin-bottom:15px}.field label{display:block;font-size:12px;text-transform:uppercase;letter-spacing:1px;color:#bbb;margin-bottom:7px}.field input,.field textarea,.field select{width:100%;background:#080808;border:1px solid #333;color:#fff;padding:12px;border-radius:10px;outline:none}.field textarea{min-height:90px;resize:vertical}.field input:focus,.field textarea:focus,.field select:focus{border-color:var(--gold)}.notice{padding:12px 15px;border-radius:10px;background:#16120a;border:1px solid #5d4710;color:#e5c86c;margin-bottom:18px}.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:25px}.tab{border:1px solid #333;background:#101010;color:#ccc;padding:11px 15px;border-radius:25px;cursor:pointer}.tab.active{border-color:var(--gold);color:var(--gold)}.panel{display:none}.panel.active{display:block}.card{background:var(--panel);border:1px solid #252525;border-radius:20px;padding:25px;margin-bottom:20px}.card h2,.card h3{margin-top:0}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}.grid.three{grid-template-columns:repeat(3,minmax(0,1fr))}.row{display:flex;gap:10px;align-items:center}.list-item{display:flex;justify-content:space-between;gap:15px;align-items:center;border-top:1px solid #262626;padding:15px 0}.list-item:first-child{border-top:0}.meta{color:var(--muted);font-size:13px}.readonly{opacity:.55}.locked{background:#090909;border:1px dashed #555;color:#ddd;padding:12px;border-radius:10px}.small{font-size:12px;color:#888}.hidden{display:none!important}.status{position:fixed;right:20px;bottom:20px;z-index:50;background:#111;border:1px solid var(--gold);padding:12px 16px;border-radius:10px;display:none}.group{border:1px solid #292929;padding:15px;border-radius:14px;margin-top:12px}.group h4{margin:0 0 12px;color:var(--gold)}@media(max-width:800px){.grid,.grid.three{grid-template-columns:1fr}header{align-items:flex-start;gap:15px;flex-direction:column}.list-item{align-items:flex-start;flex-direction:column}}
 </style>
 </head>
-
 <body>
 
-<header id="adminHeader">
+<div id="loginView" class="login">
+<h2>Mophato Admin</h2>
+<p class="small">Sign in to manage website content, events and performances.</p>
+<div id="configNotice" class="notice hidden">Firebase is not configured. Add your Firebase project values to <b>firebase-config.js</b> before using the portal.</div>
+<form id="loginForm">
+<div class="field">
+<label>Email</label>
+<input id="loginEmail" type="email" required>
+</div>
+<div class="field">
+<label>Password</label>
+<input id="loginPassword" type="password" required>
+</div>
+<button class="btn primary" type="submit">Sign In</button>
+</form>
+</div>
 
-  <div class="brand">
-    <h1>Mophato Admin</h1>
-  </div>
-
-  <div style="display:flex; gap:24px; align-items:center;">
-
-    <a href="index.html">&larr; Back to Site</a>
-
-    <a href="#" id="logoutLink" style="display:none;">
-      Log Out
-    </a>
-
-  </div>
-
+<div id="app" class="hidden">
+<header>
+<h1>Mophato Admin</h1>
+<div class="actions">
+<a class="btn" href="index.html">Back to Site</a>
+<button id="logoutBtn" class="btn">Log Out</button>
+</div>
 </header>
 
-<div id="configWarning">
+<main class="wrap">
 
-  <strong>Firebase isn't configured yet.</strong>
+<div class="notice">
+Changes made here are saved to Firestore and are reflected on the public website.
+The designer credit <b>Designed by Rebaone Lesly Mochabeng</b> is locked in the website code and is not stored in editable content.
+</div>
 
-  Open <code>firebase-config.js</code> and add your Firebase project
-  configuration.
+<div class="tabs">
+<button class="tab active" data-tab="events">Upcoming Events</button>
+<button class="tab" data-tab="performances">Past Performances</button>
+<button class="tab" data-tab="content">Site Content</button>
+</div>
 
-  This admin portal requires Firebase Authentication and Firestore
-  before it can save events, performances or site content.
+<section id="events" class="panel active">
+
+<div class="card">
+<h2>Add / Edit Upcoming Event</h2>
+
+<form id="eventForm">
+<input id="eventId" type="hidden">
+
+<div class="grid">
+
+<div class="field">
+<label>Title</label>
+<input id="eventTitle" required>
+</div>
+
+<div class="field">
+<label>Venue</label>
+<input id="eventVenue" required>
+</div>
+
+<div class="field">
+<label>Show time</label>
+<input id="eventShowTime" placeholder="19:30">
+</div>
+
+<div class="field">
+<label>Show dates</label>
+<input id="eventDates" placeholder="2026-10-01, 2026-10-02" required>
+</div>
+
+<div class="field">
+<label>Start date/time</label>
+<input id="eventStart" type="datetime-local" required>
+</div>
+
+<div class="field">
+<label>End date/time</label>
+<input id="eventEnd" type="datetime-local" required>
+</div>
 
 </div>
 
-<div id="loginScreen">
+<div class="field">
+<label>Description</label>
+<textarea id="eventSubtitle" required></textarea>
+</div>
 
-  <h2>Sign In</h2>
+<div class="grid">
 
-  <p>
-    Enter the email and password set up for you in Firebase Authentication.
-  </p>
+<div class="field">
+<label>Currency</label>
+<input id="eventCurrency" value="BWP">
+</div>
 
-  <div class="field">
-
-    <label for="loginEmail">
-      Email
-    </label>
-
-    <input
-      type="email"
-      id="loginEmail"
-      autocomplete="username"
-    >
-
-  </div>
-
-  <div class="field">
-
-    <label for="loginPassword">
-      Password
-    </label>
-
-    <input
-      type="password"
-      id="loginPassword"
-      autocomplete="current-password"
-    >
-
-  </div>
-
-  <button class="btn btn-gold" id="loginBtn">
-    Sign In
-  </button>
-
-  <p id="loginError"></p>
+<div class="field">
+<label>Tickets on sale</label>
+<select id="eventTickets">
+<option value="true">Yes</option>
+<option value="false">No</option>
+</select>
+</div>
 
 </div>
 
-<main id="dashboard">
+<div class="field">
+<label>Ticket types</label>
+<div id="ticketTypes"></div>
+<button type="button" class="btn" id="addTicket">+ Add Ticket Type</button>
+</div>
 
-  <div class="security-note">
+<div class="row">
+<button class="btn primary" type="submit">Save Event</button>
+<button class="btn" type="button" id="clearEvent">Clear</button>
+</div>
 
-    <strong>Administrator access</strong><br>
+</form>
+</div>
 
-    This portal is restricted to approved administrators.
-    Your Firebase account must be registered under
-    <code>admins/{USER_UID}</code> with
-    <code>active: true</code> and <code>role: "admin"</code>.
+<div class="card">
+<h2>Current Events</h2>
+<div id="eventList"></div>
+</div>
 
-  </div>
+</section>
 
-  <div class="tabs">
+<section id="performances" class="panel">
 
-    <button
-      class="tab-btn active"
-      data-tab="events"
-    >
-      Upcoming Events
-    </button>
+<div class="card">
+<h2>Add / Edit Past Performance</h2>
 
-    <button
-      class="tab-btn"
-      data-tab="performances"
-    >
-      Past Performances
-    </button>
+<form id="perfForm">
+<input id="perfId" type="hidden">
 
-    <button
-      class="tab-btn"
-      data-tab="sitecontent"
-    >
-      Site Content
-    </button>
+<div class="grid">
 
-  </div>
+<div class="field">
+<label>Title</label>
+<input id="perfTitle" required>
+</div>
 
-  <!-- =========================================================
-  EVENTS TAB
-  ========================================================= -->
+<div class="field">
+<label>Subtitle</label>
+<input id="perfSubtitle" required>
+</div>
 
-  <div class="tab-panel active" id="tab-events">
+</div>
 
-    <div class="panel-head">
+<div class="field">
+<label>Image URL or file path</label>
+<input id="perfImage" placeholder="a.jpg or https://...">
+</div>
 
-      <h2>
-        Upcoming Events
-      </h2>
+<div class="field">
+<label>Display order</label>
+<input id="perfOrder" type="number" value="1">
+</div>
 
-      <button
-        class="btn btn-gold btn-small"
-        id="addEventBtn"
-      >
-        + Add Event
-      </button>
+<div class="row">
+<button class="btn primary" type="submit">Save Performance</button>
+<button class="btn" type="button" id="clearPerf">Clear</button>
+</div>
 
-    </div>
+</form>
+</div>
 
-    <div class="form-card" id="eventForm">
+<div class="card">
+<h2>Current Performances</h2>
+<div id="perfList"></div>
+</div>
 
-      <h3 id="eventFormTitle">
-        Add Event
-      </h3>
+</section>
 
-      <div class="form-row">
+<section id="content" class="panel">
 
-        <div class="field">
+<form id="contentForm">
 
-          <label>
-            Title
-          </label>
+<div class="card">
+<h2>Hero</h2>
 
-          <input
-            type="text"
-            id="ev-title"
-            placeholder="e.g. Botswana's Story, Told in Dance"
-          >
+<div class="grid">
 
-        </div>
+<div class="field">
+<label>Eyebrow</label>
+<input id="heroEyebrow">
+</div>
 
-        <div class="field">
+<div class="field">
+<label>Title line 1</label>
+<input id="heroTitle1">
+</div>
 
-          <label>
-            Venue
-          </label>
+<div class="field">
+<label>Title line 2</label>
+<input id="heroTitle2">
+</div>
 
-          <input
-            type="text"
-            id="ev-venue"
-            placeholder="e.g. Civic Center Hall, Main Mall"
-          >
+</div>
 
-        </div>
+<div class="field">
+<label>Description</label>
+<textarea id="heroDescription"></textarea>
+</div>
 
-      </div>
+</div>
 
-      <div class="field">
+<div class="card">
+<h2>Our Story</h2>
 
-        <label>
-          Subtitle / Description
-        </label>
+<div class="grid">
 
-        <textarea
-          id="ev-subtitle"
-          rows="3"
-          placeholder="Shown under the title on the flyer and tickets page"
-        ></textarea>
+<div class="field">
+<label>Eyebrow</label>
+<input id="storyEyebrow">
+</div>
 
-      </div>
+<div class="field">
+<label>Heading</label>
+<input id="storyHeading">
+</div>
 
-      <div class="form-row">
+<div class="field">
+<label>Year</label>
+<input id="storyYear">
+</div>
 
-        <div class="field">
+<div class="field">
+<label>Founder</label>
+<input id="storyFounder">
+</div>
 
-          <label>
-            Run Starts (date &amp; time)
-          </label>
+<div class="field">
+<label>Image URL or file path</label>
+<input id="storyImage">
+</div>
 
-          <input
-            type="datetime-local"
-            id="ev-start"
-          >
+</div>
 
-        </div>
+<div class="field">
+<label>Paragraph 1</label>
+<textarea id="storyP1"></textarea>
+</div>
 
-        <div class="field">
+<div class="field">
+<label>Paragraph 2</label>
+<textarea id="storyP2"></textarea>
+</div>
 
-          <label>
-            Run Ends (date &amp; time)
-          </label>
+</div>
 
-          <input
-            type="datetime-local"
-            id="ev-end"
-          >
+<div class="card">
+<h2>Community Impact</h2>
 
-        </div>
+<div class="grid">
 
-      </div>
+<div class="field">
+<label>Eyebrow</label>
+<input id="impactEyebrow">
+</div>
 
-      <label class="subsection-label">
-        Show Dates
-      </label>
+<div class="field">
+<label>Heading</label>
+<input id="impactHeading">
+</div>
 
-      <div id="showDateRows"></div>
+</div>
 
-      <button
-        class="btn btn-outline btn-small"
-        id="addShowDateBtn"
-        type="button"
-      >
-        + Add Date
-      </button>
+<div class="grid three">
 
-      <p
-        class="hint"
-        style="margin-top:14px;"
-      >
+<div class="group">
+<h4>Card 1</h4>
 
-        Leave "Status" blank for a normal, available date.
+<div class="field">
+<label>Number</label>
+<input id="impactN0">
+</div>
 
-        Type anything you like to show a small badge on that date
-        on the Tickets page.
+<div class="field">
+<label>Text</label>
+<textarea id="impactT0"></textarea>
+</div>
 
-        Examples:
-        <em>Sold Out</em>,
-        <em>20 Tickets Left</em>,
-        <em>Selling Fast</em>.
+</div>
 
-        Typing "sold out" also automatically stops that date
-        from being selected on the Tickets page.
+<div class="group">
+<h4>Card 2</h4>
 
-      </p>
+<div class="field">
+<label>Number</label>
+<input id="impactN1">
+</div>
 
-      <div class="form-row">
+<div class="field">
+<label>Text</label>
+<textarea id="impactT1"></textarea>
+</div>
 
-        <div class="field">
+</div>
 
-          <label>
-            Currency
-          </label>
+<div class="group">
+<h4>Card 3</h4>
 
-          <input
-            type="text"
-            id="ev-currency"
-            placeholder="BWP"
-            value="BWP"
-          >
+<div class="field">
+<label>Number</label>
+<input id="impactN2">
+</div>
 
-        </div>
+<div class="field">
+<label>Text</label>
+<textarea id="impactT2"></textarea>
+</div>
 
-        <div
-          class="checkbox-field"
-          style="margin-top:34px;"
-        >
+</div>
 
-          <input
-            type="checkbox"
-            id="ev-onsale"
-            checked
-          >
+</div>
+</div>
 
-          <label
-            for="ev-onsale"
-            style="margin:0;"
-          >
-            Tickets on sale
-          </label>
+<div class="card">
+<h2>Dance Classes</h2>
 
-        </div>
+<div class="grid">
 
-      </div>
+<div class="field">
+<label>Eyebrow</label>
+<input id="classEyebrow">
+</div>
 
-      <label class="subsection-label">
-        Ticket Types
-      </label>
+<div class="field">
+<label>Heading</label>
+<input id="classHeading">
+</div>
 
-      <div id="ticketTypeRows"></div>
+<div class="field">
+<label>Registration phone</label>
+<input id="classPhone">
+</div>
 
-      <button
-        class="btn btn-outline btn-small"
-        id="addTicketTypeBtn"
-        type="button"
-      >
-        + Add Ticket Type
-      </button>
+<div class="field">
+<label>Button text</label>
+<input id="classCta">
+</div>
 
-      <p
-        class="hint"
-        style="margin-top:14px;"
-      >
+</div>
 
-        The Lemon Squeezy Variant ID links this ticket type to
-        a specific product in your Lemon Squeezy store.
+<div class="field">
+<label>Introduction</label>
+<textarea id="classIntro"></textarea>
+</div>
 
-        Add as many ticket types as you need.
+<div class="grid">
 
-        Use only the Variant ID itself.
+<div class="field">
+<label>Saturday heading</label>
+<input id="satHeading">
+</div>
 
-      </p>
+<div class="field">
+<label>Saturday note</label>
+<textarea id="satNote"></textarea>
+</div>
 
-      <div class="form-actions">
+<div class="field">
+<label>Journey heading</label>
+<input id="journeyHeading">
+</div>
 
-        <button
-          class="btn btn-gold"
-          id="saveEventBtn"
-        >
-          Save Event
-        </button>
+<div class="field">
+<label>Assessments text</label>
+<textarea id="assessments"></textarea>
+</div>
 
-        <button
-          class="btn btn-outline"
-          id="cancelEventBtn"
-        >
-          Cancel
-        </button>
+<div class="field">
+<label>Professional company text</label>
+<textarea id="companyText"></textarea>
+</div>
 
-      </div>
+<div class="field">
+<label>Three-month commitment text</label>
+<textarea id="commitment"></textarea>
+</div>
 
-      <p
-        class="status-msg"
-        id="eventFormStatus"
-      ></p>
+<div class="field">
+<label>T-shirt note</label>
+<textarea id="shirtNote"></textarea>
+</div>
 
-    </div>
+<div class="field">
+<label>Saturday genres, comma separated</label>
+<input id="genres">
+</div>
 
-    <div id="eventsList"></div>
+</div>
 
-  </div>
+<div id="classGroups"></div>
 
-  <!-- =========================================================
-  PERFORMANCES TAB
-  ========================================================= -->
+</div>
 
-  <div
-    class="tab-panel"
-    id="tab-performances"
-  >
+<div class="card">
+<h2>Contact</h2>
 
-    <div class="panel-head">
+<div class="grid">
 
-      <h2>
-        Past Performances
-      </h2>
+<div class="field">
+<label>Eyebrow</label>
+<input id="contactEyebrow">
+</div>
 
-      <button
-        class="btn btn-gold btn-small"
-        id="addPerfBtn"
-      >
-        + Add Performance
-      </button>
+<div class="field">
+<label>Heading</label>
+<input id="contactHeading">
+</div>
 
-    </div>
+</div>
 
-    <p
-      class="hint"
-      style="margin-bottom:24px;"
-    >
+<div class="field">
+<label>Availability</label>
+<textarea id="availability"></textarea>
+</div>
 
-      These populate the Performances carousel on the home page.
+<div class="grid">
 
-      Add an image URL and display order for each performance.
+<div class="group">
+<h4>Marketing & Partnerships</h4>
 
-    </p>
+<div class="field">
+<label>Label</label>
+<input id="marketingLabel">
+</div>
 
-    <div
-      class="form-card"
-      id="perfForm"
-    >
+<div class="field">
+<label>Phone</label>
+<input id="marketingPhone">
+</div>
 
-      <h3 id="perfFormTitle">
-        Add Performance
-      </h3>
+<div class="field">
+<label>Email</label>
+<input id="marketingEmail">
+</div>
 
-      <div class="form-row">
+</div>
 
-        <div class="field">
+<div class="group">
+<h4>Founder & Artistic Director</h4>
 
-          <label>
-            Title
-          </label>
+<div class="field">
+<label>Label</label>
+<input id="founderLabel">
+</div>
 
-          <input
-            type="text"
-            id="pf-title"
-            placeholder="e.g. THARI"
-          >
+<div class="field">
+<label>Phone</label>
+<input id="founderPhone">
+</div>
 
-        </div>
+<div class="field">
+<label>Email</label>
+<input id="founderEmail">
+</div>
 
-        <div class="field">
+</div>
 
-          <label>
-            Display Order
-          </label>
+</div>
+</div>
 
-          <input
-            type="number"
-            id="pf-order"
-            placeholder="1"
-            min="1"
-          >
+<div class="card">
+<h2>Footer & Social Links</h2>
 
-        </div>
+<div class="grid">
 
-      </div>
+<div class="field">
+<label>Brand name</label>
+<input id="footerBrand">
+</div>
 
-      <div class="field">
+<div class="field">
+<label>Copyright</label>
+<input id="footerCopyright">
+</div>
 
-        <label>
-          Subtitle
-        </label>
+<div class="field">
+<label>Facebook URL</label>
+<input id="facebook">
+</div>
 
-        <input
-          type="text"
-          id="pf-subtitle"
-          placeholder="e.g. Women Who Carry The Nation"
-        >
+<div class="field">
+<label>Instagram URL</label>
+<input id="instagram">
+</div>
 
-      </div>
+<div class="field">
+<label>TikTok URL</label>
+<input id="tiktok">
+</div>
 
-      <div class="field">
+</div>
 
-        <label>
-          Image URL
-        </label>
+<div class="field">
+<label>Protected designer credit</label>
 
-        <input
-          type="text"
-          id="pf-image"
-          placeholder="https://..."
-        >
+<div class="locked">
+Designed by Rebaone Lesly Mochabeng
+<br>
+<span class="small">
+This value is hard-coded in index.html. There is intentionally no admin field for it and the public site does not read it from Firestore.
+</span>
+</div>
 
-      </div>
+</div>
+</div>
 
-      <div class="form-actions">
+<div class="card">
 
-        <button
-          class="btn btn-gold"
-          id="savePerfBtn"
-        >
-          Save Performance
-        </button>
+<div class="row">
+<button class="btn primary" type="submit">Save All Site Content</button>
+<button class="btn" type="button" id="reloadContent">Reload Saved Content</button>
+</div>
 
-        <button
-          class="btn btn-outline"
-          id="cancelPerfBtn"
-        >
-          Cancel
-        </button>
+</div>
 
-      </div>
+</form>
 
-      <p
-        class="status-msg"
-        id="perfFormStatus"
-      ></p>
-
-    </div>
-
-    <div id="performancesList"></div>
-
-  </div>
-
-  <!-- =========================================================
-  SITE CONTENT TAB
-  ========================================================= -->
-
-  <div
-    class="tab-panel"
-    id="tab-sitecontent"
-  >
-
-    <div class="panel-head">
-
-      <h2>
-        Site Content
-      </h2>
-
-    </div>
-
-    <p
-      class="hint"
-      style="margin-bottom:30px;"
-    >
-
-      Everything below controls text and images shown across
-      the live site.
-
-      Changes appear on the site after you click Save Site Content.
-
-    </p>
-
-    <div
-      class="form-card active"
-      style="display:block;"
-    >
-
-      <!-- LOGO -->
-
-      <div class="content-group">
-
-        <h3>
-          Logo
-        </h3>
-
-        <div class="field">
-
-          <label>
-            Logo Image URL
-          </label>
-
-          <input
-            type="text"
-            id="sc-logo"
-            placeholder="https://... or mdt.png"
-          >
-
-        </div>
-
-      </div>
-
-      <!-- HERO -->
-
-      <div class="content-group">
-
-        <h3>
-          Hero Section
-        </h3>
-
-        <div class="field">
-
-          <label>
-            Eyebrow Text
-          </label>
-
-          <input
-            type="text"
-            id="sc-hero-eyebrow"
-            placeholder="e.g. Rhythm. Heritage. Movement."
-          >
-
-        </div>
-
-        <div class="form-row">
-
-          <div class="field">
-
-            <label>
-              Title - Line 1
-            </label>
-
-            <input
-              type="text"
-              id="sc-hero-title1"
-              placeholder="e.g. Mophato"
-            >
-
-          </div>
-
-          <div class="field">
-
-            <label>
-              Title - Line 2
-            </label>
-
-            <input
-              type="text"
-              id="sc-hero-title2"
-              placeholder="e.g. Dance Theatre"
-            >
-
-          </div>
-
-        </div>
-
-        <div class="field">
-
-          <label>
-            Description
-          </label>
-
-          <textarea
-            id="sc-hero-description"
-            rows="3"
-          ></textarea>
-
-        </div>
-
-      </div>
-
-      <!-- STORY -->
-
-      <div class="content-group">
-
-        <h3>
-          Story Section
-        </h3>
-
-        <div class="field">
-
-          <label>
-            Eyebrow Text
-          </label>
-
-          <input
-            type="text"
-            id="sc-story-eyebrow"
-            placeholder="e.g. Our Story"
-          >
-
-        </div>
-
-        <div class="field">
-
-          <label>
-            Heading
-          </label>
-
-          <input
-            type="text"
-            id="sc-story-heading"
-          >
-
-        </div>
-
-        <div class="form-row">
-
-          <div class="field">
-
-            <label>
-              Founding Year
-            </label>
-
-            <input
-              type="text"
-              id="sc-story-year"
-              placeholder="e.g. 2009"
-            >
-
-          </div>
-
-          <div class="field">
-
-            <label>
-              Founder Credit
-            </label>
-
-            <input
-              type="text"
-              id="sc-story-founder"
-              placeholder="e.g. Founded by Andrew Letso Kola"
-            >
-
-          </div>
-
-        </div>
-
-        <div class="field">
-
-          <label>
-            Paragraph 1
-          </label>
-
-          <textarea
-            id="sc-story-p1"
-            rows="2"
-          ></textarea>
-
-        </div>
-
-        <div class="field">
-
-          <label>
-            Paragraph 2
-          </label>
-
-          <textarea
-            id="sc-story-p2"
-            rows="2"
-          ></textarea>
-
-        </div>
-
-        <div class="field">
-
-          <label>
-            Story Image URL
-          </label>
-
-          <input
-            type="text"
-            id="sc-story-image"
-            placeholder="https://..."
-          >
-
-        </div>
-
-      </div>
-
-      <!-- COMMUNITY IMPACT -->
-
-      <div class="content-group">
-
-        <h3>
-          Community Impact Section
-        </h3>
-
-        <div class="form-row">
-
-          <div class="field">
-
-            <label>
-              Eyebrow Text
-            </label>
-
-            <input
-              type="text"
-              id="sc-impact-eyebrow"
-              placeholder="e.g. Community Impact"
-            >
-
-          </div>
-
-          <div class="field">
-
-            <label>
-              Heading
-            </label>
-
-            <input
-              type="text"
-              id="sc-impact-heading"
-            >
-
-          </div>
-
-        </div>
-
-        <div class="impact-card-fields">
-
-          <div class="form-row">
-
-            <div class="field">
-
-              <label>
-                Stat 1 Number
-              </label>
-
-              <input
-                type="text"
-                id="sc-impact-num1"
-                placeholder="e.g. 400+"
-              >
-
-            </div>
-
-            <div class="field">
-
-              <label>
-                Stat 1 Text
-              </label>
-
-              <input
-                type="text"
-                id="sc-impact-text1"
-              >
-
-            </div>
-
-          </div>
-
-        </div>
-
-        <div class="impact-card-fields">
-
-          <div class="form-row">
-
-            <div class="field">
-
-              <label>
-                Stat 2 Number
-              </label>
-
-              <input
-                type="text"
-                id="sc-impact-num2"
-                placeholder="e.g. 10+"
-              >
-
-            </div>
-
-            <div class="field">
-
-              <label>
-                Stat 2 Text
-              </label>
-
-              <input
-                type="text"
-                id="sc-impact-text2"
-              >
-
-            </div>
-
-          </div>
-
-        </div>
-
-        <div class="impact-card-fields">
-
-          <div class="form-row">
-
-            <div class="field">
-
-              <label>
-                Stat 3 Number
-              </label>
-
-              <input
-                type="text"
-                id="sc-impact-num3"
-                placeholder="e.g. 35+"
-              >
-
-            </div>
-
-            <div class="field">
-
-              <label>
-                Stat 3 Text
-              </label>
-
-              <input
-                type="text"
-                id="sc-impact-text3"
-              >
-
-            </div>
-
-          </div>
-
-        </div>
-
-      </div>
-
-      <!-- CONTACT -->
-
-      <div class="content-group">
-
-        <h3>
-          Book Mophato / Contact Section
-        </h3>
-
-        <div class="form-row">
-
-          <div class="field">
-
-            <label>
-              Eyebrow Text
-            </label>
-
-            <input
-              type="text"
-              id="sc-contact-eyebrow"
-              placeholder="e.g. Book Mophato"
-            >
-
-          </div>
-
-          <div class="field">
-
-            <label>
-              Heading
-            </label>
-
-            <input
-              type="text"
-              id="sc-contact-heading"
-            >
-
-          </div>
-
-        </div>
-
-        <div class="field">
-
-          <label>
-            Availability Text
-          </label>
-
-          <textarea
-            id="sc-contact-availability"
-            rows="2"
-          ></textarea>
-
-        </div>
-
-        <label class="subsection-label">
-          Marketing &amp; Partnerships Contact
-        </label>
-
-        <div class="form-row">
-
-          <div class="field">
-
-            <label>
-              Label
-            </label>
-
-            <input
-              type="text"
-              id="sc-contact-mkt-label"
-            >
-
-          </div>
-
-          <div class="field">
-
-            <label>
-              Phone
-            </label>
-
-            <input
-              type="text"
-              id="sc-contact-mkt-phone"
-            >
-
-          </div>
-
-        </div>
-
-        <div class="field">
-
-          <label>
-            Email
-          </label>
-
-          <input
-            type="email"
-            id="sc-contact-mkt-email"
-          >
-
-        </div>
-
-        <label
-          class="subsection-label"
-          style="margin-top:10px;"
-        >
-          Founder &amp; Artistic Director Contact
-        </label>
-
-        <div class="form-row">
-
-          <div class="field">
-
-            <label>
-              Label
-            </label>
-
-            <input
-              type="text"
-              id="sc-contact-fdr-label"
-            >
-
-          </div>
-
-          <div class="field">
-
-            <label>
-              Phone
-            </label>
-
-            <input
-              type="text"
-              id="sc-contact-fdr-phone"
-            >
-
-          </div>
-
-        </div>
-
-        <div class="field">
-
-          <label>
-            Email
-          </label>
-
-          <input
-            type="email"
-            id="sc-contact-fdr-email"
-          >
-
-        </div>
-
-      </div>
-
-      <!-- FOOTER -->
-
-      <div class="content-group">
-
-        <h3>
-          Footer &amp; Social Links
-        </h3>
-
-        <div class="form-row">
-
-          <div class="field">
-
-            <label>
-              Brand Name
-            </label>
-
-            <input
-              type="text"
-              id="sc-footer-brand"
-            >
-
-          </div>
-
-          <div class="field">
-
-            <label>
-              Designer Credit
-            </label>
-
-            <div class="locked-field">
-
-              <strong>
-                Designed by Rebaone Lesly Mochabeng
-              </strong>
-
-              <small>
-                This credit is protected and cannot be changed
-                from the admin portal. It is hard-coded in the
-                public index.html and is not controlled by Firestore.
-              </small>
-
-            </div>
-
-          </div>
-
-        </div>
-
-        <div class="field">
-
-          <label>
-            Copyright Line
-          </label>
-
-          <input
-            type="text"
-            id="sc-footer-copyright"
-          >
-
-        </div>
-
-        <div class="form-row">
-
-          <div class="field">
-
-            <label>
-              Facebook URL
-            </label>
-
-            <input
-              type="text"
-              id="sc-footer-facebook"
-              placeholder="https://facebook.com/..."
-            >
-
-          </div>
-
-          <div class="field">
-
-            <label>
-              Instagram URL
-            </label>
-
-            <input
-              type="text"
-              id="sc-footer-instagram"
-              placeholder="https://instagram.com/..."
-            >
-
-          </div>
-
-        </div>
-
-        <div class="field">
-
-          <label>
-            TikTok URL
-          </label>
-
-          <input
-            type="text"
-            id="sc-footer-tiktok"
-            placeholder="https://tiktok.com/..."
-          >
-
-        </div>
-
-      </div>
-
-      <div class="form-actions">
-
-        <button
-          class="btn btn-gold"
-          id="saveSiteContentBtn"
-        >
-          Save Site Content
-        </button>
-
-      </div>
-
-      <p
-        class="status-msg"
-        id="siteContentStatus"
-      ></p>
-
-    </div>
-
-  </div>
+</section>
 
 </main>
+</div>
 
-<!-- =========================================================
-FIREBASE
-========================================================= -->
+<div id="status" class="status"></div>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
@@ -1705,2664 +542,853 @@ FIREBASE
 <script src="firebase-config.js"></script>
 
 <script>
+const defaults={
+hero:{
+eyebrow:'Rhythm. Heritage. Movement.',
+titleLine1:'Mophato',
+titleLine2:'Dance Theatre',
+description:"Botswana's internationally celebrated contemporary dance theatre company. Blending traditional African storytelling and powerful movement."
+},
+story:{
+eyebrow:'Our Story',
+heading:'Dance that carries the soul of Botswana',
+year:'2009',
+founder:'Founded by Andrew Letso Kola',
+paragraph1:"Mophato Dance Theatre has become one of Botswana's most influential contemporary dance companies.",
+paragraph2:'The company has performed internationally while celebrating Setswana storytelling traditions.',
+image:'a.jpg'
+},
+impact:{
+eyebrow:'Community Impact',
+heading:'Transforming lives through creativity',
+cards:[
+{number:'400+',text:'Youth empowered through workshops and mentorship.'},
+{number:'10+',text:'International collaborations and partnerships.'},
+{number:'35+',text:'Creative professionals involved in productions.'}
+]
+},
+classes:{
+eyebrow:'Find Your Rhythm',
+heading:'Move. Learn. <em>Become.</em>',
+intro:'Step into the Mophato Dance Theatre training space at University of Botswana. Our classes give young dancers and adults a place to build confidence, develop technique and grow through movement.',
+phone:'+267 76 956 517',
+cta:'Join the Classes',
+shirtNote:'Kids receive a once-off Mophato Dance Theatre T-shirt upon registration and payment of the first month.',
+saturdayHeading:"Never know what you'll dance next.",
+saturdayNote:'Optional Saturday surprise-genre sessions keep the training fresh and exciting. Come ready for whatever rhythm walks through the door.',
+genres:['Hip Hop','Ballet','Amapiano','& more'],
+journeyHeading:'Keep showing up.',
+assessments:'Quarterly assessments help track development, while annual performances and prize giving give dancers a chance to celebrate their progress.',
+company:'Selected dancers may also get the opportunity to perform with the professional Mophato Dance Theatre company.',
+commitment:'Registration commits you to a minimum of three consecutive months to support consistent growth and development.',
+groups:[
+{
+label:'GROUP A · KIDS',
+title:'Ages 6–10',
+description:'Build confidence, creativity and a love for movement through contemporary and Afro fusion.',
+time:'TUE & THU · 14:30–15:30',
+price:'P400',
+period:'/ month'
+},
+{
+label:'GROUP B · YOUTH',
+title:'Ages 11–15',
+description:'Build technique, expression and stage confidence through focused training.',
+time:'TUE & THU · 15:30–16:30',
+price:'P400',
+period:'/ month'
+},
+{
+label:'ADULTS · ALL LEVELS',
+title:'Dance & Fitness',
+description:'Move with confidence, build your technique and keep your energy alive through contemporary and Afro fusion.',
+time:'TUE & THU · 17:30–19:00',
+price:'P550',
+period:'/ month'
+}
+]
+},
+contact:{
+eyebrow:'Book Mophato',
+heading:"Let's create unforgettable experiences together",
+availability:'Available for festivals, workshops, corporate events and theatre productions.',
+marketing:{
+label:'Marketing & Partnerships',
+phone:'+267 72345678',
+email:'steph@gmail.com'
+},
+founder:{
+label:'Founder & Artistic Director',
+phone:'+267 75252777',
+email:'mophatodancetheatre@gmail.com'
+}
+},
+footer:{
+brandName:'Mophato Dance Theatre',
+copyright:'© 2026 Mophato Dance Theatre. All rights reserved.',
+socials:{
+facebook:'https://www.facebook.com/share/1HFWY7sgNZ/?mibextid=wwXIfr',
+instagram:'https://www.instagram.com/mophatodance_theatre?igsh=MW45eTVkM3d0azI3OQ==',
+tiktok:'https://www.tiktok.com/@mophatodancetheat?_r=1&_t=ZS-96cqFmmMBJo'
+}
+}
+};
 
-/* =========================================================
-CONFIGURATION
-========================================================= */
+let db=null,auth=null;
 
-const loginScreen = document.getElementById('loginScreen');
-const dashboard = document.getElementById('dashboard');
-const logoutLink = document.getElementById('logoutLink');
-const configWarning = document.getElementById('configWarning');
+const $=id=>document.getElementById(id);
 
-let editingEventId = null;
-let editingPerfId = null;
-
-const db = () => window.mdtDb;
-
-
-/* =========================================================
-CONFIG CHECK
-========================================================= */
-
-if(!window.mdtFirestoreReady){
-
-  configWarning.style.display = 'block';
-  loginScreen.style.display = 'none';
-
+function msg(t){
+const x=$('status');
+x.textContent=t;
+x.style.display='block';
+setTimeout(()=>x.style.display='none',2500)
 }
 
+function merge(a,b){
+return {...a,...b}
+}
 
-/* =========================================================
-ADMIN ACCESS CHECK
-========================================================= */
+function configured(){
+return !!window.mdtFirestoreReady&&!!window.mdtDb
+}
 
 async function requireAdmin(){
+const user=auth&&auth.currentUser;
 
-  const user = window.mdtAuth
-    ? window.mdtAuth.currentUser
-    : null;
+if(!user)
+throw new Error('You must be signed in.');
 
-  if(!user){
-    throw new Error('You must be signed in.');
-  }
+const adminDoc=await db.collection('admins').doc(user.uid).get();
 
-  if(!window.mdtDb){
-    throw new Error('Firestore is not available.');
-  }
+const data=adminDoc.exists?adminDoc.data():{};
 
-  const adminDoc = await db()
-    .collection('admins')
-    .doc(user.uid)
-    .get();
+if(data.active!==true||data.role!=='admin')
+throw new Error('Administrator access is required.');
 
-  if(!adminDoc.exists){
-
-    throw new Error(
-      'Administrator access is required.'
-    );
-
-  }
-
-  const adminData = adminDoc.data() || {};
-
-  if(
-    adminData.active !== true ||
-    adminData.role !== 'admin'
-  ){
-
-    throw new Error(
-      'Administrator access is required.'
-    );
-
-  }
-
-  return true;
-
+return true
 }
 
+function ticketRow(t={
+name:'General Admission',
+description:'',
+price:0,
+id:crypto.randomUUID?crypto.randomUUID():Date.now()+''
+}){
+const d=document.createElement('div');
 
-/* =========================================================
-LOGIN
-========================================================= */
+d.className='group ticket-row';
 
-async function attemptLogin(){
+d.innerHTML=`
+<div class="grid">
+<div class="field">
+<label>Name</label>
+<input class="tn" value="${esc(t.name)}">
+</div>
 
-  const email =
-    document.getElementById('loginEmail')
-      .value
-      .trim();
+<div class="field">
+<label>Price</label>
+<input class="tp" type="number" value="${Number(t.price)||0}">
+</div>
+</div>
 
-  const password =
-    document.getElementById('loginPassword')
-      .value;
+<div class="field">
+<label>Description</label>
+<input class="td" value="${esc(t.description||'')}">
+</div>
 
-  const errEl =
-    document.getElementById('loginError');
+<button type="button" class="btn danger remove-ticket">Remove</button>
+`;
 
-  errEl.textContent = '';
+d.dataset.id=t.id||Date.now()+'';
 
-  if(!window.mdtAuth){
+d.querySelector('.remove-ticket').onclick=()=>d.remove();
 
-    errEl.textContent =
-      'Firebase Authentication is not configured. See firebase-config.js.';
-
-    return;
-
-  }
-
-  if(!email || !password){
-
-    errEl.textContent =
-      'Please enter your email and password.';
-
-    return;
-
-  }
-
-  try{
-
-    await window.mdtAuth
-      .signInWithEmailAndPassword(
-        email,
-        password
-      );
-
-  }catch(err){
-
-    errEl.textContent =
-      'Sign-in failed: check your email and password.';
-
-  }
-
+$('ticketTypes').appendChild(d)
 }
 
-
-document
-  .getElementById('loginBtn')
-  .addEventListener(
-    'click',
-    attemptLogin
-  );
-
-
-document
-  .getElementById('loginPassword')
-  .addEventListener(
-    'keydown',
-    (e) => {
-
-      if(e.key === 'Enter'){
-        attemptLogin();
-      }
-
-    }
-  );
-
-
-/* =========================================================
-LOGOUT
-========================================================= */
-
-logoutLink.addEventListener(
-  'click',
-  async (e) => {
-
-    e.preventDefault();
-
-    if(window.mdtAuth){
-      await window.mdtAuth.signOut();
-    }
-
-  }
-);
-
-
-/* =========================================================
-AUTH STATE
-========================================================= */
-
-if(window.mdtAuth){
-
-  window.mdtAuth.onAuthStateChanged(
-    async user => {
-
-      if(!user){
-
-        loginScreen.style.display = 'block';
-        dashboard.style.display = 'none';
-        logoutLink.style.display = 'none';
-
-        return;
-
-      }
-
-      try{
-
-        await requireAdmin();
-
-        loginScreen.style.display = 'none';
-        dashboard.style.display = 'block';
-        logoutLink.style.display = 'inline';
-
-        await Promise.all([
-          loadEvents(),
-          loadPerformances(),
-          loadSiteContentForm()
-        ]);
-
-      }catch(err){
-
-        console.warn(
-          'Mophato admin access denied:',
-          err
-        );
-
-        try{
-          await window.mdtAuth.signOut();
-        }catch(signOutError){
-          console.warn(
-            'Could not sign out rejected account.',
-            signOutError
-          );
-        }
-
-        loginScreen.style.display = 'block';
-        dashboard.style.display = 'none';
-        logoutLink.style.display = 'none';
-
-        document.getElementById(
-          'loginError'
-        ).textContent =
-          'Access denied. This account is not an approved administrator.';
-
-      }
-
-    }
-  );
-
+function esc(v){
+return String(v??'')
+.replace(/&/g,'&amp;')
+.replace(/</g,'&lt;')
+.replace(/>/g,'&gt;')
+.replace(/"/g,'&quot;')
 }
 
+function clearEvent(){
+[
+'eventId',
+'eventTitle',
+'eventVenue',
+'eventShowTime',
+'eventDates',
+'eventStart',
+'eventEnd',
+'eventSubtitle'
+].forEach(x=>$(x).value='');
 
-/* =========================================================
-TABS
-========================================================= */
+$('eventCurrency').value='BWP';
+$('eventTickets').value='true';
+$('ticketTypes').innerHTML='';
 
-document
-  .querySelectorAll('.tab-btn')
-  .forEach(btn => {
+ticketRow()
+}
 
-    btn.addEventListener(
-      'click',
-      () => {
+function readEvent(){
+return {
+title:$('eventTitle').value.trim(),
+subtitle:$('eventSubtitle').value.trim(),
+venue:$('eventVenue').value.trim(),
+showTime:$('eventShowTime').value.trim(),
+showDates:$('eventDates').value
+.split(',')
+.map(x=>x.trim())
+.filter(Boolean),
+startDateTime:$('eventStart').value,
+endDateTime:$('eventEnd').value,
+ticketsOnSale:$('eventTickets').value==='true',
+currency:$('eventCurrency').value.trim()||'BWP',
+ticketTypes:[...document.querySelectorAll('.ticket-row')]
+.map(r=>({
+id:r.dataset.id,
+name:r.querySelector('.tn').value.trim(),
+description:r.querySelector('.td').value.trim(),
+price:Number(r.querySelector('.tp').value)||0
+}))
+}
+}
 
-        document
-          .querySelectorAll('.tab-btn')
-          .forEach(
-            b => b.classList.remove('active')
-          );
+async function saveEvent(e){
+e.preventDefault();
 
-        document
-          .querySelectorAll('.tab-panel')
-          .forEach(
-            p => p.classList.remove('active')
-          );
+if(!configured())
+return msg('Configure Firebase first');
 
-        btn.classList.add('active');
+try{
+await requireAdmin();
+}catch(err){
+return msg(err.message)
+}
 
-        document
-          .getElementById(
-            'tab-' + btn.dataset.tab
-          )
-          .classList.add('active');
+const data=readEvent();
+const id=$('eventId').value;
 
-      }
-    );
+if(id)
+await db.collection('events').doc(id).set(data,{merge:true});
+else
+await db.collection('events').add(data);
 
-  });
-
-
-/* =========================================================
-EVENTS
-========================================================= */
+msg('Event saved');
+clearEvent();
+loadEvents()
+}
 
 async function loadEvents(){
 
-  const listEl =
-    document.getElementById('eventsList');
+if(!configured())
+return;
 
-  listEl.innerHTML =
-    '<p class="hint">Loading...</p>';
+const snap=await db.collection('events').get();
 
-  try{
+$('eventList').innerHTML=snap.empty
+?'<p class="meta">No events saved.</p>'
+:snap.docs.map(d=>{
+const x=d.data();
 
-    const snap =
-      await db()
-        .collection('events')
-        .orderBy('startDateTime')
-        .get();
+return `
+<div class="list-item">
+<div>
+<b>${esc(x.title)}</b>
+<div class="meta">
+${esc(x.venue||'')} · ${esc((x.showDates||[]).join(', '))}
+</div>
+</div>
 
-    if(snap.empty){
+<div class="row">
+<button class="btn edit-event" data-id="${d.id}">Edit</button>
+<button class="btn danger delete-event" data-id="${d.id}">Delete</button>
+</div>
+</div>
+`
+}).join('');
 
-      listEl.innerHTML =
-        '<div class="empty-note">' +
-        'No events yet. Click "+ Add Event" above.' +
-        '</div>';
+document.querySelectorAll('.edit-event')
+.forEach(b=>b.onclick=()=>editEvent(b.dataset.id));
 
-      return;
-
-    }
-
-    listEl.innerHTML = '';
-
-    snap.forEach(doc => {
-
-      const ev = doc.data();
-
-      const dateLabels =
-        (ev.showDates || [])
-          .map(
-            d =>
-              typeof d === 'string'
-                ? d
-                : d.date
-          )
-          .join(', ');
-
-      const card =
-        document.createElement('div');
-
-      card.className = 'item-card';
-
-      card.innerHTML = `
-
-        <div class="info">
-
-          <span class="meta">
-
-            ${ev.ticketsOnSale
-              ? 'On Sale'
-              : 'Not On Sale'}
-
-            &middot;
-
-            ${escapeHtml(dateLabels)}
-
-          </span>
-
-          <h3>
-            ${escapeHtml(ev.title || '')}
-          </h3>
-
-          <p>
-            ${escapeHtml(ev.venue || '')}
-          </p>
-
-        </div>
-
-        <div class="item-actions">
-
-          <button
-            class="btn btn-outline btn-small"
-            data-action="edit"
-          >
-            Edit
-          </button>
-
-          <button
-            class="btn btn-danger btn-small"
-            data-action="delete"
-          >
-            Delete
-          </button>
-
-        </div>
-
-      `;
-
-      card
-        .querySelector(
-          '[data-action="edit"]'
-        )
-        .addEventListener(
-          'click',
-          () =>
-            openEventForm(
-              doc.id,
-              ev
-            )
-        );
-
-      card
-        .querySelector(
-          '[data-action="delete"]'
-        )
-        .addEventListener(
-          'click',
-          () =>
-            deleteEvent(
-              doc.id,
-              ev.title
-            )
-        );
-
-      listEl.appendChild(card);
-
-    });
-
-  }catch(err){
-
-    console.error(
-      'Could not load events:',
-      err
-    );
-
-    listEl.innerHTML =
-      '<div class="empty-note">' +
-      'Could not load events. Check your connection and Firestore rules.' +
-      '</div>';
-
-  }
-
+document.querySelectorAll('.delete-event')
+.forEach(b=>b.onclick=async()=>{
+if(confirm('Delete this event?')){
+try{
+await requireAdmin();
+await db.collection('events').doc(b.dataset.id).delete();
+loadEvents()
+}catch(err){
+msg(err.message)
+}
+}
+})
 }
 
+async function editEvent(id){
 
-/* =========================================================
-DELETE EVENT
-========================================================= */
+const d=await db.collection('events').doc(id).get();
+const x=d.data();
 
-async function deleteEvent(
-  id,
-  title
-){
+$('eventId').value=id;
+$('eventTitle').value=x.title||'';
+$('eventSubtitle').value=x.subtitle||'';
+$('eventVenue').value=x.venue||'';
+$('eventShowTime').value=x.showTime||'';
+$('eventDates').value=(x.showDates||[]).join(', ');
+$('eventStart').value=x.startDateTime||'';
+$('eventEnd').value=x.endDateTime||'';
+$('eventCurrency').value=x.currency||'BWP';
+$('eventTickets').value=String(x.ticketsOnSale!==false);
+$('ticketTypes').innerHTML='';
 
-  try{
+(x.ticketTypes||[]).forEach(ticketRow);
 
-    await requireAdmin();
-
-  }catch(err){
-
-    alert(
-      'Administrator access is required.'
-    );
-
-    return;
-
-  }
-
-  if(
-    !confirm(
-      'Delete "' +
-      title +
-      '"? This cannot be undone.'
-    )
-  ){
-
-    return;
-
-  }
-
-  try{
-
-    await requireAdmin();
-
-    await db()
-      .collection('events')
-      .doc(id)
-      .delete();
-
-    await loadEvents();
-
-  }catch(err){
-
-    alert(
-      'Could not delete: ' +
-      err.message
-    );
-
-  }
-
+window.scrollTo({
+top:0,
+behavior:'smooth'
+})
 }
 
+function clearPerf(){
+[
+'perfId',
+'perfTitle',
+'perfSubtitle',
+'perfImage'
+].forEach(x=>$(x).value='');
 
-/* =========================================================
-EVENT FORM
-========================================================= */
-
-const eventForm =
-  document.getElementById('eventForm');
-
-const eventFormStatus =
-  document.getElementById(
-    'eventFormStatus'
-  );
-
-
-document
-  .getElementById('addEventBtn')
-  .addEventListener(
-    'click',
-    () =>
-      openEventForm(
-        null,
-        null
-      )
-  );
-
-
-document
-  .getElementById('cancelEventBtn')
-  .addEventListener(
-    'click',
-    closeEventForm
-  );
-
-
-document
-  .getElementById('addTicketTypeBtn')
-  .addEventListener(
-    'click',
-    () =>
-      addTicketTypeRow()
-  );
-
-
-document
-  .getElementById('addShowDateBtn')
-  .addEventListener(
-    'click',
-    () =>
-      addShowDateRow()
-  );
-
-
-function openEventForm(
-  id,
-  ev
-){
-
-  editingEventId = id;
-
-  document.getElementById(
-    'eventFormTitle'
-  ).textContent =
-    id
-      ? 'Edit Event'
-      : 'Add Event';
-
-  eventFormStatus.textContent = '';
-
-  document.getElementById(
-    'ev-title'
-  ).value =
-    ev
-      ? ev.title || ''
-      : '';
-
-  document.getElementById(
-    'ev-venue'
-  ).value =
-    ev
-      ? ev.venue || ''
-      : '';
-
-  document.getElementById(
-    'ev-subtitle'
-  ).value =
-    ev
-      ? ev.subtitle || ''
-      : '';
-
-  document.getElementById(
-    'ev-start'
-  ).value =
-    ev
-      ? toLocalInputValue(
-          ev.startDateTime
-        )
-      : '';
-
-  document.getElementById(
-    'ev-end'
-  ).value =
-    ev
-      ? toLocalInputValue(
-          ev.endDateTime
-        )
-      : '';
-
-  document.getElementById(
-    'ev-currency'
-  ).value =
-    ev
-      ? (
-          ev.currency ||
-          'BWP'
-        )
-      : 'BWP';
-
-  document.getElementById(
-    'ev-onsale'
-  ).checked =
-    ev
-      ? !!ev.ticketsOnSale
-      : true;
-
-  document.getElementById(
-    'showDateRows'
-  ).innerHTML = '';
-
-  const rawDates =
-    (
-      ev &&
-      ev.showDates &&
-      ev.showDates.length
-    )
-      ? ev.showDates
-      : [
-          {
-            date:'',
-            status:''
-          }
-        ];
-
-  rawDates
-    .map(
-      d =>
-        typeof d === 'string'
-          ? {
-              date:d,
-              status:''
-            }
-          : {
-              date:d.date || '',
-              status:d.status || ''
-            }
-    )
-    .forEach(
-      d =>
-        addShowDateRow(d)
-    );
-
-  document.getElementById(
-    'ticketTypeRows'
-  ).innerHTML = '';
-
-  const types =
-    (
-      ev &&
-      ev.ticketTypes &&
-      ev.ticketTypes.length
-    )
-      ? ev.ticketTypes
-      : [
-          {
-            name:'',
-            description:'',
-            price:'',
-            variantId:''
-          }
-        ];
-
-  types.forEach(
-    t =>
-      addTicketTypeRow(t)
-  );
-
-  eventForm.classList.add('active');
-
-  eventForm.scrollIntoView({
-    behavior:'smooth',
-    block:'start'
-  });
-
+$('perfOrder').value=1
 }
 
+async function savePerf(e){
 
-function closeEventForm(){
+e.preventDefault();
 
-  eventForm.classList.remove('active');
+if(!configured())
+return msg('Configure Firebase first');
 
-  editingEventId = null;
-
+try{
+await requireAdmin();
+}catch(err){
+return msg(err.message)
 }
 
+const data={
+title:$('perfTitle').value.trim(),
+subtitle:$('perfSubtitle').value.trim(),
+image:$('perfImage').value.trim(),
+order:Number($('perfOrder').value)||1
+};
 
-/* =========================================================
-SHOW DATE ROW
-========================================================= */
+const id=$('perfId').value;
 
-function addShowDateRow(d){
+if(id)
+await db.collection('performances').doc(id).set(data,{merge:true});
+else
+await db.collection('performances').add(data);
 
-  d =
-    d ||
-    {
-      date:'',
-      status:''
-    };
-
-  const row =
-    document.createElement('div');
-
-  row.className = 'date-row';
-
-  row.innerHTML = `
-
-    <input
-      type="date"
-      class="sd-date"
-      value="${escapeAttr(d.date)}"
-    >
-
-    <input
-      type="text"
-      placeholder="Status (optional) e.g. Sold Out, 20 Tickets Left"
-      class="sd-status"
-      value="${escapeAttr(d.status)}"
-    >
-
-    <button
-      type="button"
-      class="remove-row-btn"
-      title="Remove"
-    >
-      &times;
-    </button>
-
-  `;
-
-  row
-    .querySelector(
-      '.remove-row-btn'
-    )
-    .addEventListener(
-      'click',
-      () =>
-        row.remove()
-    );
-
-  document
-    .getElementById(
-      'showDateRows'
-    )
-    .appendChild(row);
-
+msg('Performance saved');
+clearPerf();
+loadPerformances()
 }
-
-
-/* =========================================================
-TICKET TYPE ROW
-========================================================= */
-
-function addTicketTypeRow(t){
-
-  t =
-    t ||
-    {
-      name:'',
-      description:'',
-      price:'',
-      variantId:''
-    };
-
-  const row =
-    document.createElement('div');
-
-  row.className =
-    'ticket-type-row';
-
-  row.innerHTML = `
-
-    <input
-      type="text"
-      placeholder="Name (e.g. VIP)"
-      class="tt-name"
-      value="${escapeAttr(t.name)}"
-    >
-
-    <input
-      type="text"
-      placeholder="Description"
-      class="tt-desc"
-      value="${escapeAttr(t.description)}"
-    >
-
-    <input
-      type="number"
-      placeholder="Price"
-      class="tt-price"
-      value="${
-        t.price !== undefined
-          ? t.price
-          : ''
-      }"
-    >
-
-    <input
-      type="text"
-      placeholder="Lemon Squeezy Variant ID"
-      class="tt-variant"
-      value="${escapeAttr(t.variantId)}"
-    >
-
-    <button
-      type="button"
-      class="remove-row-btn"
-      title="Remove"
-    >
-      &times;
-    </button>
-
-  `;
-
-  row
-    .querySelector(
-      '.remove-row-btn'
-    )
-    .addEventListener(
-      'click',
-      () =>
-        row.remove()
-    );
-
-  document
-    .getElementById(
-      'ticketTypeRows'
-    )
-    .appendChild(row);
-
-}
-
-
-/* =========================================================
-SAVE EVENT
-========================================================= */
-
-document
-  .getElementById(
-    'saveEventBtn'
-  )
-  .addEventListener(
-    'click',
-    async () => {
-
-      try{
-
-        await requireAdmin();
-
-      }catch(err){
-
-        eventFormStatus.className =
-          'status-msg error';
-
-        eventFormStatus.textContent =
-          'Administrator access is required.';
-
-        return;
-
-      }
-
-      const title =
-        document.getElementById(
-          'ev-title'
-        ).value.trim();
-
-      const venue =
-        document.getElementById(
-          'ev-venue'
-        ).value.trim();
-
-      const subtitle =
-        document.getElementById(
-          'ev-subtitle'
-        ).value.trim();
-
-      const start =
-        document.getElementById(
-          'ev-start'
-        ).value;
-
-      const end =
-        document.getElementById(
-          'ev-end'
-        ).value;
-
-      const currency =
-        document.getElementById(
-          'ev-currency'
-        ).value.trim() ||
-        'BWP';
-
-      const ticketsOnSale =
-        document.getElementById(
-          'ev-onsale'
-        ).checked;
-
-      const showDates =
-        Array
-          .from(
-            document.querySelectorAll(
-              '#showDateRows .date-row'
-            )
-          )
-          .map(
-            row => {
-
-              const date =
-                row
-                  .querySelector(
-                    '.sd-date'
-                  )
-                  .value;
-
-              const status =
-                row
-                  .querySelector(
-                    '.sd-status'
-                  )
-                  .value
-                  .trim();
-
-              return date
-                ? {
-                    date,
-                    status
-                  }
-                : null;
-
-            }
-          )
-          .filter(Boolean);
-
-      if(
-        !title ||
-        !start ||
-        !end ||
-        showDates.length === 0
-      ){
-
-        eventFormStatus.className =
-          'status-msg error';
-
-        eventFormStatus.textContent =
-          'Please fill in at least: title, run start, run end, and at least one show date.';
-
-        return;
-
-      }
-
-      const startIso =
-        fromLocalInputValue(
-          start
-        );
-
-      const endIso =
-        fromLocalInputValue(
-          end
-        );
-
-      if(endIso < startIso){
-
-        eventFormStatus.className =
-          'status-msg error';
-
-        eventFormStatus.textContent =
-          'Run End must be after Run Start.';
-
-        return;
-
-      }
-
-      const ticketTypes =
-        Array
-          .from(
-            document.querySelectorAll(
-              '#ticketTypeRows .ticket-type-row'
-            )
-          )
-          .map(
-            (row, i) => {
-
-              const name =
-                row
-                  .querySelector(
-                    '.tt-name'
-                  )
-                  .value
-                  .trim();
-
-              const description =
-                row
-                  .querySelector(
-                    '.tt-desc'
-                  )
-                  .value
-                  .trim();
-
-              const price =
-                Math.max(
-                  0,
-                  parseFloat(
-                    row
-                      .querySelector(
-                        '.tt-price'
-                      )
-                      .value
-                  ) || 0
-                );
-
-              const variantId =
-                row
-                  .querySelector(
-                    '.tt-variant'
-                  )
-                  .value
-                  .trim()
-                  .replace(
-                    /[^a-zA-Z0-9_-]/g,
-                    ''
-                  );
-
-              return {
-
-                id:
-                  name
-                    .toLowerCase()
-                    .replace(
-                      /[^a-z0-9]+/g,
-                      '-'
-                    )
-                    .replace(
-                      /(^-|-$)/g,
-                      ''
-                    ) ||
-                  ('type-' + i),
-
-                name,
-                description,
-                price,
-                variantId
-
-              };
-
-            }
-          )
-          .filter(
-            t =>
-              t.name
-          );
-
-      const data = {
-
-        title,
-        venue,
-        subtitle,
-
-        startDateTime:
-          startIso,
-
-        endDateTime:
-          endIso,
-
-        showDates,
-
-        currency,
-
-        ticketsOnSale,
-
-        ticketTypes
-
-      };
-
-      eventFormStatus.className =
-        'status-msg';
-
-      eventFormStatus.textContent =
-        'Saving...';
-
-      try{
-
-        await requireAdmin();
-
-        if(editingEventId){
-
-          await db()
-            .collection('events')
-            .doc(editingEventId)
-            .set(data);
-
-        }else{
-
-          await db()
-            .collection('events')
-            .add(data);
-
-        }
-
-        eventFormStatus.className =
-          'status-msg success';
-
-        eventFormStatus.textContent =
-          'Saved.';
-
-        closeEventForm();
-
-        await loadEvents();
-
-      }catch(err){
-
-        console.error(
-          'Could not save event:',
-          err
-        );
-
-        eventFormStatus.className =
-          'status-msg error';
-
-        eventFormStatus.textContent =
-          'Could not save. Check your connection and Firestore rules.';
-
-      }
-
-    }
-  );
-
-
-/* =========================================================
-PERFORMANCES
-========================================================= */
 
 async function loadPerformances(){
 
-  const listEl =
-    document.getElementById(
-      'performancesList'
-    );
+if(!configured())
+return;
 
-  listEl.innerHTML =
-    '<p class="hint">Loading...</p>';
+const snap=await db
+.collection('performances')
+.orderBy('order')
+.get();
 
-  try{
+$('perfList').innerHTML=snap.empty
+?'<p class="meta">No performances saved.</p>'
+:snap.docs.map(d=>{
+const x=d.data();
 
-    const snap =
-      await db()
-        .collection('performances')
-        .orderBy('order')
-        .get();
+return `
+<div class="list-item">
+<div>
+<b>${esc(x.title)}</b>
+<div class="meta">${esc(x.subtitle||'')}</div>
+</div>
 
-    if(snap.empty){
+<div class="row">
+<button class="btn edit-perf" data-id="${d.id}">Edit</button>
+<button class="btn danger delete-perf" data-id="${d.id}">Delete</button>
+</div>
+</div>
+`
+}).join('');
 
-      listEl.innerHTML =
-        '<div class="empty-note">' +
-        'No performances yet. Click "+ Add Performance" above.' +
-        '</div>';
+document.querySelectorAll('.edit-perf')
+.forEach(b=>b.onclick=()=>editPerf(b.dataset.id));
 
-      return;
-
-    }
-
-    listEl.innerHTML = '';
-
-    snap.forEach(doc => {
-
-      const pf =
-        doc.data();
-
-      const card =
-        document.createElement('div');
-
-      card.className =
-        'item-card';
-
-      card.innerHTML = `
-
-        <div class="info">
-
-          <span class="meta">
-            Order ${
-              pf.order != null
-                ? pf.order
-                : '-'
-            }
-          </span>
-
-          <h3>
-            ${escapeHtml(
-              pf.title || ''
-            )}
-          </h3>
-
-          <p>
-            ${escapeHtml(
-              pf.subtitle || ''
-            )}
-          </p>
-
-        </div>
-
-        <div class="item-actions">
-
-          <button
-            class="btn btn-outline btn-small"
-            data-action="edit"
-          >
-            Edit
-          </button>
-
-          <button
-            class="btn btn-danger btn-small"
-            data-action="delete"
-          >
-            Delete
-          </button>
-
-        </div>
-
-      `;
-
-      card
-        .querySelector(
-          '[data-action="edit"]'
-        )
-        .addEventListener(
-          'click',
-          () =>
-            openPerfForm(
-              doc.id,
-              pf
-            )
-        );
-
-      card
-        .querySelector(
-          '[data-action="delete"]'
-        )
-        .addEventListener(
-          'click',
-          () =>
-            deletePerf(
-              doc.id,
-              pf.title
-            )
-        );
-
-      listEl.appendChild(card);
-
-    });
-
-  }catch(err){
-
-    console.error(
-      'Could not load performances:',
-      err
-    );
-
-    listEl.innerHTML =
-      '<div class="empty-note">' +
-      'Could not load performances. Check your connection and Firestore rules.' +
-      '</div>';
-
-  }
-
+document.querySelectorAll('.delete-perf')
+.forEach(b=>b.onclick=async()=>{
+if(confirm('Delete this performance?')){
+try{
+await requireAdmin();
+await db.collection('performances').doc(b.dataset.id).delete();
+loadPerformances()
+}catch(err){
+msg(err.message)
+}
+}
+})
 }
 
+async function editPerf(id){
 
-/* =========================================================
-DELETE PERFORMANCE
-========================================================= */
+const d=await db.collection('performances').doc(id).get();
+const x=d.data();
 
-async function deletePerf(
-  id,
-  title
-){
+$('perfId').value=id;
+$('perfTitle').value=x.title||'';
+$('perfSubtitle').value=x.subtitle||'';
+$('perfImage').value=x.image||'';
+$('perfOrder').value=x.order||1;
 
-  try{
-
-    await requireAdmin();
-
-  }catch(err){
-
-    alert(
-      'Administrator access is required.'
-    );
-
-    return;
-
-  }
-
-  if(
-    !confirm(
-      'Delete "' +
-      title +
-      '"? This cannot be undone.'
-    )
-  ){
-
-    return;
-
-  }
-
-  try{
-
-    await requireAdmin();
-
-    await db()
-      .collection('performances')
-      .doc(id)
-      .delete();
-
-    await loadPerformances();
-
-  }catch(err){
-
-    alert(
-      'Could not delete: ' +
-      err.message
-    );
-
-  }
-
+window.scrollTo({
+top:0,
+behavior:'smooth'
+})
 }
 
-
-/* =========================================================
-PERFORMANCE FORM
-========================================================= */
-
-const perfForm =
-  document.getElementById(
-    'perfForm'
-  );
-
-const perfFormStatus =
-  document.getElementById(
-    'perfFormStatus'
-  );
-
-
-document
-  .getElementById(
-    'addPerfBtn'
-  )
-  .addEventListener(
-    'click',
-    () =>
-      openPerfForm(
-        null,
-        null
-      )
-  );
-
-
-document
-  .getElementById(
-    'cancelPerfBtn'
-  )
-  .addEventListener(
-    'click',
-    closePerfForm
-  );
-
-
-function openPerfForm(
-  id,
-  pf
-){
-
-  editingPerfId = id;
-
-  document.getElementById(
-    'perfFormTitle'
-  ).textContent =
-    id
-      ? 'Edit Performance'
-      : 'Add Performance';
-
-  perfFormStatus.textContent = '';
-
-  document.getElementById(
-    'pf-title'
-  ).value =
-    pf
-      ? pf.title || ''
-      : '';
-
-  document.getElementById(
-    'pf-subtitle'
-  ).value =
-    pf
-      ? pf.subtitle || ''
-      : '';
-
-  document.getElementById(
-    'pf-image'
-  ).value =
-    pf
-      ? pf.image || ''
-      : '';
-
-  document.getElementById(
-    'pf-order'
-  ).value =
-    pf
-      ? (
-          pf.order != null
-            ? pf.order
-            : ''
-        )
-      : '';
-
-  perfForm.classList.add(
-    'active'
-  );
-
-  perfForm.scrollIntoView({
-    behavior:'smooth',
-    block:'start'
-  });
-
+function set(id,v){
+$(id).value=v??''
 }
 
+function contentFromForm(){
 
-function closePerfForm(){
+const groups=[
+...document.querySelectorAll('.class-group')
+].map(g=>({
+label:g.querySelector('.gl').value,
+title:g.querySelector('.gt').value,
+description:g.querySelector('.gd').value,
+time:g.querySelector('.gtime').value,
+price:g.querySelector('.gprice').value,
+period:g.querySelector('.gperiod').value
+}));
 
-  perfForm.classList.remove(
-    'active'
-  );
+return {
 
-  editingPerfId = null;
+hero:{
+eyebrow:$('heroEyebrow').value,
+titleLine1:$('heroTitle1').value,
+titleLine2:$('heroTitle2').value,
+description:$('heroDescription').value
+},
 
+story:{
+eyebrow:$('storyEyebrow').value,
+heading:$('storyHeading').value,
+year:$('storyYear').value,
+founder:$('storyFounder').value,
+paragraph1:$('storyP1').value,
+paragraph2:$('storyP2').value,
+image:$('storyImage').value
+},
+
+impact:{
+eyebrow:$('impactEyebrow').value,
+heading:$('impactHeading').value,
+cards:[0,1,2].map(i=>({
+number:$('impactN'+i).value,
+text:$('impactT'+i).value
+}))
+},
+
+classes:{
+eyebrow:$('classEyebrow').value,
+heading:$('classHeading').value,
+intro:$('classIntro').value,
+phone:$('classPhone').value,
+cta:$('classCta').value,
+shirtNote:$('shirtNote').value,
+saturdayHeading:$('satHeading').value,
+saturdayNote:$('satNote').value,
+genres:$('genres').value
+.split(',')
+.map(x=>x.trim())
+.filter(Boolean),
+journeyHeading:$('journeyHeading').value,
+assessments:$('assessments').value,
+company:$('companyText').value,
+commitment:$('commitment').value,
+groups
+},
+
+contact:{
+eyebrow:$('contactEyebrow').value,
+heading:$('contactHeading').value,
+availability:$('availability').value,
+
+marketing:{
+label:$('marketingLabel').value,
+phone:$('marketingPhone').value,
+email:$('marketingEmail').value
+},
+
+founder:{
+label:$('founderLabel').value,
+phone:$('founderPhone').value,
+email:$('founderEmail').value
+}
+},
+
+footer:{
+brandName:$('footerBrand').value,
+copyright:$('footerCopyright').value,
+
+socials:{
+facebook:$('facebook').value,
+instagram:$('instagram').value,
+tiktok:$('tiktok').value
+}
 }
 
-
-/* =========================================================
-SAVE PERFORMANCE
-========================================================= */
-
-document
-  .getElementById(
-    'savePerfBtn'
-  )
-  .addEventListener(
-    'click',
-    async () => {
-
-      try{
-
-        await requireAdmin();
-
-      }catch(err){
-
-        perfFormStatus.className =
-          'status-msg error';
-
-        perfFormStatus.textContent =
-          'Administrator access is required.';
-
-        return;
-
-      }
-
-      const title =
-        document.getElementById(
-          'pf-title'
-        ).value.trim();
-
-      const subtitle =
-        document.getElementById(
-          'pf-subtitle'
-        ).value.trim();
-
-      const image =
-        document.getElementById(
-          'pf-image'
-        ).value.trim();
-
-      const order =
-        parseInt(
-          document.getElementById(
-            'pf-order'
-          ).value,
-          10
-        ) || 0;
-
-      if(!title || !image){
-
-        perfFormStatus.className =
-          'status-msg error';
-
-        perfFormStatus.textContent =
-          'Please fill in at least a title and image URL.';
-
-        return;
-
-      }
-
-      if(
-        !/^https?:\/\//i.test(
-          image
-        )
-      ){
-
-        perfFormStatus.className =
-          'status-msg error';
-
-        perfFormStatus.textContent =
-          'Image URL must start with http:// or https://';
-
-        return;
-
-      }
-
-      const data = {
-        title,
-        subtitle,
-        image,
-        order
-      };
-
-      perfFormStatus.className =
-        'status-msg';
-
-      perfFormStatus.textContent =
-        'Saving...';
-
-      try{
-
-        await requireAdmin();
-
-        if(editingPerfId){
-
-          await db()
-            .collection(
-              'performances'
-            )
-            .doc(
-              editingPerfId
-            )
-            .set(
-              data
-            );
-
-        }else{
-
-          await db()
-            .collection(
-              'performances'
-            )
-            .add(
-              data
-            );
-
-        }
-
-        perfFormStatus.className =
-          'status-msg success';
-
-        perfFormStatus.textContent =
-          'Saved.';
-
-        closePerfForm();
-
-        await loadPerformances();
-
-      }catch(err){
-
-        console.error(
-          'Could not save performance:',
-          err
-        );
-
-        perfFormStatus.className =
-          'status-msg error';
-
-        perfFormStatus.textContent =
-          'Could not save. Check your connection and Firestore rules.';
-
-      }
-
-    }
-  );
-
-
-/* =========================================================
-SITE CONTENT
-========================================================= */
-
-const PROTECTED_DESIGNER =
-  'Designed by Rebaone Lesly Mochabeng';
-
-
-const defaultSiteContentAdmin = {
-
-  logo:
-    'mdt.png',
-
-  hero: {
-
-    eyebrow:
-      'Rhythm. Heritage. Movement.',
-
-    titleLine1:
-      'Mophato',
-
-    titleLine2:
-      'Dance Theatre',
-
-    description:
-      "Botswana's internationally celebrated contemporary dance theatre company. Blending traditional African storytelling and powerful movement."
-
-  },
-
-  story: {
-
-    eyebrow:
-      'Our Story',
-
-    heading:
-      'Dance that carries the soul of Botswana',
-
-    year:
-      '2009',
-
-    founder:
-      'Founded by Andrew Letso Kola',
-
-    paragraph1:
-      "Mophato Dance Theatre has become one of Botswana's most influential contemporary dance companies.",
-
-    paragraph2:
-      'The company has performed internationally while celebrating Setswana storytelling traditions.',
-
-    image:
-      'a.jpg'
-
-  },
-
-  impact: {
-
-    eyebrow:
-      'Community Impact',
-
-    heading:
-      'Transforming lives through creativity',
-
-    cards: [
-
-      {
-        number:
-          '400+',
-
-        text:
-          'Youth empowered through workshops and mentorship.'
-      },
-
-      {
-        number:
-          '10+',
-
-        text:
-          'International collaborations and partnerships.'
-      },
-
-      {
-        number:
-          '35+',
-
-        text:
-          'Creative professionals involved in productions.'
-      }
-
-    ]
-
-  },
-
-  contact: {
-
-    eyebrow:
-      'Book Mophato',
-
-    heading:
-      "Let's create unforgettable experiences together",
-
-    availability:
-      'Available for festivals, workshops, corporate events and theatre productions.',
-
-    marketing: {
-
-      label:
-        'Marketing & Partnerships',
-
-      phone:
-        '+267 72345678',
-
-      email:
-        'steph@gmail.com'
-
-    },
-
-    founder: {
-
-      label:
-        'Founder & Artistic Director',
-
-      phone:
-        '+267 75252777',
-
-      email:
-        'mophatodancetheatre@gmail.com'
-
-    }
-
-  },
-
-  footer: {
-
-    brandName:
-      'Mophato Dance Theatre',
-
-    copyright:
-      '© 2026 Mophato Dance Theatre. All rights reserved.',
-
-    designer:
-      PROTECTED_DESIGNER,
-
-    facebook:
-      'https://www.facebook.com/share/1HFWY7sgNZ/?mibextid=wwXIfr',
-
-    instagram:
-      'https://www.instagram.com/mophatodance_theatre?igsh=MW45eTVkM3d0azI3OQ==',
-
-    tiktok:
-      'https://www.tiktok.com/@mophatodancetheat?_r=1&_t=ZS-96cqFmmMBJo'
-
-  }
+}
+}
+
+function renderGroups(groups){
+
+$('classGroups').innerHTML=(groups||[])
+.map((g,i)=>`
+
+<div class="group class-group">
+
+<h4>Class Group ${i+1}</h4>
+
+<div class="grid">
+
+<div class="field">
+<label>Label</label>
+<input class="gl" value="${esc(g.label)}">
+</div>
+
+<div class="field">
+<label>Title</label>
+<input class="gt" value="${esc(g.title)}">
+</div>
+
+<div class="field">
+<label>Time</label>
+<input class="gtime" value="${esc(g.time)}">
+</div>
+
+<div class="field">
+<label>Price</label>
+<input class="gprice" value="${esc(g.price)}">
+</div>
+
+<div class="field">
+<label>Period</label>
+<input class="gperiod" value="${esc(g.period||'/ month')}">
+</div>
+
+</div>
+
+<div class="field">
+<label>Description</label>
+<textarea class="gd">${esc(g.description)}</textarea>
+</div>
+
+</div>
+
+`).join('')
+}
+
+function populate(c){
+
+c={...defaults,...c};
+
+c.hero={
+...defaults.hero,
+...(c.hero||{})
+};
+
+c.story={
+...defaults.story,
+...(c.story||{})
+};
+
+c.impact={
+...defaults.impact,
+...(c.impact||{})
+};
+
+c.classes={
+...defaults.classes,
+...(c.classes||{})
+};
+
+c.contact={
+...defaults.contact,
+...(c.contact||{})
+};
+
+c.footer={
+...defaults.footer,
+...(c.footer||{})
+};
+
+c.contact.marketing={
+...defaults.contact.marketing,
+...(c.contact.marketing||{})
+};
+
+c.contact.founder={
+...defaults.contact.founder,
+...(c.contact.founder||{})
+};
+
+[
+'heroEyebrow',
+'heroTitle1',
+'heroTitle2',
+'heroDescription'
+].forEach((id,i)=>
+set(id,[
+c.hero.eyebrow,
+c.hero.titleLine1,
+c.hero.titleLine2,
+c.hero.description
+][i])
+);
+
+[
+'storyEyebrow',
+'storyHeading',
+'storyYear',
+'storyFounder',
+'storyP1',
+'storyP2',
+'storyImage'
+].forEach((id,i)=>
+set(id,[
+c.story.eyebrow,
+c.story.heading,
+c.story.year,
+c.story.founder,
+c.story.paragraph1,
+c.story.paragraph2,
+c.story.image
+][i])
+);
+
+set('impactEyebrow',c.impact.eyebrow);
+set('impactHeading',c.impact.heading);
+
+(c.impact.cards||[])
+.slice(0,3)
+.forEach((x,i)=>{
+set('impactN'+i,x.number);
+set('impactT'+i,x.text)
+});
+
+set('classEyebrow',c.classes.eyebrow);
+set('classHeading',c.classes.heading);
+set('classIntro',c.classes.intro);
+set('classPhone',c.classes.phone);
+set('classCta',c.classes.cta);
+set('shirtNote',c.classes.shirtNote);
+set('satHeading',c.classes.saturdayHeading);
+set('satNote',c.classes.saturdayNote);
+set('journeyHeading',c.classes.journeyHeading);
+set('assessments',c.classes.assessments);
+set('companyText',c.classes.company);
+set('commitment',c.classes.commitment);
+set('genres',(c.classes.genres||[]).join(', '));
+
+renderGroups(c.classes.groups);
+
+set('contactEyebrow',c.contact.eyebrow);
+set('contactHeading',c.contact.heading);
+set('availability',c.contact.availability);
+
+set('marketingLabel',c.contact.marketing.label);
+set('marketingPhone',c.contact.marketing.phone);
+set('marketingEmail',c.contact.marketing.email);
+
+set('founderLabel',c.contact.founder.label);
+set('founderPhone',c.contact.founder.phone);
+set('founderEmail',c.contact.founder.email);
+
+set('footerBrand',c.footer.brandName);
+set('footerCopyright',c.footer.copyright);
+set('facebook',c.footer.socials?.facebook);
+set('instagram',c.footer.socials?.instagram);
+set('tiktok',c.footer.socials?.tiktok)
+}
+
+async function loadContent(){
+
+if(!configured())
+return populate(defaults);
+
+const d=await db
+.collection('siteContent')
+.doc('main')
+.get();
+
+populate(
+d.exists
+?merge(defaults,d.data())
+:defaults
+)
+}
+
+async function saveContent(e){
+
+e.preventDefault();
+
+if(!configured())
+return msg('Configure Firebase first');
+
+try{
+await requireAdmin();
+}catch(err){
+return msg(err.message)
+}
+
+const data=contentFromForm();
+
+await db
+.collection('siteContent')
+.doc('main')
+.set(data,{merge:true});
+
+msg('Site content saved')
+}
+
+function init(){
+
+if(!configured()){
+$('configNotice').classList.remove('hidden');
+return
+}
+
+db=window.mdtDb;
+auth=window.mdtAuth;
+
+if(!auth){
+$('configNotice').classList.remove('hidden');
+$('configNotice').textContent='Firebase Authentication is not available. Check firebase-config.js.';
+return
+}
+
+auth.onAuthStateChanged(async user=>{
+
+if(!user){
+$('loginView').classList.remove('hidden');
+$('app').classList.add('hidden');
+return
+}
+
+try{
+
+await requireAdmin();
+
+$('loginView').classList.add('hidden');
+$('app').classList.remove('hidden');
+
+await Promise.all([
+loadEvents(),
+loadPerformances(),
+loadContent()
+])
+
+}catch(err){
+
+await auth.signOut();
+
+$('loginView').classList.remove('hidden');
+$('app').classList.add('hidden');
+
+msg('Access denied. This account is not an approved administrator.')
+}
+
+})
+}
+
+$('loginForm').onsubmit=async e=>{
+
+e.preventDefault();
+
+try{
+
+await auth.signInWithEmailAndPassword(
+$('loginEmail').value,
+$('loginPassword').value
+)
+
+}catch(err){
+
+msg(err.message)
+
+}
 
 };
 
+$('logoutBtn').onclick=()=>auth.signOut();
 
-/* =========================================================
-FILL SITE CONTENT FORM
-========================================================= */
+$('eventForm').onsubmit=saveEvent;
+$('perfForm').onsubmit=savePerf;
+$('contentForm').onsubmit=saveContent;
 
-function fillSiteContentForm(c){
+$('addTicket').onclick=()=>ticketRow();
+$('clearEvent').onclick=clearEvent;
+$('clearPerf').onclick=clearPerf;
+$('reloadContent').onclick=loadContent;
 
-  document.getElementById(
-    'sc-logo'
-  ).value =
-    c.logo || '';
+document.querySelectorAll('.tab').forEach(t=>
+t.onclick=()=>{
 
-  document.getElementById(
-    'sc-hero-eyebrow'
-  ).value =
-    c.hero.eyebrow || '';
+document.querySelectorAll('.tab')
+.forEach(x=>x.classList.remove('active'));
 
-  document.getElementById(
-    'sc-hero-title1'
-  ).value =
-    c.hero.titleLine1 || '';
+document.querySelectorAll('.panel')
+.forEach(x=>x.classList.remove('active'));
 
-  document.getElementById(
-    'sc-hero-title2'
-  ).value =
-    c.hero.titleLine2 || '';
+t.classList.add('active');
 
-  document.getElementById(
-    'sc-hero-description'
-  ).value =
-    c.hero.description || '';
-
-  document.getElementById(
-    'sc-story-eyebrow'
-  ).value =
-    c.story.eyebrow || '';
-
-  document.getElementById(
-    'sc-story-heading'
-  ).value =
-    c.story.heading || '';
-
-  document.getElementById(
-    'sc-story-year'
-  ).value =
-    c.story.year || '';
-
-  document.getElementById(
-    'sc-story-founder'
-  ).value =
-    c.story.founder || '';
-
-  document.getElementById(
-    'sc-story-p1'
-  ).value =
-    c.story.paragraph1 || '';
-
-  document.getElementById(
-    'sc-story-p2'
-  ).value =
-    c.story.paragraph2 || '';
-
-  document.getElementById(
-    'sc-story-image'
-  ).value =
-    c.story.image || '';
-
-  document.getElementById(
-    'sc-impact-eyebrow'
-  ).value =
-    c.impact.eyebrow || '';
-
-  document.getElementById(
-    'sc-impact-heading'
-  ).value =
-    c.impact.heading || '';
-
-  const cards =
-    c.impact.cards || [];
-
-  for(
-    let i = 0;
-    i < 3;
-    i++
-  ){
-
-    document.getElementById(
-      'sc-impact-num' +
-      (i + 1)
-    ).value =
-      (
-        cards[i] &&
-        cards[i].number
-      ) || '';
-
-    document.getElementById(
-      'sc-impact-text' +
-      (i + 1)
-    ).value =
-      (
-        cards[i] &&
-        cards[i].text
-      ) || '';
-
-  }
-
-  document.getElementById(
-    'sc-contact-eyebrow'
-  ).value =
-    c.contact.eyebrow || '';
-
-  document.getElementById(
-    'sc-contact-heading'
-  ).value =
-    c.contact.heading || '';
-
-  document.getElementById(
-    'sc-contact-availability'
-  ).value =
-    c.contact.availability || '';
-
-  document.getElementById(
-    'sc-contact-mkt-label'
-  ).value =
-    c.contact.marketing.label || '';
-
-  document.getElementById(
-    'sc-contact-mkt-phone'
-  ).value =
-    c.contact.marketing.phone || '';
-
-  document.getElementById(
-    'sc-contact-mkt-email'
-  ).value =
-    c.contact.marketing.email || '';
-
-  document.getElementById(
-    'sc-contact-fdr-label'
-  ).value =
-    c.contact.founder.label || '';
-
-  document.getElementById(
-    'sc-contact-fdr-phone'
-  ).value =
-    c.contact.founder.phone || '';
-
-  document.getElementById(
-    'sc-contact-fdr-email'
-  ).value =
-    c.contact.founder.email || '';
-
-  document.getElementById(
-    'sc-footer-brand'
-  ).value =
-    c.footer.brandName || '';
-
-  /*
-    Designer credit is always forced to the protected value.
-    It is never taken from Firestore.
-  */
-
-  const designerDisplay =
-    document.querySelector(
-      '.locked-field strong'
-    );
-
-  if(designerDisplay){
-
-    designerDisplay.textContent =
-      PROTECTED_DESIGNER;
-
-  }
-
-  document.getElementById(
-    'sc-footer-copyright'
-  ).value =
-    c.footer.copyright || '';
-
-  document.getElementById(
-    'sc-footer-facebook'
-  ).value =
-    c.footer.facebook || '';
-
-  document.getElementById(
-    'sc-footer-instagram'
-  ).value =
-    c.footer.instagram || '';
-
-  document.getElementById(
-    'sc-footer-tiktok'
-  ).value =
-    c.footer.tiktok || '';
+$(t.dataset.tab)
+.classList.add('active');
 
 }
+);
 
+clearEvent();
 
-/* =========================================================
-LOAD SITE CONTENT
-========================================================= */
+let last=scrollY;
 
-async function loadSiteContentForm(){
+window.addEventListener('scroll',()=>{
 
-  fillSiteContentForm(
-    defaultSiteContentAdmin
-  );
+const y=scrollY;
 
-  try{
+document.querySelector('header')
+?.classList.toggle(
+'nav-hidden',
+y>last&&y>80
+);
 
-    const doc =
-      await db()
-        .collection('site')
-        .doc('content')
-        .get();
+if(y<=10)
+document.querySelector('header')
+?.classList.remove('nav-hidden');
 
-    if(doc.exists){
+last=y
 
-      const data =
-        doc.data();
+},{passive:true});
 
-      const merged = {
-
-        logo:
-          data.logo ||
-          defaultSiteContentAdmin.logo,
-
-        hero: {
-
-          ...defaultSiteContentAdmin.hero,
-
-          ...(data.hero || {})
-
-        },
-
-        story: {
-
-          ...defaultSiteContentAdmin.story,
-
-          ...(data.story || {})
-
-        },
-
-        impact: {
-
-          eyebrow:
-            (
-              data.impact &&
-              data.impact.eyebrow
-            ) ||
-            defaultSiteContentAdmin
-              .impact
-              .eyebrow,
-
-          heading:
-            (
-              data.impact &&
-              data.impact.heading
-            ) ||
-            defaultSiteContentAdmin
-              .impact
-              .heading,
-
-          cards:
-            (
-              data.impact &&
-              data.impact.cards &&
-              data.impact.cards.length === 3
-            )
-              ? data.impact.cards
-              : defaultSiteContentAdmin
-                  .impact
-                  .cards
-
-        },
-
-        contact: {
-
-          eyebrow:
-            (
-              data.contact &&
-              data.contact.eyebrow
-            ) ||
-            defaultSiteContentAdmin
-              .contact
-              .eyebrow,
-
-          heading:
-            (
-              data.contact &&
-              data.contact.heading
-            ) ||
-            defaultSiteContentAdmin
-              .contact
-              .heading,
-
-          availability:
-            (
-              data.contact &&
-              data.contact.availability
-            ) ||
-            defaultSiteContentAdmin
-              .contact
-              .availability,
-
-          marketing: {
-
-            ...defaultSiteContentAdmin
-              .contact
-              .marketing,
-
-            ...(
-              (
-                data.contact &&
-                data.contact.marketing
-              ) || {}
-            )
-
-          },
-
-          founder: {
-
-            ...defaultSiteContentAdmin
-              .contact
-              .founder,
-
-            ...(
-              (
-                data.contact &&
-                data.contact.founder
-              ) || {}
-            )
-
-          }
-
-        },
-
-        footer: {
-
-          ...defaultSiteContentAdmin.footer,
-
-          ...(data.footer || {}),
-
-          /*
-            Never accept a Firestore value for the designer.
-          */
-
-          designer:
-            PROTECTED_DESIGNER
-
-        }
-
-      };
-
-      fillSiteContentForm(
-        merged
-      );
-
-    }
-
-  }catch(err){
-
-    console.warn(
-      'Mophato: could not load saved site content yet.',
-      err
-    );
-
-  }
-
-}
-
-
-/* =========================================================
-SAVE SITE CONTENT
-========================================================= */
-
-document
-  .getElementById(
-    'saveSiteContentBtn'
-  )
-  .addEventListener(
-    'click',
-    async () => {
-
-      const statusEl =
-        document.getElementById(
-          'siteContentStatus'
-        );
-
-      try{
-
-        await requireAdmin();
-
-      }catch(err){
-
-        statusEl.className =
-          'status-msg error';
-
-        statusEl.textContent =
-          'Administrator access is required.';
-
-        return;
-
-      }
-
-      const urlOrEmpty =
-        id => {
-
-          return document
-            .getElementById(id)
-            .value
-            .trim();
-
-        };
-
-
-      const socialLinks = {
-
-        facebook:
-          urlOrEmpty(
-            'sc-footer-facebook'
-          ),
-
-        instagram:
-          urlOrEmpty(
-            'sc-footer-instagram'
-          ),
-
-        tiktok:
-          urlOrEmpty(
-            'sc-footer-tiktok'
-          )
-
-      };
-
-
-      for(
-        const key in socialLinks
-      ){
-
-        if(
-          socialLinks[key] &&
-          !/^https?:\/\//i.test(
-            socialLinks[key]
-          )
-        ){
-
-          statusEl.className =
-            'status-msg error';
-
-          statusEl.textContent =
-            'Social links must start with http:// or https:// (check ' +
-            key +
-            ').';
-
-          return;
-
-        }
-
-      }
-
-
-      const data = {
-
-        logo:
-          document
-            .getElementById(
-              'sc-logo'
-            )
-            .value
-            .trim(),
-
-        hero: {
-
-          eyebrow:
-            document
-              .getElementById(
-                'sc-hero-eyebrow'
-              )
-              .value
-              .trim(),
-
-          titleLine1:
-            document
-              .getElementById(
-                'sc-hero-title1'
-              )
-              .value
-              .trim(),
-
-          titleLine2:
-            document
-              .getElementById(
-                'sc-hero-title2'
-              )
-              .value
-              .trim(),
-
-          description:
-            document
-              .getElementById(
-                'sc-hero-description'
-              )
-              .value
-              .trim()
-
-        },
-
-        story: {
-
-          eyebrow:
-            document
-              .getElementById(
-                'sc-story-eyebrow'
-              )
-              .value
-              .trim(),
-
-          heading:
-            document
-              .getElementById(
-                'sc-story-heading'
-              )
-              .value
-              .trim(),
-
-          year:
-            document
-              .getElementById(
-                'sc-story-year'
-              )
-              .value
-              .trim(),
-
-          founder:
-            document
-              .getElementById(
-                'sc-story-founder'
-              )
-              .value
-              .trim(),
-
-          paragraph1:
-            document
-              .getElementById(
-                'sc-story-p1'
-              )
-              .value
-              .trim(),
-
-          paragraph2:
-            document
-              .getElementById(
-                'sc-story-p2'
-              )
-              .value
-              .trim(),
-
-          image:
-            document
-              .getElementById(
-                'sc-story-image'
-              )
-              .value
-              .trim()
-
-        },
-
-        impact: {
-
-          eyebrow:
-            document
-              .getElementById(
-                'sc-impact-eyebrow'
-              )
-              .value
-              .trim(),
-
-          heading:
-            document
-              .getElementById(
-                'sc-impact-heading'
-              )
-              .value
-              .trim(),
-
-          cards:
-            [1,2,3].map(
-              i => ({
-
-                number:
-                  document
-                    .getElementById(
-                      'sc-impact-num' +
-                      i
-                    )
-                    .value
-                    .trim(),
-
-                text:
-                  document
-                    .getElementById(
-                      'sc-impact-text' +
-                      i
-                    )
-                    .value
-                    .trim()
-
-              })
-            )
-
-        },
-
-        contact: {
-
-          eyebrow:
-            document
-              .getElementById(
-                'sc-contact-eyebrow'
-              )
-              .value
-              .trim(),
-
-          heading:
-            document
-              .getElementById(
-                'sc-contact-heading'
-              )
-              .value
-              .trim(),
-
-          availability:
-            document
-              .getElementById(
-                'sc-contact-availability'
-              )
-              .value
-              .trim(),
-
-          marketing: {
-
-            label:
-              document
-                .getElementById(
-                  'sc-contact-mkt-label'
-                )
-                .value
-                .trim(),
-
-            phone:
-              document
-                .getElementById(
-                  'sc-contact-mkt-phone'
-                )
-                .value
-                .trim(),
-
-            email:
-              document
-                .getElementById(
-                  'sc-contact-mkt-email'
-                )
-                .value
-                .trim()
-
-          },
-
-          founder: {
-
-            label:
-              document
-                .getElementById(
-                  'sc-contact-fdr-label'
-                )
-                .value
-                .trim(),
-
-            phone:
-              document
-                .getElementById(
-                  'sc-contact-fdr-phone'
-                )
-                .value
-                .trim(),
-
-            email:
-              document
-                .getElementById(
-                  'sc-contact-fdr-email'
-                )
-                .value
-                .trim()
-
-          }
-
-        },
-
-        footer: {
-
-          brandName:
-            document
-              .getElementById(
-                'sc-footer-brand'
-              )
-              .value
-              .trim(),
-
-          /*
-            IMPORTANT:
-            The designer credit is never read from an input
-            and never taken from Firestore.
-          */
-
-          designer:
-            PROTECTED_DESIGNER,
-
-          copyright:
-            document
-              .getElementById(
-                'sc-footer-copyright'
-              )
-              .value
-              .trim(),
-
-          facebook:
-            socialLinks.facebook,
-
-          instagram:
-            socialLinks.instagram,
-
-          tiktok:
-            socialLinks.tiktok
-
-        }
-
-      };
-
-
-      statusEl.className =
-        'status-msg';
-
-      statusEl.textContent =
-        'Saving...';
-
-
-      try{
-
-        await requireAdmin();
-
-        await db()
-          .collection('site')
-          .doc('content')
-          .set(
-            data,
-            {
-              merge:true
-            }
-          );
-
-        statusEl.className =
-          'status-msg success';
-
-        statusEl.textContent =
-          'Saved. Changes are now live on the site.';
-
-      }catch(err){
-
-        console.error(
-          'Could not save site content:',
-          err
-        );
-
-        statusEl.className =
-          'status-msg error';
-
-        statusEl.textContent =
-          'Could not save. Check your connection and Firestore rules.';
-
-      }
-
-    }
-  );
-
-
-/* =========================================================
-UTILITY FUNCTIONS
-========================================================= */
-
-function escapeHtml(str){
-
-  return String(
-    str || ''
-  ).replace(
-    /[&<>"']/g,
-    m => ({
-
-      '&':
-        '&amp;',
-
-      '<':
-        '&lt;',
-
-      '>':
-        '&gt;',
-
-      '"':
-        '&quot;',
-
-      "'":
-        '&#39;'
-
-    })[m]
-  );
-
-}
-
-
-function escapeAttr(str){
-
-  return escapeHtml(str);
-
-}
-
-
-function toLocalInputValue(
-  isoString
-){
-
-  if(!isoString){
-    return '';
-  }
-
-  return isoString.length >= 16
-    ? isoString.slice(
-        0,
-        16
-      )
-    : isoString;
-
-}
-
-
-function fromLocalInputValue(
-  value
-){
-
-  return value &&
-    value.length === 16
-
-    ? value + ':00'
-
-    : value;
-
-}
-
-
-/* =========================================================
-HIDE HEADER WHILE SCROLLING DOWN
-SHOW HEADER WHILE SCROLLING UP
-========================================================= */
-
-(function(){
-
-  const header =
-    document.getElementById(
-      'adminHeader'
-    );
-
-  if(!header){
-    return;
-  }
-
-  let lastScrollY =
-    window.scrollY;
-
-  window.addEventListener(
-    'scroll',
-    function(){
-
-      const currentScrollY =
-        window.scrollY;
-
-      if(
-        currentScrollY >
-          lastScrollY &&
-        currentScrollY >
-          80
-      ){
-
-        header.classList.add(
-          'nav-hidden'
-        );
-
-      }else if(
-        currentScrollY <
-        lastScrollY
-      ){
-
-        header.classList.remove(
-          'nav-hidden'
-        );
-
-      }
-
-      if(
-        currentScrollY <= 20
-      ){
-
-        header.classList.remove(
-          'nav-hidden'
-        );
-
-      }
-
-      lastScrollY =
-        currentScrollY;
-
-    },
-    {
-      passive:true
-    }
-  );
-
-})();
-
+init();
 </script>
 
 </body>
