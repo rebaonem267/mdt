@@ -256,7 +256,7 @@ used by browser applications.
 ========================================================= */
 
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
+const FIREBASE_CONFIG = {
   apiKey: "AIzaSyDEUwIaOor4AZQx7d-OzydVHu3G_sXKwRM",
   authDomain: "mophato.firebaseapp.com",
   projectId: "mophato",
