@@ -2012,6 +2012,9 @@ DANCE CLASSES
 .class-time{font-size:.8rem;letter-spacing:2px;color:#ddd;text-transform:uppercase;margin-bottom:20px;}
 .class-price{font-family:'Oswald',sans-serif;font-size:2.2rem;color:var(--gold);}
 .class-price span{font-family:'Poppins',sans-serif;font-size:.8rem;color:#888;}
+.class-pay-btn{margin-top:18px;align-self:flex-start;display:inline-flex;align-items:center;gap:10px;padding:12px 22px;background:var(--gold);border:none;border-radius:50px;color:#000;text-transform:uppercase;letter-spacing:2px;font-size:.7rem;cursor:pointer;transition:.3s;font-family:'Poppins',sans-serif;}
+.class-pay-btn:hover{background:#e6b422;}
+.lesson-pay-note{color:#777;font-size:.82rem;margin-top:20px;}
 .rhythm-feature{display:grid;grid-template-columns:1fr 1fr;margin-top:24px;border:1px solid rgba(212,160,23,.2);border-radius:28px;overflow:hidden;}
 .rhythm-panel,.registration-panel{padding:45px;}
 .rhythm-panel{background:var(--gold);color:#050505;}
@@ -2233,10 +2236,11 @@ DANCE CLASSES
 <h2 class="dance-heading">Move. Learn. <em>Become.</em></h2>
 <p class="dance-intro">Step into the Mophato Dance Theatre training space. Our classes give young dancers and adults a place to build confidence, develop technique and grow through movement.</p>
 <div class="class-grid">
-<article class="class-card featured"><span class="class-number">GROUP A · KIDS</span><h3>Ages 6–10</h3><p>Build confidence, creativity and a love for movement through contemporary and Afro fusion.</p><span class="class-time">TUE &amp; THU · 14:30–15:30</span><div class="class-price">P400 <span>/ month</span></div></article>
-<article class="class-card featured"><span class="class-number">GROUP B · YOUTH</span><h3>Ages 11–15</h3><p>Build technique, expression and stage confidence through focused training.</p><span class="class-time">TUE &amp; THU · 15:30–16:30</span><div class="class-price">P400 <span>/ month</span></div></article>
-<article class="class-card featured"><span class="class-number">ADULTS · ALL LEVELS</span><h3>Dance &amp; Fitness</h3><p>Move with confidence, build your technique and keep your energy alive through contemporary and Afro fusion.</p><span class="class-time">TUE &amp; THU · 17:30–19:00</span><div class="class-price">P550 <span>/ month</span></div></article>
+<article class="class-card featured" data-lesson="group-a"><span class="class-number">GROUP A · KIDS</span><h3>Ages 6–10</h3><p>Build confidence, creativity and a love for movement through contemporary and Afro fusion.</p><span class="class-time">TUE &amp; THU · 14:30–15:30</span><div class="class-price">P400 <span>/ month</span></div><button type="button" class="class-pay-btn" data-lesson="group-a">Pay &amp; Register · P400/mo</button></article>
+<article class="class-card featured" data-lesson="group-b"><span class="class-number">GROUP B · YOUTH</span><h3>Ages 11–15</h3><p>Build technique, expression and stage confidence through focused training.</p><span class="class-time">TUE &amp; THU · 15:30–16:30</span><div class="class-price">P400 <span>/ month</span></div><button type="button" class="class-pay-btn" data-lesson="group-b">Pay &amp; Register · P400/mo</button></article>
+<article class="class-card featured" data-lesson="adults"><span class="class-number">ADULTS · ALL LEVELS</span><h3>Dance &amp; Fitness</h3><p>Move with confidence, build your technique and keep your energy alive through contemporary and Afro fusion.</p><span class="class-time">TUE &amp; THU · 17:30–19:00</span><div class="class-price">P550 <span>/ month</span></div><button type="button" class="class-pay-btn" data-lesson="adults">Pay &amp; Register · P550/mo</button></article>
 </div>
+<p class="lesson-pay-note" id="lessonPayNote">Monthly class fees are paid securely online via Lemon Squeezy. Registration commits you to a minimum of three consecutive months.</p>
 <div class="rhythm-feature"><div class="rhythm-panel"><span class="mini-label">Saturday Sessions</span><h3>Never know what you'll dance next.</h3><p class="rhythm-note">Optional Saturday surprise-genre sessions keep the training fresh and exciting. Come ready for whatever rhythm walks through the door.</p><div class="genre-pills"><span>Hip Hop</span><span>Ballet</span><span>Amapiano</span><span>&amp; more</span></div></div><div class="registration-panel"><span class="mini-label">Your Journey</span><h3>Keep showing up.</h3><p><strong>Quarterly assessments</strong> help track development, while <strong>annual performances and prize giving</strong> give dancers a chance to celebrate their progress.</p><p>Selected dancers may also get the opportunity to perform with the professional Mophato Dance Theatre company.</p><p><strong>Registration commits you to a minimum of three consecutive months</strong> to support consistent growth and development.</p></div></div>
 <div class="dance-bottom"><div><div class="dance-contact"><small>Enquiries &amp; Registration</small>+267 76 956 517</div><p style="color:#888;margin:8px 0 0;font-size:.85rem;">Kids receive a once-off Mophato Dance Theatre T-shirt upon registration and payment of the first month.</p></div><a href="tel:+26776956517" class="dance-cta">Join the Classes <span>↗</span></a></div>
 </div></section>
@@ -2580,6 +2584,39 @@ edit by hand, one time, with your free Firebase project keys.
 <script src="firebase-config.js"></script>
 
 <script>
+
+/* =========================================================
+LEMON SQUEEZY CONFIGURATION — CLASS PAYMENTS
+=========================================================
+Only your store ID lives here. Each class below carries its
+own Lemon Squeezy Variant ID, which you create per class in
+Lemon Squeezy (recommended: monthly Subscription products).
+
+Find your store ID in Lemon Squeezy under Settings > Stores.
+Use the SAME store as the one configured in tickets.html.
+
+No secret API key is ever needed here — checkout happens
+through Lemon Squeezy hosted checkout pages, and the store
+ID is public. Never paste your Lemon Squeezy API key into
+any website file. Test orders with Lemon Squeezy's built-in
+Test Mode (Store Settings) before going live.
+========================================================= */
+
+const LEMON_SQUEEZY_CONFIG = {
+
+  storeId: "YOUR_STORE_ID"
+
+};
+
+const LESSON_PRODUCTS = [
+
+  { id: "group-a", name: "Group A · Kids (Ages 6–10)",   price: 400, variantId: "YOUR_GROUP_A_VARIANT_ID" },
+
+  { id: "group-b", name: "Group B · Youth (Ages 11–15)", price: 400, variantId: "YOUR_GROUP_B_VARIANT_ID" },
+
+  { id: "adults",  name: "Adults · Dance & Fitness",     price: 550, variantId: "YOUR_ADULTS_VARIANT_ID" }
+
+];
 
 /* =========================================================
 UPCOMING EVENTS DATA
@@ -3286,6 +3323,66 @@ document.querySelectorAll('nav ul li a').forEach(link => {
 document.addEventListener('keydown',(e)=>{if(e.key==='Escape')closeModal('bookingModal');});
 window.addEventListener('resize',()=>{if(window.innerWidth>950){navMenu.classList.remove('active');}});
 document.querySelector('#bookingModal form').addEventListener('submit',(e)=>{e.preventDefault();alert('Thank you! Your inquiry has been captured.');});
+
+
+/* =========================================================
+CLASS PAYMENTS — LEMON SQUEEZY HOSTED CHECKOUT
+=========================================================
+Builds a Lemon Squeezy hosted checkout link for one class
+product and sends the visitor there to complete payment.
+The custom fields travel with the order so you can see which
+class each order belongs to in your Lemon Squeezy dashboard.
+
+While the store ID or a variant ID is still a YOUR_…
+placeholder, the button does NOT send visitors to a broken
+checkout — it shows a "call us" note instead.
+========================================================= */
+
+function lessonProductConfigured(product){
+
+  return LEMON_SQUEEZY_CONFIG.storeId
+    && LEMON_SQUEEZY_CONFIG.storeId !== 'YOUR_STORE_ID'
+    && product
+    && product.variantId
+    && product.variantId.trim() !== ''
+    && !/^YOUR_/.test(product.variantId);
+
+}
+
+function buildLessonCheckoutUrl(product){
+
+  const params = new URLSearchParams();
+
+  params.set('checkout[custom][lesson]', product.name);
+  params.set('checkout[custom][source]', 'website-classes');
+
+  return `https://${LEMON_SQUEEZY_CONFIG.storeId}.lemonsqueezy.com/checkout/buy/${product.variantId}?${params.toString()}`;
+
+}
+
+document.querySelectorAll('.class-pay-btn').forEach(btn => {
+
+  btn.addEventListener('click', () => {
+
+    const product = LESSON_PRODUCTS.find(p => p.id === btn.dataset.lesson);
+
+    const note = document.getElementById('lessonPayNote');
+
+    if(!lessonProductConfigured(product)){
+
+      note.textContent = 'Online registration for this class isn\u2019t live yet \u2014 please call +267 76 956 517 to register.';
+
+      return;
+
+    }
+
+    note.textContent = 'Connecting to Lemon Squeezy\u2026';
+
+    window.location.href = buildLessonCheckoutUrl(product);
+
+  });
+
+});
 
 </script>
 

@@ -190,8 +190,26 @@ STEP 7
 CONFIGURE LEMON SQUEEZY
 =========================================================
 
-Ticket payments are handled separately through the
-Lemon Squeezy configuration in tickets.html.
+Payments (tickets AND class fees) are handled through
+Lemon Squeezy hosted checkout links.
+
+Configuration lives in:
+- tickets.html    (LEMON_SQUEEZY_CONFIG + ticket variant IDs)
+- index.html      (LEMON_SQUEEZY_CONFIG + LESSON_PRODUCTS)
+
+Both pages need the same store ID. Each sellable item
+(ticket type, dance class) carries its own Lemon Squeezy
+variant ID. Ticket variant IDs are managed per event in the
+Admin Portal / Firestore; class variant IDs are edited
+directly in index.html.
+
+No secret API key is required in the website — checkout
+runs entirely on Lemon Squeezy's hosted pages, and the
+store ID is public. NEVER paste your Lemon Squeezy API key
+into any of these files.
+
+Test orders using Lemon Squeezy's built-in Test Mode
+(Store Settings → Test mode) before going live.
 
 Firebase is responsible for:
 
@@ -203,7 +221,7 @@ Firebase is responsible for:
 Lemon Squeezy is responsible for:
 
 - Ticket checkout
-- Ticket payment
+- Class fee payments
 
 ======================================================== */
 
