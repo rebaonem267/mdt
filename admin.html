@@ -10,9 +10,26 @@
 </head>
 <body>
 
-<div id="app">
+<div id="loginView" class="login">
+<h2>Mophato Admin</h2>
+<p class="small">Sign in to manage website content, events and performances.</p>
+<div id="configNotice" class="notice hidden">Firebase is not configured. Add your Firebase project values to <b>firebase-config.js</b> before using the portal.</div>
+<form id="loginForm">
+<div class="field">
+<label>Email</label>
+<input id="loginEmail" type="email" required>
+</div>
+<div class="field">
+<label>Password</label>
+<input id="loginPassword" type="password" required>
+</div>
+<button class="btn primary" type="submit">Sign In</button>
+</form>
+</div>
+
+<div id="app" class="hidden">
 <header>
-<div><h1>Mophato Admin</h1><div class="small" style="margin-top:4px;color:#d4a017">DEMO MODE · LOCAL STORAGE</div></div>
+<h1>Mophato Admin</h1>
 <div class="actions">
 <a class="btn" href="index.html">Back to Site</a>
 <button id="logoutBtn" class="btn">Log Out</button>
@@ -21,10 +38,7 @@
 
 <main class="wrap">
 
-<div class="notice">
-Changes made here are saved to Firestore and are reflected on the public website.
-The designer credit <b>Designed by Rebaone Lesly Mochabeng</b> is locked in the website code and is not stored in editable content.
-</div>
+
 
 <div class="tabs">
 <button class="tab active" data-tab="events">Upcoming Events</button>
@@ -526,550 +540,841 @@ This value is hard-coded in index.html. There is intentionally no admin field fo
 
 
 <script>
-/*
-  MOPHATO ADMIN PORTAL - DEMO MODE
-  No password or authentication is required in this version.
-  Data is stored in this browser using localStorage.
+/* ============================================================
+   MOPHATO DEMO DATA LAYER
+   Admin edits are shared with the demo website through localStorage.
+   This is intentionally password-free for testing only.
+   Footer is excluded from editing.
+   ============================================================ */
+const DEMO_KEY = 'mophato_demo_site_data_v1';
 
-  Supabase migration point:
-  Replace the functions in the "DATA LAYER" section with Supabase queries.
-*/
-
-const STORAGE = {
-  content: 'mophato_admin_content_v1',
-  events: 'mophato_admin_events_v1',
-  performances: 'mophato_admin_performances_v1'
-};
-
-const $ = id => document.getElementById(id);
-
-const defaults = {
-  hero:{
-    eyebrow:'Rhythm. Heritage. Movement.',
-    titleLine1:'Mophato',
-    titleLine2:'Dance Theatre',
-    description:"Botswana's internationally celebrated contemporary dance theatre company. Blending traditional African storytelling and powerful movement."
-  },
-  story:{
-    eyebrow:'Our Story',
-    heading:'Dance that carries the soul of Botswana',
-    year:'2009',
-    founder:'Founded by Andrew Letso Kola',
-    paragraph1:"Mophato Dance Theatre has become one of Botswana's most influential contemporary dance companies.",
-    paragraph2:'The company has performed internationally while celebrating Setswana storytelling traditions.',
-    image:'a.jpg'
-  },
-  impact:{
-    eyebrow:'Community Impact',
-    heading:'Transforming lives through creativity',
-    cards:[
-      {number:'400+',text:'Youth empowered through workshops and mentorship.'},
-      {number:'10+',text:'International collaborations and partnerships.'},
-      {number:'35+',text:'Creative professionals involved in productions.'}
-    ]
-  },
-  classes:{
-    eyebrow:'Find Your Rhythm',
-    heading:'Move. Learn. <em>Become.</em>',
-    intro:'Step into the Mophato Dance Theatre training space at University of Botswana. Our classes give young dancers and adults a place to build confidence, develop technique and grow through movement.',
-    phone:'+267 76 956 517',
-    cta:'Join the Classes',
-    shirtNote:'Kids receive a once-off Mophato Dance Theatre T-shirt upon registration and payment of the first month.',
-    saturdayHeading:"Never know what you'll dance next.",
-    saturdayNote:'Optional Saturday surprise-genre sessions keep the training fresh and exciting. Come ready for whatever rhythm walks through the door.',
-    genres:['Hip Hop','Ballet','Amapiano','& more'],
-    journeyHeading:'Keep showing up.',
-    assessments:'Quarterly assessments help track development, while annual performances and prize giving give dancers a chance to celebrate their progress.',
-    company:'Selected dancers may also get the opportunity to perform with the professional Mophato Dance Theatre company.',
-    commitment:'Registration commits you to a minimum of three consecutive months to support consistent growth and development.',
-    groups:[
-      {label:'GROUP A · KIDS',title:'Ages 6–10',description:'Build confidence, creativity and a love for movement through contemporary and Afro fusion.',time:'TUE & THU · 14:30–15:30',price:'P400',period:'/ month'},
-      {label:'GROUP B · YOUTH',title:'Ages 11–15',description:'Build technique, expression and stage confidence through focused training.',time:'TUE & THU · 15:30–16:30',price:'P400',period:'/ month'},
-      {label:'ADULTS · ALL LEVELS',title:'Dance & Fitness',description:'Move with confidence, build your technique and keep your energy alive through contemporary and Afro fusion.',time:'TUE & THU · 17:30–19:00',price:'P550',period:'/ month'}
-    ]
-  },
-  contact:{
-    eyebrow:'Book Mophato',
-    heading:"Let's create unforgettable experiences together",
-    availability:'Available for festivals, workshops, corporate events and theatre productions.',
-    marketing:{label:'Marketing & Partnerships',phone:'+267 72345678',email:'steph@gmail.com'},
-    founder:{label:'Founder & Artistic Director',phone:'+267 75252777',email:'mophatodancetheatre@gmail.com'}
-  },
-  footer:{
-    brandName:'Mophato Dance Theatre',
-    copyright:'© 2026 Mophato Dance Theatre. All rights reserved.',
-    socials:{
-      facebook:'https://www.facebook.com/share/1HFWY7sgNZ/?mibextid=wwXIfr',
-      instagram:'https://www.instagram.com/mophatodance_theatre?igsh=MW45eTVkM3d0azI3OQ==',
-      tiktok:'https://www.tiktok.com/@mophatodancetheat?_r=1&_t=ZS-96cqFmmMBJo'
-    }
-  }
-};
-
-/* =========================
-   DATA LAYER
-   ========================= */
-
-function clone(value){
-  return JSON.parse(JSON.stringify(value));
-}
-
-function read(key, fallback){
+function demoRead() {
   try {
-    const value = localStorage.getItem(key);
-    return value ? JSON.parse(value) : clone(fallback);
+    return JSON.parse(localStorage.getItem(DEMO_KEY) || '{}');
   } catch {
-    return clone(fallback);
+    return {};
   }
 }
 
-function write(key, value){
-  localStorage.setItem(key, JSON.stringify(value));
+function demoWrite(data) {
+  localStorage.setItem(DEMO_KEY, JSON.stringify(data));
+  window.dispatchEvent(new StorageEvent('storage', {
+    key: DEMO_KEY,
+    newValue: JSON.stringify(data)
+  }));
 }
 
-function uid(prefix='id'){
-  return `${prefix}_${Date.now()}_${Math.random().toString(36).slice(2,8)}`;
+function demoMerge(base, update) {
+  if (!update || typeof update !== 'object') return base;
+  const result = Array.isArray(base) ? [...base] : {...base};
+  Object.keys(update).forEach(key => {
+    if (update[key] && typeof update[key] === 'object' && !Array.isArray(update[key])) {
+      result[key] = demoMerge(result[key] || {}, update[key]);
+    } else {
+      result[key] = update[key];
+    }
+  });
+  return result;
 }
 
-function msg(text){
-  const x = $('status');
-  x.textContent = text;
-  x.style.display = 'block';
-  clearTimeout(window.__statusTimer);
-  window.__statusTimer = setTimeout(() => x.style.display='none', 2200);
+function demoSaveContent(content) {
+  const current = demoRead();
+  current.content = demoMerge(current.content || {}, content);
+  demoWrite(current);
 }
 
-/* =========================
-   EVENTS
-   ========================= */
+function demoLoadContent() {
+  return demoRead().content || null;
+}
+
+function demoSaveCollection(name, records) {
+  const current = demoRead();
+  current[name] = records;
+  demoWrite(current);
+}
+
+function demoLoadCollection(name) {
+  return demoRead()[name] || [];
+}
+
+function demoReset() {
+  localStorage.removeItem(DEMO_KEY);
+  location.reload();
+}
+
+window.MophatoDemo = {
+  read: demoRead,
+  saveContent: demoSaveContent,
+  loadContent: demoLoadContent,
+  saveCollection: demoSaveCollection,
+  loadCollection: demoLoadCollection,
+  reset: demoReset
+};
+</script>
+
+<script>
+const defaults={
+hero:{
+eyebrow:'Rhythm. Heritage. Movement.',
+titleLine1:'Mophato',
+titleLine2:'Dance Theatre',
+description:"Botswana's internationally celebrated contemporary dance theatre company. Blending traditional African storytelling and powerful movement."
+},
+story:{
+eyebrow:'Our Story',
+heading:'Dance that carries the soul of Botswana',
+year:'2009',
+founder:'Founded by Andrew Letso Kola',
+paragraph1:"Mophato Dance Theatre has become one of Botswana's most influential contemporary dance companies.",
+paragraph2:'The company has performed internationally while celebrating Setswana storytelling traditions.',
+image:'a.jpg'
+},
+impact:{
+eyebrow:'Community Impact',
+heading:'Transforming lives through creativity',
+cards:[
+{number:'400+',text:'Youth empowered through workshops and mentorship.'},
+{number:'10+',text:'International collaborations and partnerships.'},
+{number:'35+',text:'Creative professionals involved in productions.'}
+]
+},
+classes:{
+eyebrow:'Find Your Rhythm',
+heading:'Move. Learn. <em>Become.</em>',
+intro:'Step into the Mophato Dance Theatre training space at University of Botswana. Our classes give young dancers and adults a place to build confidence, develop technique and grow through movement.',
+phone:'+267 76 956 517',
+cta:'Join the Classes',
+shirtNote:'Kids receive a once-off Mophato Dance Theatre T-shirt upon registration and payment of the first month.',
+saturdayHeading:"Never know what you'll dance next.",
+saturdayNote:'Optional Saturday surprise-genre sessions keep the training fresh and exciting. Come ready for whatever rhythm walks through the door.',
+genres:['Hip Hop','Ballet','Amapiano','& more'],
+journeyHeading:'Keep showing up.',
+assessments:'Quarterly assessments help track development, while annual performances and prize giving give dancers a chance to celebrate their progress.',
+company:'Selected dancers may also get the opportunity to perform with the professional Mophato Dance Theatre company.',
+commitment:'Registration commits you to a minimum of three consecutive months to support consistent growth and development.',
+groups:[
+{
+label:'GROUP A · KIDS',
+title:'Ages 6–10',
+description:'Build confidence, creativity and a love for movement through contemporary and Afro fusion.',
+time:'TUE & THU · 14:30–15:30',
+price:'P400',
+period:'/ month'
+},
+{
+label:'GROUP B · YOUTH',
+title:'Ages 11–15',
+description:'Build technique, expression and stage confidence through focused training.',
+time:'TUE & THU · 15:30–16:30',
+price:'P400',
+period:'/ month'
+},
+{
+label:'ADULTS · ALL LEVELS',
+title:'Dance & Fitness',
+description:'Move with confidence, build your technique and keep your energy alive through contemporary and Afro fusion.',
+time:'TUE & THU · 17:30–19:00',
+price:'P550',
+period:'/ month'
+}
+]
+},
+contact:{
+eyebrow:'Book Mophato',
+heading:"Let's create unforgettable experiences together",
+availability:'Available for festivals, workshops, corporate events and theatre productions.',
+marketing:{
+label:'Marketing & Partnerships',
+phone:'+267 72345678',
+email:'steph@gmail.com'
+},
+founder:{
+label:'Founder & Artistic Director',
+phone:'+267 75252777',
+email:'mophatodancetheatre@gmail.com'
+}
+},
+footer:{
+brandName:'Mophato Dance Theatre',
+copyright:'© 2026 Mophato Dance Theatre. All rights reserved.',
+socials:{
+facebook:'https://www.facebook.com/share/1HFWY7sgNZ/?mibextid=wwXIfr',
+instagram:'https://www.instagram.com/mophatodance_theatre?igsh=MW45eTVkM3d0azI3OQ==',
+tiktok:'https://www.tiktok.com/@mophatodancetheat?_r=1&_t=ZS-96cqFmmMBJo'
+}
+}
+};
+
+let db=null,auth=null;
+
+const $=id=>document.getElementById(id);
+
+function msg(t){
+const x=$('status');
+x.textContent=t;
+x.style.display='block';
+setTimeout(()=>x.style.display='none',2500)
+}
+
+function merge(a,b){
+return {...a,...b}
+}
+
+function configured(){
+return !!window.mdtFirestoreReady&&!!window.mdtDb
+}
+
+async function requireAdmin(){
+const user=auth&&auth.currentUser;
+
+if(!user)
+throw new Error('You must be signed in.');
+
+const adminDoc=await db.collection('admins').doc(user.uid).get();
+
+const data=adminDoc.exists?adminDoc.data():{};
+
+if(data.active!==true||data.role!=='admin')
+throw new Error('Administrator access is required.');
+
+return true
+}
 
 function ticketRow(t={
-  name:'General Admission',
-  description:'',
-  price:0,
-  id:uid('ticket')
+name:'General Admission',
+description:'',
+price:0,
+id:crypto.randomUUID?crypto.randomUUID():Date.now()+''
 }){
-  const d=document.createElement('div');
-  d.className='group ticket-row';
-  d.innerHTML=`
-    <div class="grid">
-      <div class="field">
-        <label>Name</label>
-        <input class="tn" value="${esc(t.name)}">
-      </div>
-      <div class="field">
-        <label>Price</label>
-        <input class="tp" type="number" min="0" value="${Number(t.price)||0}">
-      </div>
-    </div>
-    <div class="field">
-      <label>Description</label>
-      <input class="td" value="${esc(t.description||'')}">
-    </div>
-    <button type="button" class="btn danger remove-ticket">Remove</button>
-  `;
-  d.dataset.id=t.id||uid('ticket');
-  d.querySelector('.remove-ticket').onclick=()=>d.remove();
-  $('ticketTypes').appendChild(d);
+const d=document.createElement('div');
+
+d.className='group ticket-row';
+
+d.innerHTML=`
+<div class="grid">
+<div class="field">
+<label>Name</label>
+<input class="tn" value="${esc(t.name)}">
+</div>
+
+<div class="field">
+<label>Price</label>
+<input class="tp" type="number" value="${Number(t.price)||0}">
+</div>
+</div>
+
+<div class="field">
+<label>Description</label>
+<input class="td" value="${esc(t.description||'')}">
+</div>
+
+<button type="button" class="btn danger remove-ticket">Remove</button>
+`;
+
+d.dataset.id=t.id||Date.now()+'';
+
+d.querySelector('.remove-ticket').onclick=()=>d.remove();
+
+$('ticketTypes').appendChild(d)
 }
 
 function esc(v){
-  return String(v ?? '')
-    .replace(/&/g,'&amp;')
-    .replace(/</g,'&lt;')
-    .replace(/>/g,'&gt;')
-    .replace(/"/g,'&quot;');
+return String(v??'')
+.replace(/&/g,'&amp;')
+.replace(/</g,'&lt;')
+.replace(/>/g,'&gt;')
+.replace(/"/g,'&quot;')
 }
 
 function clearEvent(){
-  ['eventId','eventTitle','eventVenue','eventShowTime','eventDates','eventStart','eventEnd','eventSubtitle']
-    .forEach(x=>$(x).value='');
-  $('eventCurrency').value='BWP';
-  $('eventTickets').value='true';
-  $('ticketTypes').innerHTML='';
-  ticketRow();
+[
+'eventId',
+'eventTitle',
+'eventVenue',
+'eventShowTime',
+'eventDates',
+'eventStart',
+'eventEnd',
+'eventSubtitle'
+].forEach(x=>$(x).value='');
+
+$('eventCurrency').value='BWP';
+$('eventTickets').value='true';
+$('ticketTypes').innerHTML='';
+
+ticketRow()
 }
 
 function readEvent(){
-  return {
-    id:$('eventId').value || uid('event'),
-    title:$('eventTitle').value.trim(),
-    subtitle:$('eventSubtitle').value.trim(),
-    venue:$('eventVenue').value.trim(),
-    showTime:$('eventShowTime').value.trim(),
-    showDates:$('eventDates').value.split(',').map(x=>x.trim()).filter(Boolean),
-    startDateTime:$('eventStart').value,
-    endDateTime:$('eventEnd').value,
-    ticketsOnSale:$('eventTickets').value==='true',
-    currency:$('eventCurrency').value.trim()||'BWP',
-    ticketTypes:[...document.querySelectorAll('.ticket-row')].map(r=>({
-      id:r.dataset.id,
-      name:r.querySelector('.tn').value.trim(),
-      description:r.querySelector('.td').value.trim(),
-      price:Number(r.querySelector('.tp').value)||0
-    }))
-  };
+return {
+title:$('eventTitle').value.trim(),
+subtitle:$('eventSubtitle').value.trim(),
+venue:$('eventVenue').value.trim(),
+showTime:$('eventShowTime').value.trim(),
+showDates:$('eventDates').value
+.split(',')
+.map(x=>x.trim())
+.filter(Boolean),
+startDateTime:$('eventStart').value,
+endDateTime:$('eventEnd').value,
+ticketsOnSale:$('eventTickets').value==='true',
+currency:$('eventCurrency').value.trim()||'BWP',
+ticketTypes:[...document.querySelectorAll('.ticket-row')]
+.map(r=>({
+id:r.dataset.id,
+name:r.querySelector('.tn').value.trim(),
+description:r.querySelector('.td').value.trim(),
+price:Number(r.querySelector('.tp').value)||0
+}))
+}
 }
 
-function saveEvent(e){
-  e.preventDefault();
-  const data=readEvent();
-  const items=read(STORAGE.events,[]);
-  const index=items.findIndex(x=>x.id===data.id);
-  if(index>=0) items[index]=data;
-  else items.push(data);
-  write(STORAGE.events,items);
-  msg('Event saved locally');
-  clearEvent();
-  loadEvents();
+async function saveEvent(e){
+e.preventDefault();
+
+if(!configured())
+return msg('Configure Firebase first');
+
+try{
+await requireAdmin();
+}catch(err){
+return msg(err.message)
 }
 
-function loadEvents(){
-  const items=read(STORAGE.events,[]);
-  $('eventList').innerHTML=items.length ? items.map(x=>`
-    <div class="list-item">
-      <div>
-        <b>${esc(x.title)}</b>
-        <div class="meta">${esc(x.venue||'')} · ${esc((x.showDates||[]).join(', '))}</div>
-      </div>
-      <div class="row">
-        <button class="btn edit-event" data-id="${esc(x.id)}">Edit</button>
-        <button class="btn danger delete-event" data-id="${esc(x.id)}">Delete</button>
-      </div>
-    </div>
-  `).join('') : '<p class="meta">No events saved yet.</p>';
+const data=readEvent();
+const id=$('eventId').value;
 
-  document.querySelectorAll('.edit-event').forEach(b=>b.onclick=()=>editEvent(b.dataset.id));
-  document.querySelectorAll('.delete-event').forEach(b=>b.onclick=()=>{
-    if(confirm('Delete this event?')){
-      write(STORAGE.events,read(STORAGE.events,[]).filter(x=>x.id!==b.dataset.id));
-      loadEvents();
-      msg('Event deleted');
-    }
-  });
+if(id)
+await db.collection('events').doc(id).set(data,{merge:true});
+else
+await db.collection('events').add(data);
+
+msg('Event saved');
+clearEvent();
+loadEvents()
 }
 
-function editEvent(id){
-  const x=read(STORAGE.events,[]).find(x=>x.id===id);
-  if(!x) return;
-  $('eventId').value=x.id;
-  $('eventTitle').value=x.title||'';
-  $('eventSubtitle').value=x.subtitle||'';
-  $('eventVenue').value=x.venue||'';
-  $('eventShowTime').value=x.showTime||'';
-  $('eventDates').value=(x.showDates||[]).join(', ');
-  $('eventStart').value=x.startDateTime||'';
-  $('eventEnd').value=x.endDateTime||'';
-  $('eventCurrency').value=x.currency||'BWP';
-  $('eventTickets').value=String(x.ticketsOnSale!==false);
-  $('ticketTypes').innerHTML='';
-  (x.ticketTypes||[]).forEach(ticketRow);
-  document.querySelector('[data-tab="events"]').click();
-  window.scrollTo({top:0,behavior:'smooth'});
+async function loadEvents(){
+
+if(!configured())
+return;
+
+const snap=await db.collection('events').get();
+
+$('eventList').innerHTML=snap.empty
+?'<p class="meta">No events saved.</p>'
+:snap.docs.map(d=>{
+const x=d.data();
+
+return `
+<div class="list-item">
+<div>
+<b>${esc(x.title)}</b>
+<div class="meta">
+${esc(x.venue||'')} · ${esc((x.showDates||[]).join(', '))}
+</div>
+</div>
+
+<div class="row">
+<button class="btn edit-event" data-id="${d.id}">Edit</button>
+<button class="btn danger delete-event" data-id="${d.id}">Delete</button>
+</div>
+</div>
+`
+}).join('');
+
+document.querySelectorAll('.edit-event')
+.forEach(b=>b.onclick=()=>editEvent(b.dataset.id));
+
+document.querySelectorAll('.delete-event')
+.forEach(b=>b.onclick=async()=>{
+if(confirm('Delete this event?')){
+try{
+await requireAdmin();
+await db.collection('events').doc(b.dataset.id).delete();
+loadEvents()
+}catch(err){
+msg(err.message)
+}
+}
+})
 }
 
-/* =========================
-   PERFORMANCES
-   ========================= */
+async function editEvent(id){
+
+const d=await db.collection('events').doc(id).get();
+const x=d.data();
+
+$('eventId').value=id;
+$('eventTitle').value=x.title||'';
+$('eventSubtitle').value=x.subtitle||'';
+$('eventVenue').value=x.venue||'';
+$('eventShowTime').value=x.showTime||'';
+$('eventDates').value=(x.showDates||[]).join(', ');
+$('eventStart').value=x.startDateTime||'';
+$('eventEnd').value=x.endDateTime||'';
+$('eventCurrency').value=x.currency||'BWP';
+$('eventTickets').value=String(x.ticketsOnSale!==false);
+$('ticketTypes').innerHTML='';
+
+(x.ticketTypes||[]).forEach(ticketRow);
+
+window.scrollTo({
+top:0,
+behavior:'smooth'
+})
+}
 
 function clearPerf(){
-  ['perfId','perfTitle','perfSubtitle','perfImage'].forEach(x=>$(x).value='');
-  $('perfOrder').value=1;
+[
+'perfId',
+'perfTitle',
+'perfSubtitle',
+'perfImage'
+].forEach(x=>$(x).value='');
+
+$('perfOrder').value=1
 }
 
-function savePerf(e){
-  e.preventDefault();
-  const data={
-    id:$('perfId').value||uid('performance'),
-    title:$('perfTitle').value.trim(),
-    subtitle:$('perfSubtitle').value.trim(),
-    image:$('perfImage').value.trim(),
-    order:Number($('perfOrder').value)||1
-  };
-  const items=read(STORAGE.performances,[]);
-  const index=items.findIndex(x=>x.id===data.id);
-  if(index>=0) items[index]=data;
-  else items.push(data);
-  items.sort((a,b)=>(a.order||0)-(b.order||0));
-  write(STORAGE.performances,items);
-  msg('Performance saved locally');
-  clearPerf();
-  loadPerformances();
+async function savePerf(e){
+
+e.preventDefault();
+
+if(!configured())
+return msg('Configure Firebase first');
+
+try{
+await requireAdmin();
+}catch(err){
+return msg(err.message)
 }
 
-function loadPerformances(){
-  const items=read(STORAGE.performances,[]).sort((a,b)=>(a.order||0)-(b.order||0));
-  $('perfList').innerHTML=items.length ? items.map(x=>`
-    <div class="list-item">
-      <div>
-        <b>${esc(x.title)}</b>
-        <div class="meta">${esc(x.subtitle||'')}</div>
-      </div>
-      <div class="row">
-        <button class="btn edit-perf" data-id="${esc(x.id)}">Edit</button>
-        <button class="btn danger delete-perf" data-id="${esc(x.id)}">Delete</button>
-      </div>
-    </div>
-  `).join('') : '<p class="meta">No performances saved yet.</p>';
+const data={
+title:$('perfTitle').value.trim(),
+subtitle:$('perfSubtitle').value.trim(),
+image:$('perfImage').value.trim(),
+order:Number($('perfOrder').value)||1
+};
 
-  document.querySelectorAll('.edit-perf').forEach(b=>b.onclick=()=>editPerf(b.dataset.id));
-  document.querySelectorAll('.delete-perf').forEach(b=>b.onclick=()=>{
-    if(confirm('Delete this performance?')){
-      write(STORAGE.performances,read(STORAGE.performances,[]).filter(x=>x.id!==b.dataset.id));
-      loadPerformances();
-      msg('Performance deleted');
-    }
-  });
+const id=$('perfId').value;
+
+if(id)
+await db.collection('performances').doc(id).set(data,{merge:true});
+else
+await db.collection('performances').add(data);
+
+msg('Performance saved');
+clearPerf();
+loadPerformances()
 }
 
-function editPerf(id){
-  const x=read(STORAGE.performances,[]).find(x=>x.id===id);
-  if(!x) return;
-  $('perfId').value=x.id;
-  $('perfTitle').value=x.title||'';
-  $('perfSubtitle').value=x.subtitle||'';
-  $('perfImage').value=x.image||'';
-  $('perfOrder').value=x.order||1;
-  document.querySelector('[data-tab="performances"]').click();
-  window.scrollTo({top:0,behavior:'smooth'});
+async function loadPerformances(){
+
+if(!configured())
+return;
+
+const snap=await db
+.collection('performances')
+.orderBy('order')
+.get();
+
+$('perfList').innerHTML=snap.empty
+?'<p class="meta">No performances saved.</p>'
+:snap.docs.map(d=>{
+const x=d.data();
+
+return `
+<div class="list-item">
+<div>
+<b>${esc(x.title)}</b>
+<div class="meta">${esc(x.subtitle||'')}</div>
+</div>
+
+<div class="row">
+<button class="btn edit-perf" data-id="${d.id}">Edit</button>
+<button class="btn danger delete-perf" data-id="${d.id}">Delete</button>
+</div>
+</div>
+`
+}).join('');
+
+document.querySelectorAll('.edit-perf')
+.forEach(b=>b.onclick=()=>editPerf(b.dataset.id));
+
+document.querySelectorAll('.delete-perf')
+.forEach(b=>b.onclick=async()=>{
+if(confirm('Delete this performance?')){
+try{
+await requireAdmin();
+await db.collection('performances').doc(b.dataset.id).delete();
+loadPerformances()
+}catch(err){
+msg(err.message)
+}
+}
+})
 }
 
-/* =========================
-   SITE CONTENT
-   ========================= */
+async function editPerf(id){
 
-function set(id,value){
-  if($(id)) $(id).value=value ?? '';
+const d=await db.collection('performances').doc(id).get();
+const x=d.data();
+
+$('perfId').value=id;
+$('perfTitle').value=x.title||'';
+$('perfSubtitle').value=x.subtitle||'';
+$('perfImage').value=x.image||'';
+$('perfOrder').value=x.order||1;
+
+window.scrollTo({
+top:0,
+behavior:'smooth'
+})
 }
 
-function renderGroups(groups=[]){
-  $('classGroups').innerHTML=(groups||[]).map((g,i)=>`
-    <div class="group class-group" data-index="${i}">
-      <h4>Class Group ${i+1}</h4>
-      <div class="grid">
-        <div class="field"><label>Label</label><input class="glabel" value="${esc(g.label||'')}"></div>
-        <div class="field"><label>Title</label><input class="gtitle" value="${esc(g.title||'')}"></div>
-        <div class="field"><label>Time</label><input class="gtime" value="${esc(g.time||'')}"></div>
-        <div class="field"><label>Price</label><input class="gprice" value="${esc(g.price||'')}"></div>
-        <div class="field"><label>Period</label><input class="gperiod" value="${esc(g.period||'/ month')}"></div>
-      </div>
-      <div class="field"><label>Description</label><textarea class="gdesc">${esc(g.description||'')}</textarea></div>
-    </div>
-  `).join('');
-}
-
-function mergeDefaults(c){
-  c=c||{};
-  return {
-    ...clone(defaults), ...c,
-    hero:{...defaults.hero,...(c.hero||{})},
-    story:{...defaults.story,...(c.story||{})},
-    impact:{...defaults.impact,...(c.impact||{})},
-    classes:{...defaults.classes,...(c.classes||{})},
-    contact:{...defaults.contact,...(c.contact||{})},
-    footer:{...defaults.footer,...(c.footer||{})}
-  };
-}
-
-function populate(c){
-  c=mergeDefaults(c);
-
-  set('heroEyebrow',c.hero.eyebrow);
-  set('heroTitle1',c.hero.titleLine1);
-  set('heroTitle2',c.hero.titleLine2);
-  set('heroDescription',c.hero.description);
-
-  set('storyEyebrow',c.story.eyebrow);
-  set('storyHeading',c.story.heading);
-  set('storyYear',c.story.year);
-  set('storyFounder',c.story.founder);
-  set('storyP1',c.story.paragraph1);
-  set('storyP2',c.story.paragraph2);
-  set('storyImage',c.story.image);
-
-  set('impactEyebrow',c.impact.eyebrow);
-  set('impactHeading',c.impact.heading);
-  (c.impact.cards||[]).slice(0,3).forEach((x,i)=>{
-    set('impactN'+i,x.number);
-    set('impactT'+i,x.text);
-  });
-
-  set('classEyebrow',c.classes.eyebrow);
-  set('classHeading',c.classes.heading);
-  set('classIntro',c.classes.intro);
-  set('classPhone',c.classes.phone);
-  set('classCta',c.classes.cta);
-  set('shirtNote',c.classes.shirtNote);
-  set('satHeading',c.classes.saturdayHeading);
-  set('satNote',c.classes.saturdayNote);
-  set('journeyHeading',c.classes.journeyHeading);
-  set('assessments',c.classes.assessments);
-  set('companyText',c.classes.company);
-  set('commitment',c.classes.commitment);
-  set('genres',(c.classes.genres||[]).join(', '));
-  renderGroups(c.classes.groups);
-
-  set('contactEyebrow',c.contact.eyebrow);
-  set('contactHeading',c.contact.heading);
-  set('availability',c.contact.availability);
-  set('marketingLabel',c.contact.marketing?.label);
-  set('marketingPhone',c.contact.marketing?.phone);
-  set('marketingEmail',c.contact.marketing?.email);
-  set('founderLabel',c.contact.founder?.label);
-  set('founderPhone',c.contact.founder?.phone);
-  set('founderEmail',c.contact.founder?.email);
-
-  set('footerBrand',c.footer.brandName);
-  set('footerCopyright',c.footer.copyright);
-  set('facebook',c.footer.socials?.facebook);
-  set('instagram',c.footer.socials?.instagram);
-  set('tiktok',c.footer.socials?.tiktok);
+function set(id,v){
+$(id).value=v??''
 }
 
 function contentFromForm(){
-  const groups=[...document.querySelectorAll('.class-group')].map(g=>({
-    label:g.querySelector('.glabel')?.value.trim()||'',
-    title:g.querySelector('.gtitle')?.value.trim()||'',
-    time:g.querySelector('.gtime')?.value.trim()||'',
-    price:g.querySelector('.gprice')?.value.trim()||'',
-    period:g.querySelector('.gperiod')?.value.trim()||'/ month',
-    description:g.querySelector('.gdesc')?.value.trim()||''
-  }));
 
-  return {
-    hero:{
-      eyebrow:$('heroEyebrow').value.trim(),
-      titleLine1:$('heroTitle1').value.trim(),
-      titleLine2:$('heroTitle2').value.trim(),
-      description:$('heroDescription').value.trim()
-    },
-    story:{
-      eyebrow:$('storyEyebrow').value.trim(),
-      heading:$('storyHeading').value.trim(),
-      year:$('storyYear').value.trim(),
-      founder:$('storyFounder').value.trim(),
-      paragraph1:$('storyP1').value.trim(),
-      paragraph2:$('storyP2').value.trim(),
-      image:$('storyImage').value.trim()
-    },
-    impact:{
-      eyebrow:$('impactEyebrow').value.trim(),
-      heading:$('impactHeading').value.trim(),
-      cards:[0,1,2].map(i=>({
-        number:$('impactN'+i).value.trim(),
-        text:$('impactT'+i).value.trim()
-      }))
-    },
-    classes:{
-      eyebrow:$('classEyebrow').value.trim(),
-      heading:$('classHeading').value.trim(),
-      intro:$('classIntro').value.trim(),
-      phone:$('classPhone').value.trim(),
-      cta:$('classCta').value.trim(),
-      shirtNote:$('shirtNote').value.trim(),
-      saturdayHeading:$('satHeading').value.trim(),
-      saturdayNote:$('satNote').value.trim(),
-      genres:$('genres').value.split(',').map(x=>x.trim()).filter(Boolean),
-      journeyHeading:$('journeyHeading').value.trim(),
-      assessments:$('assessments').value.trim(),
-      company:$('companyText').value.trim(),
-      commitment:$('commitment').value.trim(),
-      groups
-    },
-    contact:{
-      eyebrow:$('contactEyebrow').value.trim(),
-      heading:$('contactHeading').value.trim(),
-      availability:$('availability').value.trim(),
-      marketing:{
-        label:$('marketingLabel').value.trim(),
-        phone:$('marketingPhone').value.trim(),
-        email:$('marketingEmail').value.trim()
-      },
-      founder:{
-        label:$('founderLabel').value.trim(),
-        phone:$('founderPhone').value.trim(),
-        email:$('founderEmail').value.trim()
-      }
-    },
-    footer:{
-      brandName:$('footerBrand').value.trim(),
-      copyright:$('footerCopyright').value.trim(),
-      socials:{
-        facebook:$('facebook').value.trim(),
-        instagram:$('instagram').value.trim(),
-        tiktok:$('tiktok').value.trim()
-      }
-    }
-  };
+const groups=[
+...document.querySelectorAll('.class-group')
+].map(g=>({
+label:g.querySelector('.gl').value,
+title:g.querySelector('.gt').value,
+description:g.querySelector('.gd').value,
+time:g.querySelector('.gtime').value,
+price:g.querySelector('.gprice').value,
+period:g.querySelector('.gperiod').value
+}));
+
+return {
+
+hero:{
+eyebrow:$('heroEyebrow').value,
+titleLine1:$('heroTitle1').value,
+titleLine2:$('heroTitle2').value,
+description:$('heroDescription').value
+},
+
+story:{
+eyebrow:$('storyEyebrow').value,
+heading:$('storyHeading').value,
+year:$('storyYear').value,
+founder:$('storyFounder').value,
+paragraph1:$('storyP1').value,
+paragraph2:$('storyP2').value,
+image:$('storyImage').value
+},
+
+impact:{
+eyebrow:$('impactEyebrow').value,
+heading:$('impactHeading').value,
+cards:[0,1,2].map(i=>({
+number:$('impactN'+i).value,
+text:$('impactT'+i).value
+}))
+},
+
+classes:{
+eyebrow:$('classEyebrow').value,
+heading:$('classHeading').value,
+intro:$('classIntro').value,
+phone:$('classPhone').value,
+cta:$('classCta').value,
+shirtNote:$('shirtNote').value,
+saturdayHeading:$('satHeading').value,
+saturdayNote:$('satNote').value,
+genres:$('genres').value
+.split(',')
+.map(x=>x.trim())
+.filter(Boolean),
+journeyHeading:$('journeyHeading').value,
+assessments:$('assessments').value,
+company:$('companyText').value,
+commitment:$('commitment').value,
+groups
+},
+
+contact:{
+eyebrow:$('contactEyebrow').value,
+heading:$('contactHeading').value,
+availability:$('availability').value,
+
+marketing:{
+label:$('marketingLabel').value,
+phone:$('marketingPhone').value,
+email:$('marketingEmail').value
+},
+
+founder:{
+label:$('founderLabel').value,
+phone:$('founderPhone').value,
+email:$('founderEmail').value
+}
+},
+
+footer:{
+brandName:$('footerBrand').value,
+copyright:$('footerCopyright').value,
+
+socials:{
+facebook:$('facebook').value,
+instagram:$('instagram').value,
+tiktok:$('tiktok').value
+}
 }
 
-function loadContent(){
-  populate(read(STORAGE.content,defaults));
+}
 }
 
-function saveContent(e){
-  e.preventDefault();
-  write(STORAGE.content,contentFromForm());
-  msg('Site content saved locally');
+function renderGroups(groups){
+
+$('classGroups').innerHTML=(groups||[])
+.map((g,i)=>`
+
+<div class="group class-group">
+
+<h4>Class Group ${i+1}</h4>
+
+<div class="grid">
+
+<div class="field">
+<label>Label</label>
+<input class="gl" value="${esc(g.label)}">
+</div>
+
+<div class="field">
+<label>Title</label>
+<input class="gt" value="${esc(g.title)}">
+</div>
+
+<div class="field">
+<label>Time</label>
+<input class="gtime" value="${esc(g.time)}">
+</div>
+
+<div class="field">
+<label>Price</label>
+<input class="gprice" value="${esc(g.price)}">
+</div>
+
+<div class="field">
+<label>Period</label>
+<input class="gperiod" value="${esc(g.period||'/ month')}">
+</div>
+
+</div>
+
+<div class="field">
+<label>Description</label>
+<textarea class="gd">${esc(g.description)}</textarea>
+</div>
+
+</div>
+
+`).join('')
 }
 
-/* =========================
-   RESET DEMO DATA
-   ========================= */
+function populate(c){
 
-function resetDemo(){
-  if(!confirm('Reset all local demo data to the original defaults?')) return;
-  localStorage.removeItem(STORAGE.content);
-  localStorage.removeItem(STORAGE.events);
-  localStorage.removeItem(STORAGE.performances);
-  loadContent();
-  loadEvents();
-  loadPerformances();
-  clearEvent();
-  clearPerf();
-  msg('Demo data reset');
-}
+c={...defaults,...c};
 
-/* =========================
-   INIT
-   ========================= */
+c.hero={
+...defaults.hero,
+...(c.hero||{})
+};
 
-$('eventForm').onsubmit=saveEvent;
-$('perfForm').onsubmit=savePerf;
-$('contentForm').onsubmit=saveContent;
-$('addTicket').onclick=()=>ticketRow();
-$('clearEvent').onclick=clearEvent;
-$('clearPerf').onclick=clearPerf;
-$('reloadContent').onclick=loadContent;
+c.story={
+...defaults.story,
+...(c.story||{})
+};
 
-document.querySelectorAll('.tab').forEach(t=>{
-  t.onclick=()=>{
-    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
-    document.querySelectorAll('.panel').forEach(x=>x.classList.remove('active'));
-    t.classList.add('active');
-    $(t.dataset.tab).classList.add('active');
-  };
+c.impact={
+...defaults.impact,
+...(c.impact||{})
+};
+
+c.classes={
+...defaults.classes,
+...(c.classes||{})
+};
+
+c.contact={
+...defaults.contact,
+...(c.contact||{})
+};
+
+c.footer={
+...defaults.footer,
+...(c.footer||{})
+};
+
+c.contact.marketing={
+...defaults.contact.marketing,
+...(c.contact.marketing||{})
+};
+
+c.contact.founder={
+...defaults.contact.founder,
+...(c.contact.founder||{})
+};
+
+[
+'heroEyebrow',
+'heroTitle1',
+'heroTitle2',
+'heroDescription'
+].forEach((id,i)=>
+set(id,[
+c.hero.eyebrow,
+c.hero.titleLine1,
+c.hero.titleLine2,
+c.hero.description
+][i])
+);
+
+[
+'storyEyebrow',
+'storyHeading',
+'storyYear',
+'storyFounder',
+'storyP1',
+'storyP2',
+'storyImage'
+].forEach((id,i)=>
+set(id,[
+c.story.eyebrow,
+c.story.heading,
+c.story.year,
+c.story.founder,
+c.story.paragraph1,
+c.story.paragraph2,
+c.story.image
+][i])
+);
+
+set('impactEyebrow',c.impact.eyebrow);
+set('impactHeading',c.impact.heading);
+
+(c.impact.cards||[])
+.slice(0,3)
+.forEach((x,i)=>{
+set('impactN'+i,x.number);
+set('impactT'+i,x.text)
 });
 
-const header=document.querySelector('header');
-let last=scrollY;
-window.addEventListener('scroll',()=>{
-  const y=scrollY;
-  header?.classList.toggle('nav-hidden',y>last&&y>80);
-  if(y<=10) header?.classList.remove('nav-hidden');
-  last=y;
-},{passive:true});
+set('classEyebrow',c.classes.eyebrow);
+set('classHeading',c.classes.heading);
+set('classIntro',c.classes.intro);
+set('classPhone',c.classes.phone);
+set('classCta',c.classes.cta);
+set('shirtNote',c.classes.shirtNote);
+set('satHeading',c.classes.saturdayHeading);
+set('satNote',c.classes.saturdayNote);
+set('journeyHeading',c.classes.journeyHeading);
+set('assessments',c.classes.assessments);
+set('companyText',c.classes.company);
+set('commitment',c.classes.commitment);
+set('genres',(c.classes.genres||[]).join(', '));
 
-const notice=document.querySelector('header')?.nextElementSibling?.querySelector('.notice');
-if(notice){
-  notice.innerHTML='<b>Demo Mode:</b> No password is required. Changes are stored in this browser only. This portal is ready to be connected to Supabase next.';
+renderGroups(c.classes.groups);
+
+set('contactEyebrow',c.contact.eyebrow);
+set('contactHeading',c.contact.heading);
+set('availability',c.contact.availability);
+
+set('marketingLabel',c.contact.marketing.label);
+set('marketingPhone',c.contact.marketing.phone);
+set('marketingEmail',c.contact.marketing.email);
+
+set('founderLabel',c.contact.founder.label);
+set('founderPhone',c.contact.founder.phone);
+set('founderEmail',c.contact.founder.email);
+
+set('footerBrand',c.footer.brandName);
+set('footerCopyright',c.footer.copyright);
+set('facebook',c.footer.socials?.facebook);
+set('instagram',c.footer.socials?.instagram);
+set('tiktok',c.footer.socials?.tiktok)
 }
 
-clearEvent();
-clearPerf();
-loadContent();
-loadEvents();
-loadPerformances();
+async function loadContent(){
+
+if(!configured())
+return populate(defaults);
+
+const d=await db
+.collection('siteContent')
+.doc('main')
+.get();
+
+populate(
+d.exists
+?merge(defaults,d.data())
+:defaults
+)
+}
+
+async function saveContent(e){
+
+e.preventDefault();
+
+if(!configured())
+return msg('Configure Firebase first');
+
+try{
+await requireAdmin();
+}catch(err){
+return msg(err.message)
+}
+
+const data=contentFromForm();
+
+await db
+.collection('siteContent')
+.doc('main')
+.set(data,{merge:true});
+
+msg('Site content saved')
+}
+
+function init(){
+  const loginView = document.getElementById('loginView');
+  const app = document.getElementById('app');
+  if (loginView) loginView.classList.add('hidden');
+  if (app) app.classList.remove('hidden');
+
+  // Load any previously saved demo content.
+  const saved = window.MophatoDemo.loadContent();
+  if (saved && typeof populate === 'function') {
+    populate(saved);
+  }
+
+  Promise.resolve()
+    .then(() => typeof loadEvents === 'function' ? loadEvents() : null)
+    .then(() => typeof loadPerformances === 'function' ? loadPerformances() : null)
+    .then(() => typeof loadContent === 'function' ? loadContent() : null)
+    .catch(err => console.error(err));
+}
+
+if (typeof auth !== 'undefined') auth = null;
+if (typeof db !== 'undefined') db = null;
+
+if (typeof saveContent === 'function') {
+  const originalSaveContent = saveContent;
+  saveContent = async function(e) {
+    e.preventDefault();
+    const data = contentFromForm();
+    delete data.footer;
+    window.MophatoDemo.saveContent(data);
+    if (typeof msg === 'function') msg('Site content saved to demo storage');
+    return data;
+  };
+}
+
+init();
 </script>
 
 </body>
